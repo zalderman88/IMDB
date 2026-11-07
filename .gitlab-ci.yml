@@ -39,7 +39,7 @@ build:
     - python tests/test_tmdb_au.py
     - |
       if [ "$CI_PIPELINE_SOURCE" = "schedule" ] || [ "$CI_PIPELINE_SOURCE" = "web" ]; then FORCE=--force; else FORCE=; fi
-      python tools/fetch_tmdb_au.py --max-lookups 20000 $FORCE
+      python tools/fetch_tmdb_au.py --max-lookups 40000 $FORCE
     - python rebuild.py
     - python tools/check_refresh.py
     - node tests/verify_movie_finder.mjs
