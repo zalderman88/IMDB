@@ -164,7 +164,7 @@ def main():
             old = json.loads(out.read_text())
         except ValueError:
             old = {}
-    if old.get('fetchedAtUnix') and not a.force and (time.time() - old['fetchedAtUnix']) / 86400 < a.max_age_days:
+    if old.get('fetchedAtUnix') and old.get('complete') and not a.force and (time.time() - old['fetchedAtUnix']) / 86400 < a.max_age_days:
         print(f"tmdb-au: cached sweep is {(time.time() - old['fetchedAtUnix']) / 86400:.1f} days old, not fetching")
         return
     key = os.environ.get('TMDB_API_KEY', '').strip()

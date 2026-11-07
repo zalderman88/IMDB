@@ -21,6 +21,7 @@ build:
   cache:
     key: new-on-streaming
     paths: [cache/]
+    when: always  # keep sweep progress even if a later step fails
   script:
     - apt-get update -qq && apt-get install -y -qq nodejs >/dev/null && node --version
     - mkdir -p /tmp/imdb

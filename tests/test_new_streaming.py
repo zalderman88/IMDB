@@ -95,14 +95,14 @@ def main():
     base = f'http://127.0.0.1:{srv.server_address[1]}/v4'
     with tempfile.TemporaryDirectory() as tmp:
         tmp = pathlib.Path(tmp)
-        env = {k: v for k, v in os.environ.items() if k not in ('STREAMING_AVAILABILITY_API_KEY', 'RAPIDAPI_KEY')}
+        env = {k: v for k, v in os.environ.items() if k not in ('STREAMING_AVAILABILITY_API_KEY', 'RAPIDAPI_KEY', 'TMDB_API_KEY')}
         env['NO_PROXY'] = env['no_proxy'] = '127.0.0.1'
         cache, page = tmp / 'new.json', tmp / 'new.html'
 
         # 1. No key: skip quietly, page says not set up.
         out = run(['tools/fetch_new_streaming.py', '--out', str(cache)], env)
         assert 'no STREAMING_AVAILABILITY_API_KEY' in out and not cache.exists()
-        run(['tools/build_new_streaming.py', '--data', str(cache), '--out', str(page)], env)
+        run(['tools/build_new_streaming.py', '--data', str(cache), '--tmdb', str(tmp / 'no-tmdb.json'), '--out', str(page)], env)
         assert '"state":"no-key"' in page.read_text()
 
         # 2. With key: fetch both item types, follow the cursor, keep subscription only.
@@ -132,7 +132,7 @@ def main():
         ratings = tmp / 'r.tsv.gz'
         with gzip.open(ratings, 'wt') as f:
             f.write('tconst\taverageRating\tnumVotes\ntt1000001\t7.8\t12345\ntt1000003\t6.1\t900\n')
-        out = run(['tools/build_new_streaming.py', '--data', str(cache), '--ratings', str(ratings), '--out', str(page)], env)
+        out = run(['tools/build_new_streaming.py', '--data', str(cache), '--tmdb', str(tmp / 'no-tmdb.json'), '--ratings', str(ratings), '--out', str(page)], env)
         html = page.read_text()
         rows = json.loads(html.split('<script id="catalogue" type="application/json">')[1].split('</script>')[0])
         by = {r[0]: r for r in rows}
