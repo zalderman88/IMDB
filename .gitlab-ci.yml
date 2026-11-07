@@ -63,6 +63,9 @@ build:
         https://www.netflix.com/tudum/top10/data/all-weeks-countries.tsv || rm -f /tmp/netflix_top10.tsv
       NF=; [ -s /tmp/netflix_top10.tsv ] && NF="--netflix-tsv /tmp/netflix_top10.tsv"
       python tools/build_top20.py --basics /tmp/imdb/title.basics.tsv.gz --ratings /tmp/imdb/title.ratings.tsv.gz $NF $FORCE
+    # Coming soon: upcoming movies, new shows and new seasons in AU (TMDB, same TMDB_API_KEY, ~500 requests).
+    - python tests/test_coming_soon.py
+    - python tools/build_coming_soon.py --ratings /tmp/imdb/title.ratings.tsv.gz
     - mkdir -p _site
     # Posters and synopses: TMDB if the masked CI/CD variable TMDB_API_KEY is set, then Wikipedia and TVmaze.
     - python tests/test_posters.py
@@ -72,6 +75,7 @@ build:
     - cp ForYou_Android.html _site/foryou.html
     - cp New_Streaming_Android.html _site/new.html
     - cp Top20_Android.html _site/top20.html
+    - cp Coming_Soon_Android.html _site/coming.html
     # Watch list + Notifications pages: no data, the list is saved in each browser (site/watchlist.js).
     - python tests/test_watchlist.py
     - python tools/build_watchlist.py --out _site/watchlist.html --notifications-out _site/notifications.html

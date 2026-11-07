@@ -1,4 +1,4 @@
-/* Watch list: a "Watch list" tick on every title (Movies, TV, For you, New, Top 20) and the
+/* Watch list: a "Watch list" tick on every title (Movies, TV, For you, New, Coming soon, Top 20) and the
    watchlist.html page that shows what you ticked. Saved in this browser only (localStorage
    'watchlist-v1'), like the other settings, so each phone or browser has its own list.
    Loaded with <script src="watchlist.js" defer> on every page. Rows are found the same way
@@ -153,7 +153,7 @@
   // Rotten Tomatoes: Movies rows have Tomatometer/Popcornmeter blocks with review-page links; For you shows "RT 94%".
   function rtOf(li) {
     var out = {};
-    function pct(sel) { var s = li.querySelector(sel); var v = s && parseInt(s.textContent.replace(/[^0-9]/g, ''), 10); return v >= 0 && v <= 100 && /\d/.test(s.textContent) ? v : null; }
+    function pct(sel) { var s = li.querySelector(sel); var v = s && parseInt(s.textContent.replace(/[^0-9]/g, ''), 10); return s && v >= 0 && v <= 100 && /\d/.test(s.textContent) ? v : null; }
     var c = pct('.score.critics strong'); if (c == null) c = pct('.scores .rt');
     var a = pct('.score.audience strong');
     if (c != null) out.critics = c;
@@ -179,6 +179,8 @@
     var g = genresOf(li); if (g.length) it.genres = g;
     var rt = rtOf(li); for (var k in rt) it[k] = rt[k];
     var p = posterOf(li); if (p) it.poster = p;
+    // From the Coming soon page: remember the arrival date and services so the watch list can show them.
+    if (/^\d{4}-\d{2}-\d{2}$/.test(li.dataset.soon || '')) { it.soon = li.dataset.soon; if (li.dataset.where) it.where = li.dataset.where; }
     var page = location.pathname.split('/').pop() || 'index.html';
     if (page !== 'watchlist.html') it.from = page;
     return it;
