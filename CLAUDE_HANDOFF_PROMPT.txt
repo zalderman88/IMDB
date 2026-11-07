@@ -1,0 +1,11 @@
+Read README.md, CLAUDE.md, USER_REQUIREMENTS.md, ARCHITECTURE.md, DATA_SOURCES_AND_LIMITS.md, REFRESH_GUIDE.md and AUTOMATION.md in this ZIP. This is an existing working project, not a request to recreate it from scratch.
+
+First run `python rebuild.py --verify` if your environment supports Python and Node. Inspect the result and summarize the architecture and the source-data limitations briefly. If execution is unavailable, say so and inspect the files without claiming tests passed.
+
+Preserve every existing feature. The latest country default is exactly "Exclude India · allow unknown countries", both on fresh opens and Reset filters. The new original-language filter offers All languages (default), English, Foreign language and Unknown, based on recorded original-language facts rather than inferred country or dubbing availability.
+
+Keep the Android-friendly detailed list, independent OR score routes and minimum vote/review counts, genuine review links/badges, the seven AU subscription services, year range, Australian classification selection, grouped major genres and visible Reset button. Never guess unavailable ratings, counts, classifications or languages.
+
+The catalogues are incomplete, especially RT review-count coverage. Keep that disclosure and respect access limits. Do not run a new live scrape, deploy a website, create a GitHub repository, modify the existing ChatGPT automation or create a duplicate schedule unless I ask for that work.
+
+The existing monthly task remains in ChatGPT. Its exported reference does not create a task in Claude. These filter changes must not add movies or change scores/counts. Keep the global 1,000 IMDb-vote floor. Use the catalogue lock to check this. After validating the handover, continue with my next requested change.

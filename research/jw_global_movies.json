@@ -1,0 +1,369 @@
+{
+  "scope": "JustWatch AU movie catalogue, all rating levels and all services, release years 1800–2026",
+  "complete": false,
+  "leaves": [
+    {
+      "min": 1800,
+      "max": 1913,
+      "expected": 8,
+      "retrieved": 8,
+      "pages": 1,
+      "complete": true
+    },
+    {
+      "min": 1943,
+      "max": 1949,
+      "expected": 460,
+      "retrieved": 460,
+      "pages": 5,
+      "complete": true
+    },
+    {
+      "min": 1914,
+      "max": 1942,
+      "expected": 1006,
+      "retrieved": 1006,
+      "pages": 11,
+      "complete": true
+    },
+    {
+      "min": 1957,
+      "max": 1963,
+      "expected": 923,
+      "retrieved": 923,
+      "pages": 10,
+      "complete": true
+    },
+    {
+      "min": 1950,
+      "max": 1956,
+      "expected": 763,
+      "retrieved": 763,
+      "pages": 8,
+      "complete": true
+    },
+    {
+      "min": 1968,
+      "max": 1970,
+      "expected": 603,
+      "retrieved": 603,
+      "pages": 7,
+      "complete": true
+    },
+    {
+      "min": 1964,
+      "max": 1967,
+      "expected": 672,
+      "retrieved": 672,
+      "pages": 7,
+      "complete": true
+    },
+    {
+      "min": 1975,
+      "max": 1977,
+      "expected": 709,
+      "retrieved": 709,
+      "pages": 8,
+      "complete": true
+    },
+    {
+      "min": 1978,
+      "max": 1981,
+      "expected": 1041,
+      "retrieved": 1041,
+      "pages": 11,
+      "complete": true
+    },
+    {
+      "min": 1982,
+      "max": 1984,
+      "expected": 843,
+      "retrieved": 843,
+      "pages": 9,
+      "complete": true
+    },
+    {
+      "min": 1971,
+      "max": 1974,
+      "expected": 1015,
+      "retrieved": 1015,
+      "pages": 11,
+      "complete": true
+    },
+    {
+      "min": 1985,
+      "max": 1986,
+      "expected": 672,
+      "retrieved": 672,
+      "pages": 7,
+      "complete": true
+    },
+    {
+      "min": 2005,
+      "max": 2005,
+      "expected": 839,
+      "retrieved": 839,
+      "pages": 9,
+      "complete": true
+    },
+    {
+      "min": 1987,
+      "max": 1988,
+      "expected": 757,
+      "retrieved": 757,
+      "pages": 8,
+      "complete": true
+    },
+    {
+      "min": 1991,
+      "max": 1991,
+      "expected": 403,
+      "retrieved": 403,
+      "pages": 5,
+      "complete": true
+    },
+    {
+      "min": 1989,
+      "max": 1990,
+      "expected": 736,
+      "retrieved": 736,
+      "pages": 8,
+      "complete": true
+    },
+    {
+      "min": 1998,
+      "max": 1998,
+      "expected": 531,
+      "retrieved": 531,
+      "pages": 6,
+      "complete": true
+    },
+    {
+      "min": 1996,
+      "max": 1997,
+      "expected": 999,
+      "retrieved": 999,
+      "pages": 10,
+      "complete": true
+    },
+    {
+      "min": 1992,
+      "max": 1993,
+      "expected": 791,
+      "retrieved": 791,
+      "pages": 8,
+      "complete": true
+    },
+    {
+      "min": 1994,
+      "max": 1995,
+      "expected": 906,
+      "retrieved": 906,
+      "pages": 10,
+      "complete": true
+    },
+    {
+      "min": 2001,
+      "max": 2001,
+      "expected": 613,
+      "retrieved": 613,
+      "pages": 7,
+      "complete": true
+    },
+    {
+      "min": 2006,
+      "max": 2006,
+      "expected": 1023,
+      "retrieved": 1023,
+      "pages": 11,
+      "complete": true
+    },
+    {
+      "min": 2007,
+      "max": 2007,
+      "expected": 1041,
+      "retrieved": 1041,
+      "pages": 11,
+      "complete": true
+    },
+    {
+      "min": 2002,
+      "max": 2002,
+      "expected": 685,
+      "retrieved": 685,
+      "pages": 7,
+      "complete": true
+    },
+    {
+      "min": 2010,
+      "max": 2010,
+      "expected": 1423,
+      "retrieved": 1423,
+      "pages": 15,
+      "complete": true
+    },
+    {
+      "min": 2011,
+      "max": 2011,
+      "expected": 1637,
+      "retrieved": 1637,
+      "pages": 17,
+      "complete": true
+    },
+    {
+      "min": 2000,
+      "max": 2000,
+      "expected": 570,
+      "retrieved": 570,
+      "pages": 6,
+      "complete": true
+    },
+    {
+      "min": 1999,
+      "max": 1999,
+      "expected": 564,
+      "retrieved": 564,
+      "pages": 6,
+      "complete": true
+    },
+    {
+      "min": 2003,
+      "max": 2003,
+      "expected": 708,
+      "retrieved": 708,
+      "pages": 8,
+      "complete": true
+    },
+    {
+      "min": 2004,
+      "max": 2004,
+      "expected": 763,
+      "retrieved": 763,
+      "pages": 8,
+      "complete": true
+    },
+    {
+      "min": 2008,
+      "max": 2008,
+      "expected": 1209,
+      "retrieved": 1209,
+      "pages": 13,
+      "complete": true
+    },
+    {
+      "min": 2009,
+      "max": 2009,
+      "expected": 1358,
+      "retrieved": 1358,
+      "pages": 14,
+      "complete": true
+    }
+  ],
+  "errors": [
+    {
+      "range": [
+        2012,
+        2012
+      ],
+      "error": "Pagination stalled for 2012-2012"
+    },
+    {
+      "range": [
+        2026,
+        2026
+      ],
+      "error": "Pagination stalled for 2026-2026"
+    },
+    {
+      "range": [
+        2019,
+        2019
+      ],
+      "error": "Pagination stalled for 2019-2019"
+    },
+    {
+      "range": [
+        2020,
+        2020
+      ],
+      "error": "Pagination stalled for 2020-2020"
+    },
+    {
+      "range": [
+        2021,
+        2021
+      ],
+      "error": "Pagination stalled for 2021-2021"
+    },
+    {
+      "range": [
+        2024,
+        2024
+      ],
+      "error": "Pagination stalled for 2024-2024"
+    },
+    {
+      "range": [
+        2025,
+        2025
+      ],
+      "error": "Pagination stalled for 2025-2025"
+    },
+    {
+      "range": [
+        2022,
+        2022
+      ],
+      "error": "Pagination stalled for 2022-2022"
+    },
+    {
+      "range": [
+        2023,
+        2023
+      ],
+      "error": "Pagination stalled for 2023-2023"
+    },
+    {
+      "range": [
+        2013,
+        2013
+      ],
+      "error": "Pagination stalled for 2013-2013"
+    },
+    {
+      "range": [
+        2014,
+        2014
+      ],
+      "error": "Pagination stalled for 2014-2014"
+    },
+    {
+      "range": [
+        2015,
+        2015
+      ],
+      "error": "Pagination stalled for 2015-2015"
+    },
+    {
+      "range": [
+        2016,
+        2016
+      ],
+      "error": "Pagination stalled for 2016-2016"
+    },
+    {
+      "range": [
+        2017,
+        2017
+      ],
+      "error": "Pagination stalled for 2017-2017"
+    },
+    {
+      "range": [
+        2018,
+        2018
+      ],
+      "error": "Pagination stalled for 2018-2018"
+    }
+  ]
+}

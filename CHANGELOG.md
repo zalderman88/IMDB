@@ -1,0 +1,12 @@
+# Work completed
+
+1. Started with AU Netflix/Prime Video/Paramount+/Stan movies rated IMDb 6.5+, excluding romance, horror, documentary and Indian productions.
+2. Created a searchable HTML and spreadsheet; adapted the HTML for Android, then changed tile cards to detailed list rows.
+3. Added the 0.1 IMDb slider, later lowered the floor to 6.0, and imposed the 1,000-vote minimum. Added review links, sort orders and multi-genre include/exclude controls.
+4. Imported the eligible global IMDb movie subset and partial RT search/checked-scorecard data. Added independent IMDb/Tomatometer/Popcornmeter OR routes, sample-count minimums, source badges and genuine review links. RT data coverage could not be completed because of result caps and film-page access limits.
+5. Added Disney+, HBO Max and Apple TV subscription; AU-only subscription offers; release-year range; Australian classifications; 16 grouped major genres; visible Reset; saved preferences; theme and CSV export.
+6. Created the monthly ChatGPT refresh task. It updates the original saved artifact, not downloaded copies.
+7. Before this export, changed the country default to **Exclude India · allow unknown countries** on fresh opens and Reset, and updated the task instructions to preserve it.
+8. Added original-language filtering: All languages, English, Foreign language and Unknown, backed by IMDb-ID-matched Wikidata language facts. Updated the monthly task instructions as well.
+9. Exported this working app, normalized source snapshots, source code, portable rebuild entry point, functional checks, reference screenshot and Claude handover documentation. Omitted unrelated workspace files, redundant raw caches, browser/session material and private file-transfer helpers.
+10. Published to GitHub (zalderman88/IMDB) with GitHub Pages. Added a twice-weekly GitHub Actions refresh of IMDb ratings/votes from the official datasets, refresh checks, and a site notice showing separate IMDb and streaming/RT dates. UI, filters and defaults unchanged.

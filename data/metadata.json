@@ -1,0 +1,88 @@
+{
+  "checked": "7 November 2026",
+  "checkedISO": "2026-11-07",
+  "total": 37844,
+  "defaultResults": 21890,
+  "defaultCountryFilter": "exclude",
+  "imdbMovieRecordsImported": 56562,
+  "imdbBulkQualified": 37287,
+  "justWatchRecords": 57065,
+  "rtSearchRecords": 91057,
+  "rtReviewCountsChecked": 395,
+  "rtCheckedInFinal": 394,
+  "rtReviewCountCoverageComplete": false,
+  "rtSearchCoverageComplete": false,
+  "knownAustralianClassifications": 17935,
+  "classificationCounts": {
+    "PG": 3594,
+    "M": 7129,
+    "MA15+": 4059,
+    "G": 1847,
+    "R18+": 1301,
+    "X18+": 6
+  },
+  "languageCounts": {
+    "unknown": 4749,
+    "english": 18988,
+    "foreign": 14107
+  },
+  "rtOnlyQualifiers": 1,
+  "ambiguousMatchesSkipped": 1318,
+  "sourceCounts": {
+    "nfx": 1000,
+    "prv": 1172,
+    "pmp": 203,
+    "stn": 726,
+    "dnp": 695,
+    "mxx": 294,
+    "atp": 57
+  },
+  "coverageText": "IMDb bulk data was checked across 56,562 movie/short records with at least 1,000 votes. 57,065 JustWatch Australia movie records and 91,057 RT search records were processed. Review counts were confirmed for 395 RT film pages before access limits interrupted further checks. Unconfirmed RT counts cannot qualify a movie. The default exclusions show 21,890 movies; the file contains 37,844 qualifying records before genre and country filters.",
+  "coverageRows": [
+    [
+      "IMDb movie/short records imported (1,000+ votes)",
+      56562
+    ],
+    [
+      "IMDb records meeting 6.0+ (all countries/genres)",
+      37287
+    ],
+    [
+      "JustWatch AU movie records processed",
+      57065
+    ],
+    [
+      "Rotten Tomatoes search records processed",
+      91057
+    ],
+    [
+      "RT film pages with confirmed counts",
+      395
+    ],
+    [
+      "RT count-checked titles in this file",
+      394
+    ],
+    [
+      "Films with an Australian classification",
+      17935
+    ],
+    [
+      "Qualifying records in this file",
+      37844
+    ],
+    [
+      "Results with your default genre/country exclusions",
+      21890
+    ]
+  ],
+  "refresh": {
+    "id": "Automation_4790569883f48191aa48fb16bd8e6ccc",
+    "is_enabled": true,
+    "schedule": "BEGIN:VEVENT\nDTSTART;TZID=Australia/Perth:20261201T090000\nRRULE:FREQ=MONTHLY;BYMONTHDAY=1;BYHOUR=9;BYMINUTE=0;BYSECOND=0\nEND:VEVENT",
+    "timing_mode": "flexible_schedule",
+    "timezone": "Australia/Perth",
+    "firstScheduledDate": "1 December 2026",
+    "description": "1st of each month, around 9:00 am Perth time"
+  }
+}

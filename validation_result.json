@@ -1,0 +1,66 @@
+{
+  "status": "passed",
+  "offlinePortableRebuild": true,
+  "buildFromDifferentDirectoryWithSpaces": true,
+  "catalogueLock": {
+    "catalogueLock": "passed",
+    "films": 37844,
+    "minimumIMDbVotes": 1000
+  },
+  "functionalChecks": {
+    "records": 37844,
+    "defaultResults": 21890,
+    "rtReviewCountsChecked": 395,
+    "rtOnlyQualifiers": 1,
+    "services": {
+      "nfx": 1000,
+      "prv": 1172,
+      "pmp": 203,
+      "stn": 726,
+      "dnp": 695,
+      "mxx": 294,
+      "atp": 57
+    },
+    "checks": [
+      "Independent OR scores",
+      "Minimum vote/review boundary cases",
+      "Unverified RT counts rejected",
+      "123 slider positions",
+      "All adjustable review-count options",
+      "Seven Australian services",
+      "Year range and crossing handles",
+      "Sixteen major genres; compound-genre grouping and exclusions",
+      "Australian classification multiselect; Unknown separate",
+      "Country default allows unknown; reset preserved",
+      "Original-language filters: English, foreign, unknown, all",
+      "Search and empty state",
+      "Thirteen sorting choices; nulls last",
+      "Pagination",
+      "IMDb and RT review links",
+      "Saved filters, reset, theme and CSV export"
+    ],
+    "status": "passed"
+  },
+  "pythonSourcesCompile": true,
+  "sameCompleteMovieDataAfterRebuild": true,
+  "byteIdenticalHTML": true,
+  "filterOnlyIntegrity": {
+    "baselineLibraryVersion": 3,
+    "baselineSHA256": "80aca4e91ebf577103c27ba9a7d2761b4c7f8d28487bbb6e31bd458d7d0eea7b",
+    "baselineFilmCount": 37844,
+    "exportFilmCount": 37844,
+    "addedFilms": 0,
+    "removedFilms": 0,
+    "existingFilmFactsChanged": 0,
+    "minimumIMDbVotes": 1000,
+    "onlyMovieFieldsAdded": [
+      "languageGroup",
+      "languageLabels",
+      "languageSourceUrl"
+    ],
+    "verified": true
+  },
+  "durationSeconds": 29.28,
+  "browserRenderTested": false,
+  "note": "Node VM/DOM functional checks passed; no full Android/pixel render is claimed. RT coverage remains partial."
+}

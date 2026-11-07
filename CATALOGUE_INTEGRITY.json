@@ -1,0 +1,16 @@
+{
+  "baselineLibraryVersion": 3,
+  "baselineSHA256": "80aca4e91ebf577103c27ba9a7d2761b4c7f8d28487bbb6e31bd458d7d0eea7b",
+  "baselineFilmCount": 37844,
+  "exportFilmCount": 37844,
+  "addedFilms": 0,
+  "removedFilms": 0,
+  "existingFilmFactsChanged": 0,
+  "minimumIMDbVotes": 1000,
+  "onlyMovieFieldsAdded": [
+    "languageGroup",
+    "languageLabels",
+    "languageSourceUrl"
+  ],
+  "verified": true
+}

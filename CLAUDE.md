@@ -1,0 +1,13 @@
+# Project instructions
+
+This is the user's personal Australian-account movie finder. Source files and source snapshots are included so the app can be changed and rebuilt without losing its data or filters.
+
+1. Preserve the working detailed-list UI and offline browser operation. Do not replace the project with a small demonstration catalogue.
+2. Country defaults to `exclude`: exclude known Indian productions, allow unknown countries. Reset must restore this exact default. Strict known-country checking remains optional.
+3. Language defaults to `all`; explicit English/Foreign/Unknown filters use recorded original-language facts. Unknown is not Foreign. See USER_REQUIREMENTS.md for multilingual semantics.
+4. Scores use OR within the existing catalogue. Every film must have at least 1,000 IMDb votes. RT score paths also need their own confirmed sample counts. Do not apply the IMDb score minimum to an independently qualified RT path. During filter/UI work, preserve all existing film IDs and rating/count values; verify the catalogue lock. Process large JSON snapshots with code rather than loading them into the conversation context.
+5. No fabricated scores, review counts, certification badges, direct review links, classifications or language facts. Keep last-check dates and coverage limitations visible.
+6. Use the source template and data-fusion script, then rebuild and run the checks. Inspect actual browser/mobile layout when browser execution is available; the included Node harness is functional verification, not a full rendering test.
+7. Live harvest scripts are tools for an explicit refresh. Do not run them simply to inspect this export. Stop new RT film-page requests immediately on HTTP 403 or 429; never change channels to evade a restriction.
+8. The user asked (7 Nov 2026) for this to be published at github.com/zalderman88/IMDB with GitHub Pages and a twice-weekly IMDb refresh via GitHub Actions; see AUTOMATION.md. The old ChatGPT task identifiers are references only. Do not add further schedules or scrape JustWatch/RT unattended without the user asking.
+9. Keep the snapshot date unchanged for an offline/UI-only rebuild. Advance source dates only when the relevant sources actually refreshed. Do not label retained old RT facts as newly checked.

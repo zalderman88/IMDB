@@ -1,0 +1,7 @@
+# Built by rebuild.py / GitHub Actions; the live app is published to GitHub Pages.
+Australian_Movies_Android.html
+research/extended_catalogue.json
+data/catalogue.json
+_site/
+__pycache__/
+*.pyc
