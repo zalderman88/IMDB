@@ -27,6 +27,10 @@
 .wl-back{margin:0;font-size:13px;font-weight:700;color:var(--accent)}
 .card.is-back{background:var(--green-bg);box-shadow:inset 0 0 0 2px var(--accent)}
 .wl-newtag{display:inline-block;margin-right:7px;padding:1px 8px;border-radius:999px;background:var(--accent);color:var(--on-accent);font-family:Inter,system-ui,sans-serif;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;vertical-align:3px}
+.wl-scores{display:flex;gap:8px;flex-wrap:wrap}
+.wl-sc{display:inline-flex;align-items:center;gap:4px;min-height:36px;padding:4px 11px;border-radius:8px;background:var(--soft);color:var(--ink);font-size:13px;font-weight:600;text-decoration:none}
+.wl-sc:hover{box-shadow:inset 0 0 0 1px var(--accent)}
+.wl-sc.imdb strong{color:var(--imdb)}.wl-sc.rt strong{color:var(--tomato)}.wl-sc.rt strong+strong,.wl-sc.rt strong:nth-of-type(2){color:var(--gold)}
 .wl-season{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:2px 0 0;font-size:13px;color:var(--muted)}
 .wl-bell{min-height:36px;padding:5px 12px;border:1px solid var(--line);border-radius:18px;background:transparent;color:var(--muted);font-size:13px;font-weight:650;cursor:pointer}
 .wl-bell[aria-pressed=true]{border-color:var(--accent);color:var(--accent);background:var(--green-bg)}
@@ -67,6 +71,16 @@ try{const s=JSON.parse(localStorage.getItem('watchlist-view-v1')||'{}');if(['all
 function saveView(){try{localStorage.setItem('watchlist-view-v1',JSON.stringify({tab,sort:$('sort').value,hide:hideWatched}));}catch(e){}}
 const yr=it=>parseInt(it.year,10)||0;
 const SORTS={new:(a,b)=>b.added-a.added,old:(a,b)=>a.added-b.added,title:(a,b)=>a.title.localeCompare(b.title,'en',{sensitivity:'base'}),year:(a,b)=>yr(b)-yr(a)||b.added-a.added,score:(a,b)=>(b.score||0)-(a.score||0)||b.added-a.added};
+// IMDb and Rotten Tomatoes scores, each a link to its page (RT search when the page isn't known).
+function ext(label,href,cls){const a=el('a',cls||'',label);a.href=href;a.target='_blank';a.rel='noopener noreferrer';return a;}
+function scoreLine(it){
+  const sc=el('p','scores wl-scores');
+  const im=ext('','https://www.imdb.com/title/'+it.id+'/','wl-sc imdb');im.append('IMDb ',el('strong','',it.score?it.score.toFixed(1):'—'),' ↗');im.setAttribute('aria-label','IMDb '+(it.score?it.score.toFixed(1):'')+', open on IMDb');sc.append(im);
+  const rtUrl=it.rt||'https://www.rottentomatoes.com/search?search='+encodeURIComponent(it.title);
+  const rt=ext('',rtUrl,'wl-sc rt');rt.append('🍅 ',el('strong','',it.critics!=null?it.critics+'%':'—'));if(it.audience!=null)rt.append(' · 🍿 ',el('strong','',it.audience+'%'));rt.append(' ↗');
+  rt.setAttribute('aria-label','Rotten Tomatoes'+(it.critics!=null?' Tomatometer '+it.critics+'%':'')+(it.audience!=null?', Popcornmeter '+it.audience+'%':'')+', open on Rotten Tomatoes');sc.append(rt);
+  return sc;
+}
 function card(it){
   const li=el('li','card');li.dataset.id=it.id;li.dataset.kind=it.kind;
   if(it.poster){const box=el('span','pf-poster wl-own');box.setAttribute('aria-hidden','true');const img=el('img');img.src=it.poster;img.alt='';img.loading='lazy';img.decoding='async';img.referrerPolicy='no-referrer';img.onerror=()=>{box.remove();li.classList.remove('wl-pic');};box.append(img);li.append(box);li.classList.add('wl-pic');}
@@ -76,7 +90,7 @@ function card(it){
   if(it.watched)li.classList.add('is-watched');
   if(it.back&&!it.watched){li.classList.add('is-back');h.prepend(el('span','wl-newtag',it.back.number===1?'New season':'New episode'));li.append(el('p','wl-back','New since you watched: season '+it.back.season+(it.back.number?' episode '+it.back.number:'')+' · '+dayFmt.format(new Date(it.back.at))));}
   const meta=[it.year,(it.genres||[]).join(' · ')].filter(Boolean).join(' · ');if(meta)li.append(el('p','meta',meta));
-  if(it.score){const sc=el('p','scores');sc.append('IMDb ',el('strong','',it.score.toFixed(1)));li.append(sc);}
+  li.append(scoreLine(it));
   const where=el('p','where');const jw=el('a','','Where to watch ↗');jw.href='https://www.justwatch.com/au/search?q='+encodeURIComponent(it.title);jw.target='_blank';jw.rel='noopener noreferrer';where.append(jw);li.append(where);
   if(it.kind==='tv')li.append(seasonRow(it));
   li.append(el('p','wl-added','Added '+dayFmt.format(new Date(it.added))+(it.watched?' · watched '+dayFmt.format(new Date(it.watched)):'')));

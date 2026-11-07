@@ -150,6 +150,18 @@
     var v = s && parseFloat(s.textContent);
     return v > 0 && v <= 10 ? v : null;
   }
+  // Rotten Tomatoes: Movies rows have Tomatometer/Popcornmeter blocks with review-page links; For you shows "RT 94%".
+  function rtOf(li) {
+    var out = {};
+    function pct(sel) { var s = li.querySelector(sel); var v = s && parseInt(s.textContent.replace(/[^0-9]/g, ''), 10); return v >= 0 && v <= 100 && /\d/.test(s.textContent) ? v : null; }
+    var c = pct('.score.critics strong'); if (c == null) c = pct('.scores .rt');
+    var a = pct('.score.audience strong');
+    if (c != null) out.critics = c;
+    if (a != null) out.audience = a;
+    var link = li.querySelector('.score.critics a[href*="rottentomatoes.com"], .score.audience a[href*="rottentomatoes.com"], a[href*="rottentomatoes.com/m/"], a[href*="rottentomatoes.com/tv/"]');
+    if (link) out.rt = link.href;
+    return out;
+  }
   function genresOf(li) {
     var g = txt(li.querySelector('.movie-genres'));
     if (g && !/unknown/i.test(g)) return g.split(' · ').slice(0, 3);
@@ -165,6 +177,7 @@
     var it = { id: id, title: titleOf(li) || id, kind: kindOf(li), year: yearOf(li) };
     var sc = scoreOf(li); if (sc) it.score = sc;
     var g = genresOf(li); if (g.length) it.genres = g;
+    var rt = rtOf(li); for (var k in rt) it[k] = rt[k];
     var p = posterOf(li); if (p) it.poster = p;
     var page = location.pathname.split('/').pop() || 'index.html';
     if (page !== 'watchlist.html') it.from = page;
@@ -197,9 +210,21 @@
     box.parentNode.classList.toggle('on', on);
     box.title = on ? 'On your watch list (tap to remove)' : 'Add to your watch list';
   }
+  // Titles already on the list pick up scores and links they were saved without (e.g. added from Top 20).
+  function refresh(li, id) {
+    if (window.WatchListPage) return;
+    var i = index(id); if (i < 0) return;
+    var it = items[i], fresh = itemOf(li), changed = false;
+    ['score', 'critics', 'audience', 'rt', 'year', 'poster'].forEach(function (k) {
+      if (fresh[k] != null && fresh[k] !== '' && it[k] !== fresh[k] && (it[k] == null || it[k] === '' || k === 'score' || k === 'critics' || k === 'audience' || k === 'rt')) { it[k] = fresh[k]; changed = true; }
+    });
+    if (!it.genres && fresh.genres) { it.genres = fresh.genres; changed = true; }
+    if (changed) write();
+  }
   function decorate(li) {
     if (li.dataset.wl) return;
     var id = ttOf(li); if (!id) return;
+    refresh(li, id);
     var h = heading(li); if (!h) return;
     li.dataset.wl = '1';
     var row = li.querySelector('.wl-ticks');
