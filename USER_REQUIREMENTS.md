@@ -30,3 +30,4 @@ Certified Fresh and Verified Hot are reported source designations, not inferred 
 - Sorting: IMDb, Tomatometer, Popcornmeter and release year in either direction; IMDb votes in either direction; most critic reviews; most audience ratings; title A–Z. Missing numeric values sort last.
 
 Browser-stored preferences override fresh defaults after the user chooses settings. A fresh open and Reset are both tested with the latest country/language defaults.
+- Title type (added 7 Nov 2026): default `mainstream` = IMDb title type `movie` only, hiding suspicious ratings (IMDb 9.0+ from under 10,000 votes with no RT score). `features` keeps all ratings; `all` also includes TV movies, shorts and videos. Reset restores `mainstream`.
