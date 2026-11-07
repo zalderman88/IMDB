@@ -104,7 +104,7 @@ for(const o of ids.sort.options){fire('sort','change',o.value);const got=matches
  if(o.value!=='title'){const f=o.value.replace(/-asc$/,''),asc=o.value.endsWith('-asc');const vals=got.map(m=>m[f]).filter(v=>typeof v==='number');for(let i=1;i<vals.length;i++)assert.ok(asc?vals[i]>=vals[i-1]:vals[i]<=vals[i-1],o.value);}}
 fire('sort','change','score');
 // One-tap sort buttons: tap once for newest/highest, again for oldest/lowest.
-for(const f of ['startYear','lastYear','votes','score']){fire('sort-'+f,'click');assert.equal(ids.sort.value,f);assert.equal(ids['sort-'+f].attrs['aria-pressed'],'true');fire('sort-'+f,'click');assert.equal(ids.sort.value,f+'-asc');const v=matches().map(m=>m[f]);for(let i=1;i<v.length;i++)assert.ok(v[i]>=v[i-1],f);}
+for(const f of ['startYear','lastYear','seasons','score']){fire('sort-'+f,'click');assert.equal(ids.sort.value,f);assert.equal(ids['sort-'+f].attrs['aria-pressed'],'true');fire('sort-'+f,'click');assert.equal(ids.sort.value,f+'-asc');const v=matches().map(m=>m[f]);for(let i=1;i<v.length;i++)assert.ok(v[i]>=v[i-1],f);}
 fire('sort','change','score');
 if(count()>50){fire('more','click');assert.equal(ids.shows.children.length,Math.min(100,count()));}
 assert.ok(walk(ids.shows).filter(n=>n.tagName==='A'&&n.href).every(n=>n.href.startsWith('https://')));
