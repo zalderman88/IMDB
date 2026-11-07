@@ -29,3 +29,20 @@ The original monthly ChatGPT task (1st of each month, Perth time) still exists i
 1. `tools/fetch_new_streaming.py` calls `/countries/au` once and `/changes?change_type=new` for new titles and new seasons (25 changes a page, at most 80 pages a run). It needs the masked CI/CD variable `STREAMING_AVAILABILITY_API_KEY` (free plan, 1,000 requests a month). Without it the page says it is not set up yet and the build still passes.
 2. Scheduled and manual pipelines always fetch. Pushes to `main` reuse the GitLab CI cache (`cache/new_streaming.json`) if it is under 13 days old, so code changes don't spend requests. On HTTP 401/403/429 it stops and keeps the previous data.
 3. `tools/build_new_streaming.py` adds IMDb ratings from the official `title.ratings` dataset and writes `new.html`. `tests/test_new_streaming.py` checks both scripts offline against a fake API.
+
+## Top 20 (top20.html)
+
+`tools/build_top20.py` ranks the 20 most popular movies and TV shows across Australian streaming
+services. Sources (no scraping; published files and documented APIs only):
+
+1. Netflix's official weekly Top 10 for Australia (`all-weeks-countries.tsv` from netflix.com/tudum/top10), no key.
+2. The services' own AU top lists from the Streaming Availability API `GET /shows/top` (Netflix, Prime Video,
+   Disney+, Apple TV+, Paramount+, HBO Max), using the same `STREAMING_AVAILABILITY_API_KEY` as the New page.
+   About 12 requests per scheduled run; cached in `cache/top20_sa.json` so code pushes spend none.
+3. Optional `TMDB_API_KEY`: TMDB popularity for titles on AU services with no chart (Stan, Binge, Foxtel Now,
+   BritBox, ABC iview, SBS On Demand, Shudder, DocPlay), counted at 60%.
+4. IMDb ratings/votes from the datasets the build already downloads (also used to identify Netflix titles).
+
+Scoring: 10 points for #1 down to 1 for #10 on each chart; best chart per service; services add up; Netflix
+adds 25% of last week's points; quality bonus (IMDb - 6) x 1.5, capped at 4.5, needs 1,000+ votes. India is
+excluded. A source failing never fails the build; the page lists which sources worked. Tests: `tests/test_top20.py`.

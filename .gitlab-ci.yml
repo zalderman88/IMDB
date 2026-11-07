@@ -45,11 +45,16 @@ build:
       if [ "$CI_PIPELINE_SOURCE" = "schedule" ] || [ "$CI_PIPELINE_SOURCE" = "web" ]; then FORCE=--force; else FORCE=; fi
       python tools/fetch_new_streaming.py $FORCE
     - python tools/build_new_streaming.py --ratings /tmp/imdb/title.ratings.tsv.gz
+    # Top 20: Netflix's official AU Top 10 file + services' own top lists (Streaming Availability
+    # /shows/top, same key, ~12 requests, cached like New) + optional TMDB_API_KEY + IMDb ratings.
+    - python tests/test_top20.py
+    - python tools/build_top20.py --basics /tmp/imdb/title.basics.tsv.gz --ratings /tmp/imdb/title.ratings.tsv.gz $FORCE
     - mkdir -p _site
     - cp Australian_Movies_Android.html _site/index.html
     - cp TV_Shows_Android.html _site/tv.html
     - cp ForYou_Android.html _site/foryou.html
     - cp New_Streaming_Android.html _site/new.html
+    - cp Top20_Android.html _site/top20.html
     - cp -r site/. _site/
     - ls -l _site
   artifacts:

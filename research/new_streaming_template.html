@@ -66,8 +66,11 @@ select.pill{padding-right:30px;appearance:auto}
 .empty{padding:22px 16px;border:1px dashed var(--line);border-radius:12px;text-align:center;color:var(--muted);font-size:14px}.empty strong{color:var(--ink)}
 .note{margin:22px 2px 0;font-size:11px;color:var(--muted)}.note a{color:var(--link)}
 @media(min-width:700px){.cards{grid-template-columns:1fr 1fr}h1{font-size:48px}.shell{padding-top:28px}}
+/* Five-tab nav (Top 20 added Nov 2026): tabs size to their labels and stay on one line on phones */
+.mode-switch a{flex:1 1 auto;white-space:nowrap;padding:10px 8px;font-size:15px}
+@media(max-width:420px){.mode-switch{gap:2px;padding:3px}.mode-switch a{padding:8px 5px;font-size:13.5px;min-height:48px}}
 </style></head><body><main class="shell">
-<header class="masthead"><div class="topline"><p class="kicker">JUST ADDED IN AUSTRALIA</p><nav class="mode-switch" aria-label="Finder"><a href="index.html">Movies</a><a href="tv.html">TV shows</a><a href="foryou.html">For you</a><a href="new.html" aria-current="page">New</a></nav></div><div class="heading"><h1>New on <em>streaming</em></h1><button class="theme" id="theme" type="button" aria-label="Switch colour theme" title="Switch colour theme"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="display:block;margin:auto"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button></div>
+<header class="masthead"><div class="topline"><p class="kicker">JUST ADDED IN AUSTRALIA</p><nav class="mode-switch" aria-label="Finder"><a href="index.html">Movies</a><a href="tv.html">TV shows</a><a href="foryou.html">For you</a><a href="new.html" aria-current="page">New</a><a href="top20.html">Top 20</a></nav></div><div class="heading"><h1>New on <em>streaming</em></h1><button class="theme" id="theme" type="button" aria-label="Switch colour theme" title="Switch colour theme"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="display:block;margin:auto"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button></div>
 <p class="intro"><strong>Movies and shows added to Australian subscription services in the last month.</strong> Tick the services you have; your choice is saved on this device.</p>
 <p class="stamp"><span class="dot"></span><span id="stamp">Loading…</span></p></header>
 
