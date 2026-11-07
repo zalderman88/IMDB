@@ -71,7 +71,7 @@ select.pill{padding-right:30px;appearance:auto}
 @media(max-width:420px){.mode-switch{gap:2px;padding:3px}.mode-switch a{padding:8px 5px;font-size:13.5px;min-height:48px}}
 </style></head><body><main class="shell">
 <header class="masthead"><div class="topline"><p class="kicker">JUST ADDED IN AUSTRALIA</p><nav class="mode-switch" aria-label="Finder"><a href="index.html">Movies</a><a href="tv.html">TV shows</a><a href="foryou.html">For you</a><a href="new.html" aria-current="page">New</a><a href="top20.html">Top 20</a></nav></div><div class="heading"><h1>New on <em>streaming</em></h1><button class="theme" id="theme" type="button" aria-label="Switch colour theme" title="Switch colour theme"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="display:block;margin:auto"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button></div>
-<p class="intro"><strong>Movies and shows added to Australian subscription services in the last month.</strong> Tick the services you have; your choice is saved on this device.</p>
+<p class="intro"><strong>Movies and shows that recently arrived on Australian subscription services.</strong> Tick the services you have; your choice is saved on this device.</p>
 <p class="stamp"><span class="dot"></span><span id="stamp">Loading…</span></p></header>
 
 <details class="box" id="svc-box"><summary>My services <span id="svc-sum"></span></summary><div class="inner">
@@ -112,7 +112,8 @@ const svcCount=SV.map(()=>0);for(const it of items)for(const i of new Set(it.add
 function stamp(){
   if(META.state==='no-key'){$('stamp').textContent='Not set up yet';return;}
   if(META.state==='error'){$('stamp').textContent='Couldn’t load the latest list';return;}
-  $('stamp').textContent='Checked '+longFmt.format(new Date(META.fetchedAt*1000))+' · added since '+shortFmt.format(new Date(META.from*1000));
+  if(META.state==='baseline'){$('stamp').textContent='Tracking started '+longFmt.format(new Date(META.fetchedAt*1000));return;}
+  $('stamp').textContent='Checked '+longFmt.format(new Date(META.fetchedAt*1000))+(META.mode==='tmdb'?' · new since the check on ':' · added since ')+shortFmt.format(new Date(META.from*1000));
 }
 function buildServices(){
   const box=$('services');box.replaceChildren();
@@ -169,6 +170,7 @@ function render(reset){
   if(!items.length){
     empty.hidden=false;
     if(META.state==='no-key'){empty.append(el('strong','','Waiting for the streaming data key.')),empty.append(document.createElement('br'),document.createTextNode('Once the key is saved in GitLab, the next build fills this page.'));}
+    else if(META.state==='baseline'){empty.append(el('strong','','Tracking has started.')),empty.append(document.createElement('br'),document.createTextNode('This build recorded what each service has today. Anything that arrives after this shows here from the next refresh (the 1st or 15th).'));}
     else if(META.state==='error'){empty.append(el('strong','','The streaming data service didn’t answer last time.')),empty.append(document.createElement('br'),document.createTextNode('The next scheduled build will try again.'));}
     else empty.textContent='Nothing new found in the last month.';
   }else if(!rows.length){empty.hidden=false;empty.textContent=SV.every((s,i)=>!svcCount[i]||store.off.includes(s.id))?'Tick at least one service above.':'Nothing matches these filters.';}
@@ -181,7 +183,7 @@ $('sort').addEventListener('change',e=>{store.sort=e.target.value==='imdb'?'imdb
 $('more').addEventListener('click',()=>{limit+=BATCH;render(false);});
 function sync(){document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.tab===store.tab)));$('seasons').setAttribute('aria-pressed',String(!!store.seasons));$('min').value=String(store.min||0);$('sort').value=store.sort;}
 {const n=$('note'),a=el('a','',META.source||'Streaming Availability API');a.href=META.sourceUrl||'https://www.movieofthenight.com/about/api';a.target='_blank';a.rel='noopener';
-  n.append(document.createTextNode('Streaming data from the '),a,document.createTextNode('. IMDb ratings from IMDb’s official datasets'+(META.imdbAsOf?' ('+META.imdbAsOf+')':'')+'. Refreshed with each scheduled build (1st and 15th of the month). Links open the service’s own page.'));}
+  n.append(document.createTextNode(''+(META.mode==='tmdb'?'Where-to-watch data from ':'Streaming data from the ')),a,document.createTextNode((META.mode==='tmdb'?' (JustWatch data). TMDB has no “date added”, so the date is when our check first saw the title on that service':'')+'. IMDb ratings from IMDb’s official datasets'+(META.imdbAsOf?' ('+META.imdbAsOf+')':'')+'.'+(META.mode==='tmdb'?' This product uses the TMDB API but is not endorsed or certified by TMDB.':'')+' Refreshed with each scheduled build (1st and 15th of the month). Links open the service’s own page.'));}
 if(!SV.some((s,i)=>svcCount[i]))$('svc-box').hidden=true;else{let fresh=true;try{fresh=!localStorage.getItem(STORE);}catch{}if(fresh)$('svc-box').open=true;}
 $('theme').addEventListener('click',()=>{const dark=getComputedStyle(document.documentElement).colorScheme==='dark';document.documentElement.dataset.theme=dark?'light':'dark';try{localStorage.setItem('movie-finder-theme',dark?'light':'dark');}catch{}});
 try{const t=localStorage.getItem('movie-finder-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;}catch{}

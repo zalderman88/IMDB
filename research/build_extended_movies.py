@@ -81,6 +81,17 @@ for node in jw.values():
         if code in providers and offer['monetizationType']=='FLATRATE':
             m['offers'][code]=html.unescape(offer['standardWebURL'])
 
+# Live where-to-watch (TMDB watch providers, refreshed each scheduled build) replaces the
+# 7 Nov 2026 JustWatch offers when a complete sweep exists. JustWatch deep links are kept for
+# services that still list the film; other services link to TMDB's AU watch page.
+from streaming_au import load_live
+live=load_live()
+if live:
+    for m in movies.values():
+        iid=m['id'][5:] if m['id'].startswith('imdb:') else None
+        now_on=live['movies'].get(iid,{}) if iid else {}
+        m['offers']={c:(m['offers'].get(c) or url) for c,url in sorted(now_on.items()) if c in providers}
+
 idx=collections.defaultdict(set)
 for ident,m in movies.items():
     for title in [m['title'],m.get('originalTitle')]+m['aliases']:
@@ -185,7 +196,7 @@ meta={'checked':checked_label,'checkedISO':today.isoformat(),'imdbAsOf':imdb_aso
       'classificationCounts':dict(collections.Counter(c for m in selected for c in m['classifications'])),
       'languageCounts':dict(collections.Counter(m['languageGroup'] for m in selected)),
       'rtOnlyQualifiers':sum(not ((m.get('score') or 0)>=6 and (m.get('votes') or 0)>=1000) for m in selected),
-      'ambiguousMatchesSkipped':ambiguous,'sourceCounts':{c:sum(c in m['offers'] for m in default_movies) for c in providers},
+      'ambiguousMatchesSkipped':ambiguous,'streamingLive':live['label'] if live else None,'sourceCounts':{c:sum(c in m['offers'] for m in default_movies) for c in providers},
       'coverageText':f'IMDb bulk data was checked across {len(imdb):,} records with at least 1,000 votes; only feature films and TV movies are kept. {len(jw):,} JustWatch Australia movie records and {len(rt):,} RT search records were processed. Review counts were confirmed for {len(rt_counts):,} RT film pages before access limits interrupted further checks. Unconfirmed RT counts cannot qualify a movie. Left out entirely: {dropped["type"]:,} shorts and videos, {dropped["india"]:,} Indian productions and {dropped["suspicious"]+dropped["unconfirmed"]:,} suspicious or unconfirmed ratings. The default English-language view with genre exclusions shows {len(default_movies):,} movies; the file contains {len(selected):,} qualifying records before genre and country filters.',
       'coverageRows':[['IMDb records imported (1,000+ votes, all title types)',len(imdb)],['IMDb records meeting 6.0+ (all countries/genres)',sum(not m['adult'] and m['score']>=6 for m in imdb)],['JustWatch AU movie records processed',len(jw)],['Rotten Tomatoes search records processed',len(rt)],['RT film pages with confirmed counts',len(rt_counts)],['RT count-checked titles in this file',sum(bool(m.get('rtCountsChecked')) for m in selected)],['Films with an Australian classification',sum(bool(m['classifications']) for m in selected)],['Qualifying records in this file',len(selected)],['Left out: shorts, TV shorts, videos, specials',dropped['type']],['Left out: Indian productions',dropped['india']],['Left out: IMDb 8.5+ from under 10,000 votes, no RT score',dropped['suspicious']],['Left out: unconfirmed by JustWatch, RT or Wikidata, under 25,000 votes',dropped['unconfirmed']],['Results with your default language and genre settings',len(default_movies)]]}
 years=[m['year'] for m in selected if isinstance(m.get('year'),int)]
@@ -205,7 +216,8 @@ if meta.get('refresh',{}).get('is_enabled'):
     r=meta['refresh']
     template=template.replace('Monthly refresh is being set up. Download the latest file after a refresh; existing downloaded copies stay unchanged.',
         f'<strong>Automatic refresh:</strong> {html.escape(r["description"])}. IMDb ratings and votes last updated {imdb_asof.day} {imdb_asof:%B %Y}. '
-        f'Australian streaming availability, Rotten Tomatoes, classification and language facts are from the {checked_label} snapshot and are not refreshed automatically. '
+        +(f'Australian streaming availability last updated {live["label"]} from TMDB (JustWatch data). Rotten Tomatoes, classification and language facts are from the {checked_label} snapshot and are not refreshed automatically. ' if live else
+        f'Australian streaming availability, Rotten Tomatoes, classification and language facts are from the {checked_label} snapshot and are not refreshed automatically. ')+
         f'<a href="{html.escape(r["latestUrl"])}" target="_blank" rel="noopener noreferrer">Open the latest version</a>. Downloaded copies stay unchanged.')
 refresh_recipe={
     'purpose':'Refresh this personal movie-finder HTML in place, preserving the UI and Library identity.',

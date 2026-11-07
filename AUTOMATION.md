@@ -46,3 +46,11 @@ services. Sources (no scraping; published files and documented APIs only):
 Scoring: 10 points for #1 down to 1 for #10 on each chart; best chart per service; services add up; Netflix
 adds 25% of last week's points; quality bonus (IMDb - 6) x 1.5, capped at 4.5, needs 1,000+ votes. India is
 excluded. A source failing never fails the build; the page lists which sources worked. Tests: `tests/test_top20.py`.
+
+### TMDB: live where-to-watch, and New without a second key
+
+`tools/fetch_tmdb_au.py` sweeps TMDB's official API (`/discover` with `watch_region=AU`, subscription only) for Netflix, Prime Video, Disney+, Stan, Paramount+, HBO Max, Apple TV, Binge and Foxtel Now, then looks up IMDb ids (cached). It needs the masked CI/CD variable `TMDB_API_KEY` (v3 key or v4 read token). The result `cache/tmdb_au.json` is kept by the GitLab CI cache.
+
+* **Where to watch:** when a complete sweep exists, `research/streaming_au.py` replaces the 7 Nov 2026 JustWatch offers on the movie page (JustWatch deep links are kept where the service still has the film; others link to TMDB's AU watch page) and adds services to TV shows. `tools/check_refresh.py` then stops comparing `offers` with the baseline. Without a key nothing changes.
+* **New page:** TMDB has no "date added", so a title counts as new when it appears on a service it wasn't on at the previous sweep. The first sweep is the baseline. The Streaming Availability data is used instead if that key is ever added.
+* The first sweep makes roughly 1,500 discover calls and up to 20,000 IMDb-id lookups (about 10 minutes); later sweeps only look up new titles. On HTTP 401/403 it stops and keeps the previous data; an incomplete sweep never replaces a complete one.

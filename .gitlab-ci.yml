@@ -31,6 +31,12 @@ build:
     - python tools/refresh_imdb.py --basics /tmp/imdb/title.basics.tsv.gz --ratings /tmp/imdb/title.ratings.tsv.gz
     - python tools/refresh_tv.py --basics /tmp/imdb/title.basics.tsv.gz --ratings /tmp/imdb/title.ratings.tsv.gz --episode /tmp/imdb/title.episode.tsv.gz
     - python tools/refresh_india.py --akas /tmp/imdb/title.akas.tsv.gz
+    # Live where-to-watch (movies, TV, For You) and New page data from TMDB watch providers
+    # (official API, JustWatch data; CI/CD variable TMDB_API_KEY). Cached in cache/ like New.
+    - python tests/test_tmdb_au.py
+    - |
+      if [ "$CI_PIPELINE_SOURCE" = "schedule" ] || [ "$CI_PIPELINE_SOURCE" = "web" ]; then FORCE=--force; else FORCE=; fi
+      python tools/fetch_tmdb_au.py --max-lookups 20000 $FORCE
     - python rebuild.py
     - python tools/check_refresh.py
     - node tests/verify_movie_finder.mjs

@@ -19,6 +19,7 @@ SNAPSHOT = ROOT / 'research/tv_snapshot.json'
 TEMPLATE = ROOT / 'research/tv_finder_template.html'
 sys.path.insert(0, str(ROOT / 'research'))
 from title_quality import SUSPECT_SCORE, SUSPECT_VOTES, load_india, tv_drop_reason  # noqa: E402
+from streaming_au import load_live  # noqa: E402
 OUT = ROOT / 'TV_Shows_Android.html'
 EXTRACT = ROOT / 'research/tv_catalogue.json'
 
@@ -76,6 +77,7 @@ def main():
     asof = datetime.date.fromisoformat(snap.get('imdbAsOf', '2026-11-07'))
 
     india = load_india()
+    live = load_live()  # where-to-watch from the TMDB sweep, when a complete one exists
     dropped = {'india': 0, 'suspicious': 0}
     selected = []
     for s in shows:
@@ -95,6 +97,8 @@ def main():
                'imdb': 'https://www.imdb.com/title/' + s['imdbId'] + '/', 'recent': recent, 'acclaimed': acclaimed}
         if s.get('originalTitle') and s['originalTitle'] != s['title']:
             rec['originalTitle'] = s['originalTitle']
+        if live:
+            rec['offers'] = dict(sorted(live['tv'].get(s['imdbId'], {}).items()))
         selected.append(rec)
     selected.sort(key=lambda r: (-r['score'], -r['votes'], r['title']))
     if len(selected) < a.min_shows:
@@ -107,6 +111,7 @@ def main():
     checked = f'{asof.day} {asof:%B %Y}'
     meta = {
         'imdbAsOf': asof.isoformat(), 'total': len(selected), 'defaultResults': len(default),
+        'streamingLive': live['label'] if live else None,
         'recent': recent_n, 'acclaimedOnly': acclaimed_only, 'suspectHidden': suspect, 'indiaDropped': dropped['india'],
         'rules': {'minVotes': MIN_VOTES, 'recentYear': RECENT_YEAR, 'recentMinScore': RECENT_SCORE,
                   'acclaimedStartYear': ACCLAIMED_START, 'acclaimedScoreAbove': ACCLAIMED_ABOVE},
@@ -133,6 +138,11 @@ def main():
     start_years = [r['startYear'] for r in selected] or [ACCLAIMED_START]
     last_years = [r['lastYear'] for r in selected] or [RECENT_YEAR]
     html = TEMPLATE.read_text()
+    if live:
+        html = html.replace('Australian streaming services, Rotten Tomatoes scores', 'Rotten Tomatoes scores').replace(
+            '<p><strong>Not covered yet.</strong>',
+            f'<p><strong>Where to watch</strong> on Australian subscription services was updated {live["label"]} '
+            f'from TMDB (JustWatch data), and refreshes with each scheduled build.</p><p><strong>Not covered yet.</strong>', 1)
     data = json.dumps(selected, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
     for k, v in {'@@MINYEAR@@': min(start_years), '@@MAXYEAR@@': max(max(start_years), max(last_years)),
                  '@@LASTMIN@@': min(last_years), '@@CHECKED@@': checked,
