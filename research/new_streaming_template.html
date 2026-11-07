@@ -70,8 +70,10 @@ select.pill{padding-right:30px;appearance:auto}
 .mode-switch a{flex:1 1 auto;white-space:nowrap;padding:10px 8px;font-size:15px}
 @media(max-width:420px){.mode-switch{gap:2px;padding:3px}.mode-switch a{padding:8px 5px;font-size:13.5px;min-height:48px}}
 .reset-small{min-height:40px;padding:6px 14px;border-radius:999px;border:1.5px solid var(--accent);background:transparent;color:var(--accent);font-size:13px;font-weight:750;cursor:pointer;white-space:nowrap}.reset-small:hover{background:var(--accent);color:var(--on-accent)}
+/* Six-tab nav (Watch list added Nov 2026): three columns by two rows on phones */
+@media(max-width:520px){.mode-switch{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px}.mode-switch a{min-height:44px;padding:8px 4px;font-size:14px}}
 </style></head><body><main class="shell">
-<header class="masthead"><div class="topline"><p class="kicker">JUST ADDED IN AUSTRALIA</p><nav class="mode-switch" aria-label="Finder"><a href="index.html">Movies</a><a href="tv.html">TV shows</a><a href="foryou.html">For you</a><a href="new.html" aria-current="page">New</a><a href="top20.html">Top 20</a></nav></div><div class="heading"><h1>New on <em>streaming</em></h1><button class="theme" id="theme" type="button" aria-label="Switch colour theme" title="Switch colour theme"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="display:block;margin:auto"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button></div>
+<header class="masthead"><div class="topline"><p class="kicker">JUST ADDED IN AUSTRALIA</p><nav class="mode-switch" aria-label="Finder"><a href="index.html">Movies</a><a href="tv.html">TV shows</a><a href="foryou.html">For you</a><a href="new.html" aria-current="page">New</a><a href="top20.html">Top 20</a><a href="watchlist.html">Watch list</a></nav></div><div class="heading"><h1>New on <em>streaming</em></h1><button class="theme" id="theme" type="button" aria-label="Switch colour theme" title="Switch colour theme"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="display:block;margin:auto"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button></div>
 <p class="intro"><strong>Movies and shows that recently arrived on Australian subscription services.</strong> Tick the services you have; your choice is saved on this device.</p>
 <p class="stamp"><span class="dot"></span><span id="stamp">Loading…</span></p></header>
 
@@ -139,7 +141,7 @@ function visible(it){
   return{it,adds,latest:Math.max(...adds.map(a=>a[1]))};
 }
 function card(v){
-  const{it,adds}=v,li=el('li','card');
+  const{it,adds}=v,li=el('li','card');if(it.imdb){li.dataset.id=it.imdb;li.dataset.kind=it.type==='series'?'tv':'movie';}
   if(it.poster){const img=el('img','poster');img.src=it.poster;img.alt='';img.loading='lazy';img.decoding='async';img.referrerPolicy='no-referrer';img.width=72;img.height=108;img.onerror=()=>img.replaceWith(el('div','poster',it.title.slice(0,1)));li.append(img);}
   else li.append(el('div','poster',it.title.slice(0,1)));
   const b=el('div','body'),h=el('h3');h.append(el('span','kind '+it.type,it.type==='series'?'Series':'Movie'));
@@ -194,4 +196,5 @@ $('theme').addEventListener('click',()=>{const dark=getComputedStyle(document.do
 try{const t=localStorage.getItem('movie-finder-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;}catch{}
 stamp();sync();buildServices();render(true);
 $('reset-filters').addEventListener('click',()=>{try{localStorage.removeItem(STORE);localStorage.removeItem(MY);}catch{}location.reload();});
-</script></body></html>
+</script><script src="watchlist.js" defer></script>
+</body></html>
