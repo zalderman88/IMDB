@@ -37,7 +37,7 @@ build:
     - cp Australian_Movies_Android.html _site/index.html
     - cp TV_Shows_Android.html _site/tv.html
     - cp ForYou_Android.html _site/foryou.html
-    - cp site/* _site/
+    - cp -r site/. _site/
     - ls -l _site
   artifacts:
     paths: [_site/]
