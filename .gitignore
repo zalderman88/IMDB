@@ -1,4 +1,4 @@
-# Built by rebuild.py / GitHub Actions; the live app is published to GitHub Pages.
+# Built by rebuild.py / GitLab CI; the live app is published to Cloudflare Pages.
 Australian_Movies_Android.html
 research/extended_catalogue.json
 data/catalogue.json

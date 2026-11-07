@@ -1,0 +1,51 @@
+# Twice-weekly IMDb refresh, deployed to Cloudflare Pages.
+# Schedule it in GitLab: Build > Pipeline schedules > cron "0 4 * * 2,5", timezone Perth.
+# Needs CI/CD variables CLOUDFLARE_API_TOKEN (masked) and CLOUDFLARE_ACCOUNT_ID.
+# Optional variable CF_PAGES_PROJECT (default zac-movies).
+
+variables:
+  CF_PAGES_PROJECT: zac-movies
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+stages: [build, deploy]
+
+build:
+  stage: build
+  image: python:3.12-bookworm
+  timeout: 45m
+  script:
+    - apt-get update -qq && apt-get install -y -qq nodejs >/dev/null && node --version
+    - mkdir -p /tmp/imdb
+    - |
+      for f in title.basics title.ratings title.episode; do
+        curl --fail --silent --show-error --location --retry 4 --retry-delay 15 \
+          -A 'movie-finder-refresh/1.0' -o "/tmp/imdb/$f.tsv.gz" "https://datasets.imdbws.com/$f.tsv.gz"
+      done
+      ls -l /tmp/imdb
+    - python tools/refresh_imdb.py --basics /tmp/imdb/title.basics.tsv.gz --ratings /tmp/imdb/title.ratings.tsv.gz
+    - python tools/refresh_tv.py --basics /tmp/imdb/title.basics.tsv.gz --ratings /tmp/imdb/title.ratings.tsv.gz --episode /tmp/imdb/title.episode.tsv.gz
+    - python rebuild.py
+    - python tools/check_refresh.py
+    - node tests/verify_movie_finder.mjs
+    - python research/build_tv.py --min-shows 1000
+    - python tests/test_tv_pipeline.py
+    - node tests/verify_tv_finder.mjs
+    - mkdir -p _site
+    - cp Australian_Movies_Android.html _site/index.html
+    - cp TV_Shows_Android.html _site/tv.html
+    - ls -l _site
+  artifacts:
+    paths: [_site/]
+    expire_in: 1 week
+
+deploy:
+  stage: deploy
+  image: node:22-bookworm-slim
+  needs: [build]
+  script:
+    - npx --yes wrangler@4 pages deploy _site --project-name "$CF_PAGES_PROJECT" --branch main --commit-dirty=true
