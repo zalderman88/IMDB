@@ -13,7 +13,10 @@ for name in ['movie_finder', 'tv_finder', 'foryou', 'new_streaming', 'top20']:
     t = (ROOT / f'research/{name}_template.html').read_text(encoding='utf-8')
     assert t.count('<a href="watchlist.html">Watch list</a>') == 1, name + ': missing Watch list nav link'
     assert '<script src="watchlist.js" defer></script>' in t, name + ': missing watchlist.js'
+    assert t.count('<a href="notifications.html">Notifications</a>') == 1, name + ': missing Notifications nav link'
     assert t.count('<script src="account.js" defer></script>') == 1, name + ': missing account.js'
+note = build_watchlist.build(build_watchlist.NOTIFICATIONS)
+assert '@@STYLE@@' not in note and 'aria-current="page">Notifications</a>' in note and 'watchlist.js' in note
 js = (ROOT / 'site/watchlist.js').read_text(encoding='utf-8')
 assert "'watchlist-v1'" in js
 acct = (ROOT / 'site/account.js').read_text(encoding='utf-8')

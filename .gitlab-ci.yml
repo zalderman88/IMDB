@@ -72,9 +72,9 @@ build:
     - cp ForYou_Android.html _site/foryou.html
     - cp New_Streaming_Android.html _site/new.html
     - cp Top20_Android.html _site/top20.html
-    # Watch list page: no data, the list is saved in each browser (site/watchlist.js).
+    # Watch list + Notifications pages: no data, the list is saved in each browser (site/watchlist.js).
     - python tests/test_watchlist.py
-    - python tools/build_watchlist.py --out _site/watchlist.html
+    - python tools/build_watchlist.py --out _site/watchlist.html --notifications-out _site/notifications.html
     - cp -r site/. _site/
     # Actor/director search: IMDb credits for titles on the site (site/extras.js loads people.json).
     - |

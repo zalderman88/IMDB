@@ -44,7 +44,7 @@
       var i = index(id); if (i < 0) return;
       api.seasonInfo(id).then(function (v) { if (v && v.prev && index(id) > -1) { items[index(id)].seen = v.prev.season; write(); } });
     },
-    setWatched: function (id, on) { var i = index(id); if (i < 0) return; if (on) items[i].watched = Date.now(); else delete items[i].watched; write(); },
+    setWatched: function (id, on) { var i = index(id); if (i < 0) return; delete items[i].back; if (on) items[i].watched = Date.now(); else delete items[i].watched; write(); },
     seasonInfo: seasonInfo,
     seasonStatus: seasonStatus
   };
@@ -225,6 +225,7 @@
   api.onChange(function () {
     document.querySelectorAll('input[data-wl]').forEach(sync);
     badge();
+    clearTimeout(recheck); recheck = setTimeout(checkAlerts, 300);
   });
 
   function start() {
@@ -237,8 +238,33 @@
     }).observe(main, { childList: true, subtree: true });
   }
   // ---------- new-season banner on every page ----------
-  var box = null, checking = false;
+  var box = null, checking = false, recheck = null;
+  // A watched TV show comes back (no longer greyed out) when an episode airs after it was marked watched.
+  var reviving = false;
+  function aired(e) { var d = e && (e.airstamp ? Date.parse(e.airstamp) : e.airdate ? Date.parse(e.airdate + 'T23:59:00') : NaN); return isNaN(d) ? 0 : d; }
+  function checkWatched() {
+    var list = items.filter(function (x) { return x.kind === 'tv' && x.watched; }).slice(0, 60);
+    if (reviving || !list.length) return;
+    reviving = true;
+    var i = 0, changed = false;
+    function worker() {
+      if (i >= list.length) return Promise.resolve();
+      var it = list[i++];
+      return seasonInfo(it.id).then(function (v) {
+        var k = index(it.id), cur = items[k];
+        if (!cur || !cur.watched || !v || !v.prev) return;
+        var t = aired(v.prev);
+        if (t > cur.watched && t <= Date.now()) {
+          delete cur.watched;
+          cur.back = { season: v.prev.season, number: v.prev.number, at: t };
+          changed = true;
+        }
+      }).then(worker);
+    }
+    Promise.all([worker(), worker(), worker()]).then(function () { reviving = false; if (changed) write(); });
+  }
   function checkAlerts() {
+    checkWatched();
     var watched = items.filter(function (x) { return x.kind === 'tv' && x.alert; }).slice(0, 60);
     if (checking || !watched.length) { showAlerts([]); return; }
     checking = true;
@@ -254,7 +280,18 @@
     }
     Promise.all([worker(), worker(), worker()]).then(function () { checking = false; showAlerts(out); });
   }
+  function noteBadge(n) {
+    document.querySelectorAll('.mode-switch a[href="notifications.html"]').forEach(function (a) {
+      var b = a.querySelector('.wl-n');
+      if (!n) { if (b) b.remove(); a.removeAttribute('aria-label'); return; }
+      if (!b) { b = document.createElement('span'); b.className = 'wl-n'; b.setAttribute('aria-hidden', 'true'); a.append(b); }
+      b.textContent = String(n);
+      a.setAttribute('aria-label', 'Notifications, ' + n + (n === 1 ? ' new season' : ' new seasons'));
+    });
+  }
   function showAlerts(list) {
+    noteBadge(list.length);
+    if (/notifications\.html$/.test(location.pathname)) list = [];  // that page lists them itself
     if (!list.length) { if (box) box.remove(); box = null; return; }
     var head = document.querySelector('header.masthead');
     if (!head) return;
@@ -266,11 +303,11 @@
       var msg = document.createElement('span'); msg.className = 'wl-msg';
       var b = document.createElement('b'); b.textContent = x.it.title;
       msg.append('🔔 New season: ', b, ' · ' + x.s.text);
-      var go = document.createElement('a'); go.href = 'watchlist.html'; go.textContent = 'Watch list';
+      var go = document.createElement('a'); go.href = 'notifications.html'; go.textContent = 'Notifications';
       var ok = document.createElement('button'); ok.type = 'button'; ok.textContent = 'Got it';
       ok.addEventListener('click', function () { api.seasonsSeen(x.it.id); row.remove(); if (!box.children.length) { box.remove(); box = null; } });
       row.append(msg);
-      if (!/watchlist\.html$/.test(location.pathname)) row.append(go);
+      row.append(go);
       row.append(ok);
       box.append(row);
     });

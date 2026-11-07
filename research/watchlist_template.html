@@ -24,6 +24,9 @@
 .wl-ticks{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.wl-ticks .wl-tick{margin:2px 0}
 .card.is-watched{opacity:.5;filter:grayscale(1)}.card.is-watched:hover,.card.is-watched:focus-within{opacity:.85}
 .card.is-watched h3 a{text-decoration:line-through;text-decoration-thickness:1.5px}
+.wl-back{margin:0;font-size:13px;font-weight:700;color:var(--accent)}
+.card.is-back{background:var(--green-bg);box-shadow:inset 0 0 0 2px var(--accent)}
+.wl-newtag{display:inline-block;margin-right:7px;padding:1px 8px;border-radius:999px;background:var(--accent);color:var(--on-accent);font-family:Inter,system-ui,sans-serif;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;vertical-align:3px}
 .wl-season{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:2px 0 0;font-size:13px;color:var(--muted)}
 .wl-bell{min-height:36px;padding:5px 12px;border:1px solid var(--line);border-radius:18px;background:transparent;color:var(--muted);font-size:13px;font-weight:650;cursor:pointer}
 .wl-bell[aria-pressed=true]{border-color:var(--accent);color:var(--accent);background:var(--green-bg)}
@@ -37,7 +40,7 @@
 .wl-sure .yes{background:var(--danger);color:#14181c}
 </style>
 <link rel="stylesheet" href="posters.css"><script src="posters.js" defer></script></head><body><main class="shell">
-<header class="masthead"><div class="marquee-bulbs" aria-hidden="true"></div><div class="topline"><p class="kicker">SAVED ON THIS PHONE</p><nav class="mode-switch" aria-label="Finder"><a href="index.html">Movies</a><a href="tv.html">TV shows</a><a href="foryou.html">For you</a><a href="new.html">New</a><a href="top20.html">Top 20</a><a href="watchlist.html" aria-current="page">Watch list</a></nav></div><div class="heading"><h1>Watch <em>list</em></h1><button class="theme" id="theme" type="button" aria-label="Switch colour theme" title="Switch colour theme"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="display:block;margin:auto"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button></div>
+<header class="masthead"><div class="marquee-bulbs" aria-hidden="true"></div><div class="topline"><p class="kicker">SAVED ON THIS PHONE</p><nav class="mode-switch" aria-label="Finder"><a href="index.html">Movies</a><a href="tv.html">TV shows</a><a href="foryou.html">For you</a><a href="new.html">New</a><a href="top20.html">Top 20</a><a href="watchlist.html" aria-current="page">Watch list</a><a href="notifications.html">Notifications</a></nav></div><div class="heading"><h1>Watch <em>list</em></h1><button class="theme" id="theme" type="button" aria-label="Switch colour theme" title="Switch colour theme"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="display:block;margin:auto"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button></div>
 <p class="intro"><strong>Tick “Watch list” on any movie or show</strong> and it is kept here. The list is saved in this browser on this phone, nowhere else.</p>
 <p class="stamp"><span class="dot"></span><span id="count">Loading…</span></p></header>
 
@@ -71,6 +74,7 @@ function card(it){
   const ticks=el('div','wl-ticks'),wl=el('label','wl-tick wl-seen'+(it.watched?' on':'')),wbox=el('input');wbox.type='checkbox';wbox.checked=!!it.watched;
   wbox.addEventListener('change',()=>WL.setWatched(it.id,wbox.checked));wl.append(wbox,el('span','','Watched'));ticks.append(wl);li.append(ticks);
   if(it.watched)li.classList.add('is-watched');
+  if(it.back&&!it.watched){li.classList.add('is-back');h.prepend(el('span','wl-newtag',it.back.number===1?'New season':'New episode'));li.append(el('p','wl-back','New since you watched: season '+it.back.season+(it.back.number?' episode '+it.back.number:'')+' · '+dayFmt.format(new Date(it.back.at))));}
   const meta=[it.year,(it.genres||[]).join(' · ')].filter(Boolean).join(' · ');if(meta)li.append(el('p','meta',meta));
   if(it.score){const sc=el('p','scores');sc.append('IMDb ',el('strong','',it.score.toFixed(1)));li.append(sc);}
   const where=el('p','where');const jw=el('a','','Where to watch ↗');jw.href='https://www.justwatch.com/au/search?q='+encodeURIComponent(it.title);jw.target='_blank';jw.rel='noopener noreferrer';where.append(jw);li.append(where);
@@ -90,7 +94,7 @@ function seasonRow(it){
 }
 function render(){
   document.querySelectorAll('[data-tab]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.tab===tab)));
-  $('hide-watched').setAttribute('aria-pressed',String(hideWatched));const all=WL.all(),shown=all.filter(it=>(tab==='all'||it.kind===tab)&&!(hideWatched&&it.watched)).sort(SORTS[$('sort').value]||SORTS.new);
+  $('hide-watched').setAttribute('aria-pressed',String(hideWatched));const all=WL.all(),shown=all.filter(it=>(tab==='all'||it.kind===tab)&&!(hideWatched&&it.watched)).sort(SORTS[$('sort').value]||SORTS.new).sort((a,b)=>(!!b.back&&!b.watched)-(!!a.back&&!a.watched));
   const films=all.filter(it=>it.kind!=='tv').length,tv=all.length-films;
   $('count').textContent=all.length?all.length+(all.length===1?' title':' titles')+' · '+films+(films===1?' film':' films')+' · '+tv+(tv===1?' show':' shows'):'Nothing saved yet';
   $('list-note').textContent=shown.length&&shown.length<all.length?shown.length+' of '+all.length:'';
