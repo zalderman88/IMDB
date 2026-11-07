@@ -26,7 +26,7 @@ for(const m of data){
  assert.match(m.imdb,/^https:\/\/www\.imdb\.com\/title\/tt\d+\/$/);
 }
 assert.ok(html.includes('Australian streaming, Rotten Tomatoes, classifications and languages are not yet collected for TV'));
-assert.ok(html.includes('<a href="index.html">Movies</a><a href="tv.html" aria-current="page">TV shows</a>'));
+assert.ok(html.includes('<a href="index.html">Movies</a><a href="tv.html" aria-current="page">TV shows</a><a href="foryou.html">For you</a>'));
 
 class Element{
   constructor(tag='div'){this.tagName=tag.toUpperCase();this.children=[];this.attrs={};this.dataset={};this.events={};this._text='';this.value='';this.checked=false;this.disabled=false;this.hidden=false;this.open=false;this.className='';this.options=[];this.type='';this.min='';this.max='';this.classList={toggle:(name,flag)=>{const s=new Set(this.className.split(' ').filter(Boolean));flag?s.add(name):s.delete(name);this.className=[...s].join(' ');}};}

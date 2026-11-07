@@ -32,9 +32,12 @@ build:
     - python research/build_tv.py --min-shows 1000
     - python tests/test_tv_pipeline.py
     - node tests/verify_tv_finder.mjs
+    - python tools/build_foryou.py --require-tv
     - mkdir -p _site
     - cp Australian_Movies_Android.html _site/index.html
     - cp TV_Shows_Android.html _site/tv.html
+    - cp ForYou_Android.html _site/foryou.html
+    - cp site/* _site/
     - ls -l _site
   artifacts:
     paths: [_site/]

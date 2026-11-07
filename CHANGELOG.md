@@ -17,3 +17,4 @@
 
 - GitHub account suspended, so the GitHub Actions workflow was replaced by `.gitlab-ci.yml` (same build and checks) deploying to a Cloudflare Worker (static assets), kept private with Cloudflare Access.
 - Merged the title-type filter, the TV finder and the Canva redesign into one `main`.
+12. 7 Nov 2026: added a **For you** page (`foryou.html`, linked from the Movies / TV shows switch). You tap 👍 / 👎 on titles (quick-start list of well-known titles, or search). Picks are worked out in the browser from shared genres, era, IMDb score and vote count, with "Because you liked …" reasons, Movies/TV tabs, a year filter and an "On my services" filter that reuses the movie finder's saved services. Ratings are kept in that browser's localStorage only. Built by `tools/build_foryou.py` from the already-built movie and TV pages (no new facts). Added a web app manifest and icons so Android Chrome can install it to the home screen.
