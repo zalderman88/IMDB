@@ -46,19 +46,37 @@ def main():
             f.write(basics)
         with gzip.open(t / 'r.gz', 'wt') as f:
             f.write(ratings)
+        tm = t / 'tmdb'
+        tm.mkdir()
+        (tm / 'watch-providers-movie.json').write_text(json.dumps({'results': [
+            {'provider_name': 'Stan', 'provider_id': 21, 'display_priority': 3},
+            {'provider_name': 'Amazon Prime Video', 'provider_id': 9, 'display_priority': 1},
+            {'provider_name': 'Disney Plus', 'provider_id': 337, 'display_priority': 2}]}))
+        (tm / 'discover-movie-21.json').write_text(json.dumps({'results': [
+            {'id': 5, 'title': 'Stan Film', 'release_date': '2025-01-01', 'original_language': 'en'},
+            {'id': 6, 'title': 'Alpha Film', 'release_date': '2026-01-01', 'original_language': 'en'}]}))
+        (tm / 'discover-movie-337.json').write_text(json.dumps({'results': [
+            {'id': 7, 'title': 'Disney Film', 'release_date': '2025-01-01', 'original_language': 'en'}]}))
+        (tm / 'discover-movie-9.json').write_text(json.dumps({'results': [
+            {'id': 8, 'title': 'Should Not Appear', 'release_date': '2025-01-01', 'original_language': 'en'}]}))
+        for i, tt in ((5, 'tt9000040'), (6, 'tt9000010'), (7, 'tt9000041'), (8, 'tt9000042')):
+            (tm / f'movie-{i}-external_ids.json').write_text(json.dumps({'imdb_id': tt}))
         out, js = t / 'top20.html', t / 'top20.json'
         r = subprocess.run([sys.executable, str(ROOT / 'tools/build_top20.py'), '--netflix-tsv', str(t / 'nf.tsv'),
-                            '--sa-fixture', str(sa), '--basics', str(t / 'b.gz'), '--ratings', str(t / 'r.gz'),
+                            '--sa-fixture', str(sa), '--tmdb-fixture', str(tm), '--basics', str(t / 'b.gz'), '--ratings', str(t / 'r.gz'),
                             '--today', '2026-11-07', '--cache-dir', str(t / 'cache'), '--out', str(out), '--json', str(js)],
                            capture_output=True, text=True, env={'PATH': '/usr/bin:/bin'})
         assert r.returncode == 0, r.stderr
         d = json.loads(js.read_text())
         movies = {m['title']: m for m in d['movies']}
-        # Alpha: Netflix #1 (10) + Prime #2 (5) = 15, plus (8.0-6)*1.5 = 3 bonus.
+        # Alpha: Netflix #1 (10) + Prime #2 (5) + Stan TMDB #2 (5 * 0.6 = 3) = 18, plus (8.0-6)*1.5 = 3.
         a = movies['Alpha Film']
-        assert a['rank'] == 1 and a['chartPts'] == 15 and a['bonus'] == 3 and a['total'] == 18, a
-        assert [c['svc'] for c in a['charts']] == ['netflix', 'prime'], a['charts']
-        assert {w['svc'] for w in a['where']} == {'netflix', 'prime'}
+        assert a['rank'] == 1 and a['chartPts'] == 18 and a['bonus'] == 3 and a['total'] == 21, a
+        assert [c['svc'] for c in a['charts']] == ['netflix', 'prime', 'stan'], a['charts']
+        # TMDB fills Stan and Disney+ (no official chart here) but not Prime, which has one.
+        assert movies['Stan Film']['chartPts'] == 6 and movies['Disney Film']['charts'][0]['src'] == 'tmdb'
+        assert 'Should Not Appear' not in movies
+        assert {w['svc'] for w in a['where']} == {'netflix', 'prime', 'stan'}
         # Old Classic: #2 of 3 -> 6.667 points, + a quarter of last week's #1 (10 * 0.25 = 2.5);
         # matched to the 1980 film (the 2005 one has under 200 votes), bonus (8.5-6)*1.5 = 3.75.
         o = movies['Old Classic']

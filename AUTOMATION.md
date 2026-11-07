@@ -39,8 +39,8 @@ services. Sources (no scraping; published files and documented APIs only):
 2. The services' own AU top lists from the Streaming Availability API `GET /shows/top` (Netflix, Prime Video,
    Disney+, Apple TV+, Paramount+, HBO Max), using the same `STREAMING_AVAILABILITY_API_KEY` as the New page.
    About 12 requests per scheduled run; cached in `cache/top20_sa.json` so code pushes spend none.
-3. Optional `TMDB_API_KEY`: TMDB popularity for titles on AU services with no chart (Stan, Binge, Foxtel Now,
-   BritBox, ABC iview, SBS On Demand, Shudder, DocPlay), counted at 60%.
+3. `TMDB_API_KEY` (set): TMDB popularity for titles on AU services with no official chart (Stan, Binge, Foxtel Now,
+   BritBox, ABC iview, SBS On Demand, Shudder, DocPlay, and any API service whose chart is missing), counted at 60%.
 4. IMDb ratings/votes from the datasets the build already downloads (also used to identify Netflix titles).
 
 Scoring: 10 points for #1 down to 1 for #10 on each chart; best chart per service; services add up; Netflix

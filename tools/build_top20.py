@@ -60,8 +60,14 @@ NAMES = {'netflix': 'Netflix', 'prime': 'Prime Video', 'disney': 'Disney+', 'app
          'shudder': 'Shudder', 'docplay': 'DocPlay', 'crunchyroll': 'Crunchyroll'}
 # TMDB AU provider names -> our service id. Services with an official chart above are not
 # repeated here, so TMDB only fills the gaps.
-TMDB_PROVIDERS = {'Stan': 'stan', 'Binge': 'binge', 'Foxtel Now': 'foxtel', 'BritBox': 'britbox',
-                  'ABC iview': 'iview', 'SBS On Demand': 'sbs', 'Shudder': 'shudder', 'DocPlay': 'docplay'}
+# TMDB AU provider names (lower-case, letters and digits only) -> our service id. TMDB fills
+# services that have no official chart; services from SA_SERVICES are used only when the
+# Streaming Availability API gave no chart for them (no key, or the API was down).
+TMDB_PROVIDERS = {'stan': 'stan', 'binge': 'binge', 'foxtelnow': 'foxtel', 'foxtel': 'foxtel',
+                  'britbox': 'britbox', 'abciview': 'iview', 'sbsondemand': 'sbs', 'shudder': 'shudder',
+                  'docplay': 'docplay', 'amazonprimevideo': 'prime', 'primevideo': 'prime',
+                  'disneyplus': 'disney', 'disney': 'disney', 'appletvplus': 'apple', 'appletv': 'apple',
+                  'paramountplus': 'paramount', 'paramount': 'paramount', 'hbomax': 'hbo', 'max': 'hbo'}
 TMDB_WEIGHT = 0.6
 MIN_VOTES = 1000
 csv.field_size_limit(sys.maxsize)
@@ -204,7 +210,7 @@ def sa_where(show):
 
 # ---------- source 3: TMDB popularity on AU services with no chart (optional) ----------
 
-def tmdb_lists(fixture_dir):
+def tmdb_lists(fixture_dir, skip=()):
     key = os.environ.get('TMDB_API_KEY', '').strip()
     if not fixture_dir and not key:
         return {}, ['TMDB key not set (optional)']
@@ -226,11 +232,13 @@ def tmdb_lists(fixture_dir):
     try:
         for kind, tk in (('movie', 'movie'), ('series', 'tv')):
             provs = call(f'/watch/providers/{tk}', watch_region='AU').get('results', [])
-            ids = {p['provider_name']: p['provider_id'] for p in provs}
-            for name, svc in TMDB_PROVIDERS.items():
-                if name not in ids:
-                    continue
-                res = call(f'/discover/{tk}', watch_region='AU', with_watch_providers=str(ids[name]),
+            ids = {}
+            for prov in sorted(provs, key=lambda x: x.get('display_priority', 999)):
+                svc = TMDB_PROVIDERS.get(re.sub(r'[^a-z0-9]', '', prov['provider_name'].lower().replace('+', 'plus')))
+                if svc and svc not in ids and (svc, kind) not in skip:
+                    ids[svc] = prov['provider_id']
+            for svc, pid in ids.items():
+                res = call(f'/discover/{tk}', watch_region='AU', with_watch_providers=str(pid),
                            with_watch_monetization_types='flatrate', sort_by='popularity.desc',
                            include_adult='false', **{'vote_count.gte': '50'}).get('results', [])[:10]
                 items = []
@@ -318,7 +326,7 @@ def main():
     notes += sa_notes
     sources['streaming_availability'] = {'ok': bool(sa), 'lists': sorted(f'{s}-{k}' for s, k in sa),
                                          'fetched': datetime.date.fromtimestamp(sa_at).isoformat() if sa_at else None}
-    tm, tm_notes = tmdb_lists(a.tmdb_fixture)
+    tm, tm_notes = tmdb_lists(a.tmdb_fixture, skip=set(sa))
     notes += tm_notes
     sources['tmdb'] = {'ok': bool(tm), 'lists': sorted(f'{s}-{k}' for s, k in tm)}
 
