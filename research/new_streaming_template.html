@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en-AU"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark light"><meta name="theme-color" content="#14181c">
+<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="New">
+<meta name="referrer" content="no-referrer">
+<link rel="manifest" href="manifest.webmanifest" crossorigin="use-credentials">
+<link rel="icon" href="icon-192.png" type="image/png"><link rel="apple-touch-icon" href="icon-192.png">
+<title>New on streaming · Australia</title>
+<style>
+:root{color-scheme:dark;--page:#14181c;--surface:#1c2229;--ink:#e6edf3;--muted:#8b98a5;--line:#2c3440;--soft:#262e38;--accent:#00c46a;--on-accent:#06140c;--tomato:#ff6b4a;--gold:#ffb02e;--gold-bg:#3a2d12;--green-bg:#123224;--danger:#ff8a7a;--focus:#40bcf4;--hover:#212831;--imdb:#f5c518;--link:#40bcf4;--dot-1:#ff8000;--dot-2:#00e054;--dot-3:#40bcf4;--display:"Inter Tight",Inter,system-ui,sans-serif}
+:root[data-theme=light]{color-scheme:light;--page:#e4e9ee;--surface:#f3f6f8;--ink:#14181c;--muted:#55616d;--line:#cdd5dd;--soft:#dfe5eb;--accent:#00803f;--on-accent:#ffffff;--tomato:#c4432f;--gold:#94620a;--gold-bg:#f6e7c4;--green-bg:#d3eadc;--danger:#b3402f;--focus:#1a8fd0;--hover:#eaeff3;--imdb:#8a6a00;--link:#0b6fa8;--dot-1:#e06f00;--dot-2:#00a845;--dot-3:#1a8fd0;--display:"Inter Tight",Inter,system-ui,sans-serif}
+@font-face{font-family:Inter;font-style:normal;font-weight:400 800;font-display:swap;src:url(fonts/inter-latin.woff2) format('woff2')}
+@font-face{font-family:"Inter Tight";font-style:normal;font-weight:600 800;font-display:swap;src:url(fonts/inter-tight-latin.woff2) format('woff2')}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%;font-size:16px}
+body{margin:0;background:var(--page);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5}
+button,input,select{font:inherit;color:inherit}button,select{cursor:pointer}button{border:0;background:none}a{color:inherit}[hidden]{display:none!important}
+button,input,select,a,summary{-webkit-tap-highlight-color:transparent}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.shell{max-width:980px;margin:auto;padding:16px max(14px,env(safe-area-inset-right)) max(90px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left))}
+.masthead{margin:0 0 16px;padding:8px 2px 18px;border-bottom:1px solid var(--line)}
+.topline{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.kicker{display:flex;align-items:center;gap:8px;margin:0;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:.12em}
+.kicker::before{content:'';flex:none;width:34px;height:10px;background:radial-gradient(circle at 5px 5px,var(--dot-1) 4.5px,transparent 5px),radial-gradient(circle at 17px 5px,var(--dot-2) 4.5px,transparent 5px),radial-gradient(circle at 29px 5px,var(--dot-3) 4.5px,transparent 5px)}
+.mode-switch{display:inline-flex;flex-wrap:wrap;padding:3px;border-radius:999px;background:var(--surface)}
+.mode-switch a{display:inline-flex;align-items:center;min-height:38px;padding:6px 13px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:.02em;color:var(--muted);text-decoration:none;white-space:nowrap}
+.mode-switch a:not([aria-current]):hover{color:var(--ink)}.mode-switch a[aria-current=page]{background:var(--ink);color:var(--page)}
+.heading{display:flex;align-items:center;justify-content:space-between;gap:10px}
+h1{font-family:var(--display);font-weight:800;letter-spacing:-.04em;font-size:38px;line-height:1.13;margin:12px 0 8px}h1 em{font-style:normal;color:var(--accent)}
+.theme{flex:none;min-width:44px;min-height:44px;border:1px solid var(--line);border-radius:50%;background:var(--surface);color:var(--muted)}
+.intro{margin:0;color:var(--muted);font-size:13px}.intro strong{color:var(--ink)}
+.stamp{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:9px 0 0;font-size:11px;color:var(--muted)}.dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+h2{font-family:var(--display);font-weight:700;font-size:20px;letter-spacing:-.02em;margin:0}
+details.box{border-radius:10px;background:var(--surface);margin:0 0 12px}details.box>summary{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:52px;padding:12px 15px;font-weight:700;font-size:14px;cursor:pointer;list-style:none}
+details.box>summary::-webkit-details-marker{display:none}details.box>summary::after{content:'▾';color:var(--muted);transition:transform .2s}details.box[open]>summary::after{transform:rotate(180deg)}
+details.box>summary span{font-weight:500;color:var(--muted);font-size:12px;margin-left:auto}
+details.box .inner{padding:0 15px 15px}
+.services{display:flex;gap:6px;flex-wrap:wrap}
+.services label{display:flex;align-items:center;gap:8px;min-height:42px;padding:6px 12px 6px 10px;border:1px solid var(--line);border-radius:999px;font-size:13px;font-weight:600;background:var(--page);color:var(--muted);cursor:pointer;user-select:none}
+.services label:has(input:checked){border-color:var(--accent);color:var(--ink);background:var(--green-bg)}
+.services input{width:18px;height:18px;margin:0;accent-color:var(--accent)}
+.services .n{font-size:11px;font-weight:500;color:var(--muted)}
+.svc-actions{display:flex;gap:8px;margin-top:10px}.svc-actions button{min-height:38px;padding:4px 14px;border-radius:999px;font-size:12px;font-weight:700;color:var(--accent);background:var(--soft)}
+.help{font-size:12px;color:var(--muted);margin:10px 0 0}
+.controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 14px}
+.tabs{display:inline-flex;padding:3px;border-radius:999px;background:var(--surface)}
+.tabs button{min-height:40px;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:650;color:var(--muted)}.tabs button[aria-pressed=true]{background:var(--accent);color:var(--on-accent)}
+.pill{min-height:44px;padding:8px 14px;border:1px solid transparent;border-radius:999px;background:var(--surface);font-size:13px;font-weight:650;color:var(--muted)}.pill[aria-pressed=true]{background:var(--green-bg);color:var(--accent);border-color:var(--accent)}
+select.pill{padding-right:30px;appearance:auto}
+.count{margin:0 2px 10px;font-size:12px;color:var(--muted)}
+.day{margin:18px 2px 8px;font-family:var(--display);font-size:15px;font-weight:700;letter-spacing:-.01em;color:var(--muted)}.day:first-of-type{margin-top:4px}
+.cards{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
+.card{display:flex;gap:12px;padding:12px;border-radius:12px;background:var(--surface)}
+.poster{flex:none;width:72px;height:108px;border-radius:8px;background:var(--soft);object-fit:cover;display:flex;align-items:center;justify-content:center;color:var(--muted);font-family:var(--display);font-weight:800;font-size:24px;overflow:hidden}
+.body{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.card h3{margin:0;font-family:var(--display);font-size:17px;font-weight:700;line-height:1.25;letter-spacing:-.02em;overflow-wrap:anywhere}.card h3 a{text-decoration:none}.card h3 a:hover{text-decoration:underline}
+.kind{display:inline-block;margin-right:6px;padding:1px 7px;border-radius:999px;font-family:Inter,system-ui,sans-serif;font-size:10px;font-weight:750;letter-spacing:.06em;text-transform:uppercase;vertical-align:2px;background:var(--gold-bg);color:var(--gold)}.kind.series{background:var(--green-bg);color:var(--accent)}
+.meta{margin:0;font-size:12px;color:var(--muted)}
+.imdb{margin:0;font-size:12px;color:var(--muted)}.imdb strong{font-family:var(--display);font-weight:800;font-size:15px;color:var(--imdb);font-variant-numeric:tabular-nums}
+.overview{margin:0;font-size:13px;color:var(--muted);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer}.overview.open{-webkit-line-clamp:unset}
+.where{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.where a,.where span.svc{display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:0 10px;border-radius:6px;background:var(--soft);font-size:12px;font-weight:600;text-decoration:none;color:var(--ink)}
+.where a:hover{background:var(--hover)}.where i{width:9px;height:9px;border-radius:50%;flex:none;background:var(--accent);box-shadow:0 0 0 1.5px var(--muted)}.where small{font-weight:500;color:var(--muted);font-size:11px}
+.more{display:block;min-height:48px;margin:16px auto 0;padding:10px 22px;border-radius:999px;font-size:14px;font-weight:700;background:var(--accent);color:var(--on-accent)}
+.empty{padding:22px 16px;border:1px dashed var(--line);border-radius:12px;text-align:center;color:var(--muted);font-size:14px}.empty strong{color:var(--ink)}
+.note{margin:22px 2px 0;font-size:11px;color:var(--muted)}.note a{color:var(--link)}
+@media(min-width:700px){.cards{grid-template-columns:1fr 1fr}h1{font-size:48px}.shell{padding-top:28px}}
+</style></head><body><main class="shell">
+<header class="masthead"><div class="topline"><p class="kicker">JUST ADDED IN AUSTRALIA</p><nav class="mode-switch" aria-label="Finder"><a href="index.html">Movies</a><a href="tv.html">TV shows</a><a href="foryou.html">For you</a><a href="new.html" aria-current="page">New</a></nav></div><div class="heading"><h1>New on <em>streaming</em></h1><button class="theme" id="theme" type="button" aria-label="Switch colour theme" title="Switch colour theme"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="display:block;margin:auto"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button></div>
+<p class="intro"><strong>Movies and shows added to Australian subscription services in the last month.</strong> Tick the services you have; your choice is saved on this device.</p>
+<p class="stamp"><span class="dot"></span><span id="stamp">Loading…</span></p></header>
+
+<details class="box" id="svc-box"><summary>My services <span id="svc-sum"></span></summary><div class="inner">
+<div class="services" id="services"></div>
+<div class="svc-actions"><button type="button" id="svc-all">Tick all</button><button type="button" id="svc-none">Untick all</button></div>
+<p class="help">Only services with something new this month are listed.</p></div></details>
+
+<div class="controls"><div class="tabs" role="group" aria-label="Show"><button type="button" data-tab="all" aria-pressed="true">All</button><button type="button" data-tab="movie" aria-pressed="false">Movies</button><button type="button" data-tab="series" aria-pressed="false">Series</button></div>
+<button class="pill" id="seasons" type="button" aria-pressed="true">Include new seasons</button>
+<label class="sr-only" for="min">Minimum IMDb rating</label><select class="pill" id="min"><option value="0">Any rating</option><option value="6">IMDb 6+</option><option value="7">IMDb 7+</option><option value="8">IMDb 8+</option></select>
+<label class="sr-only" for="sort">Sort</label><select class="pill" id="sort"><option value="new">Newest first</option><option value="imdb">Highest IMDb</option></select></div>
+<p class="count" id="count" aria-live="polite"></p>
+<div id="list"></div><div class="empty" id="empty" hidden></div>
+<button class="more" id="more" type="button" hidden>Show more</button>
+<p class="note" id="note"></p>
+<noscript><p>Enable JavaScript to see new arrivals.</p></noscript>
+</main>
+<script id="catalogue" type="application/json">@@DATA@@</script>
+<script id="metadata" type="application/json">@@META@@</script>
+<script>
+'use strict';
+const D=JSON.parse(document.getElementById('catalogue').textContent),META=JSON.parse(document.getElementById('metadata').textContent);
+const $=id=>document.getElementById(id),SV=META.services||[],STORE='new-streaming-v1',BATCH=40;
+let store={off:[],tab:'all',seasons:true,min:0,sort:'new'};
+try{const s=JSON.parse(localStorage.getItem(STORE));if(s&&typeof s==='object')store=Object.assign(store,s);}catch{}
+if(!Array.isArray(store.off))store.off=[];
+function save(){try{localStorage.setItem(STORE,JSON.stringify(store));}catch{}}
+function el(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e;}
+const fmt=n=>Number(n).toLocaleString('en-AU'),votesShort=v=>v>=1e6?(v/1e6).toFixed(1).replace(/\.0$/,'')+'M':v>=1e3?Math.round(v/1e3)+'k':String(v);
+const dayFmt=new Intl.DateTimeFormat('en-AU',{weekday:'short',day:'numeric',month:'short',timeZone:'Australia/Perth'});
+const shortFmt=new Intl.DateTimeFormat('en-AU',{day:'numeric',month:'short',timeZone:'Australia/Perth'});
+const longFmt=new Intl.DateTimeFormat('en-AU',{day:'numeric',month:'long',year:'numeric',timeZone:'Australia/Perth'});
+const dayKey=ts=>new Intl.DateTimeFormat('en-CA',{timeZone:'Australia/Perth'}).format(new Date(ts*1000));
+// D rows: [title,type,year,lastYear,seasons,genres,overview,poster,imdbId,imdbScore,imdbVotes,adds]; adds: [[svcIdx,ts,link,season|0]]
+const items=D.map(r=>({title:r[0],type:r[1],year:r[2],last:r[3],seasons:r[4],genres:r[5]||[],overview:r[6],poster:r[7],imdb:r[8],score:r[9],votes:r[10],adds:r[11]}));
+const svcCount=SV.map(()=>0);for(const it of items)for(const i of new Set(it.adds.map(a=>a[0])))svcCount[i]++;
+
+function stamp(){
+  if(META.state==='no-key'){$('stamp').textContent='Not set up yet';return;}
+  if(META.state==='error'){$('stamp').textContent='Couldn’t load the latest list';return;}
+  $('stamp').textContent='Checked '+longFmt.format(new Date(META.fetchedAt*1000))+' · added since '+shortFmt.format(new Date(META.from*1000));
+}
+function buildServices(){
+  const box=$('services');box.replaceChildren();
+  SV.forEach((s,i)=>{if(!svcCount[i])return;const l=el('label'),c=el('input');c.type='checkbox';c.checked=!store.off.includes(s.id);c.dataset.id=s.id;
+    c.addEventListener('change',()=>{store.off=store.off.filter(x=>x!==s.id);if(!c.checked)store.off.push(s.id);save();render(true);});
+    l.append(c,el('span','',s.name),el('span','n',String(svcCount[i])));box.append(l);});
+  summary();
+}
+function summary(){const shown=SV.filter((s,i)=>svcCount[i]),on=shown.filter(s=>!store.off.includes(s.id));$('svc-sum').textContent=on.length===shown.length?'All '+shown.length:on.length+' of '+shown.length;}
+function setAll(on){store.off=on?[]:SV.map(s=>s.id);save();buildServices();render(true);}
+$('svc-all').addEventListener('click',()=>setAll(true));$('svc-none').addEventListener('click',()=>setAll(false));
+
+function visible(it){
+  if(store.tab!=='all'&&it.type!==store.tab)return null;
+  if(store.min&&!(it.score>=store.min))return null;
+  const adds=it.adds.filter(a=>!store.off.includes(SV[a[0]].id)&&(store.seasons||!a[3]));
+  if(!adds.length)return null;
+  return{it,adds,latest:Math.max(...adds.map(a=>a[1]))};
+}
+function card(v){
+  const{it,adds}=v,li=el('li','card');
+  if(it.poster){const img=el('img','poster');img.src=it.poster;img.alt='';img.loading='lazy';img.decoding='async';img.referrerPolicy='no-referrer';img.width=72;img.height=108;img.onerror=()=>img.replaceWith(el('div','poster',it.title.slice(0,1)));li.append(img);}
+  else li.append(el('div','poster',it.title.slice(0,1)));
+  const b=el('div','body'),h=el('h3');h.append(el('span','kind '+it.type,it.type==='series'?'Series':'Movie'));
+  if(it.imdb){const a=el('a','',it.title);a.href='https://www.imdb.com/title/'+it.imdb+'/';a.target='_blank';a.rel='noopener';h.append(a);}else h.append(document.createTextNode(it.title));
+  b.append(h);
+  const yrs=it.type==='series'&&it.last&&it.last!==it.year?it.year+'–'+it.last:it.year?String(it.year):'';
+  const meta=[yrs,it.type==='series'&&it.seasons?it.seasons+(it.seasons===1?' season':' seasons'):'',it.genres.slice(0,3).join(' · ')].filter(Boolean).join(' · ');
+  if(meta)b.append(el('p','meta',meta));
+  if(typeof it.score==='number'){const p=el('p','imdb');p.append(el('strong','',it.score.toFixed(1)),document.createTextNode(' IMDb · '+votesShort(it.votes)+' votes'));b.append(p);}
+  if(it.overview){const o=el('p','overview',it.overview);o.title='Tap to read more';o.addEventListener('click',()=>o.classList.toggle('open'));b.append(o);}
+  const w=el('div','where');
+  const seen=new Map();for(const a of adds.slice().sort((x,y)=>y[1]-x[1])){const k=a[0]+':'+a[3];if(!seen.has(k))seen.set(k,a);}
+  for(const a of seen.values()){const s=SV[a[0]],tag=a[2]?el('a'):el('span','svc');if(a[2]){tag.href=a[2];tag.target='_blank';tag.rel='noopener';}
+    const dotEl=el('i');if(s.color)dotEl.style.background=s.color;tag.append(dotEl,document.createTextNode(s.name),el('small','',(a[3]?'Season '+a[3]+' · ':'')+shortFmt.format(new Date(a[1]*1000))));w.append(tag);}
+  b.append(w);li.append(b);return li;
+}
+let rows=[],limit=BATCH;
+function render(reset){
+  if(reset)limit=BATCH;summary();
+  rows=items.map(visible).filter(Boolean);
+  if(store.sort==='imdb')rows.sort((x,y)=>(y.it.score||0)-(x.it.score||0)||(y.it.votes||0)-(x.it.votes||0)||y.latest-x.latest);
+  else rows.sort((x,y)=>y.latest-x.latest||(y.it.votes||0)-(x.it.votes||0));
+  const list=$('list');list.replaceChildren();
+  let ol=null,lastDay='';
+  for(const v of rows.slice(0,limit)){
+    if(store.sort==='new'){const k=dayKey(v.latest);if(k!==lastDay){lastDay=k;list.append(el('h2','day',dayFmt.format(new Date(v.latest*1000))));ol=null;}}
+    if(!ol){ol=el('ol','cards');list.append(ol);}
+    ol.append(card(v));
+  }
+  $('more').hidden=rows.length<=limit;
+  $('count').textContent=items.length?fmt(rows.length)+(rows.length===1?' title':' titles'):'';
+  const empty=$('empty');empty.replaceChildren();
+  if(!items.length){
+    empty.hidden=false;
+    if(META.state==='no-key'){empty.append(el('strong','','Waiting for the streaming data key.')),empty.append(document.createElement('br'),document.createTextNode('Once the key is saved in GitLab, the next build fills this page.'));}
+    else if(META.state==='error'){empty.append(el('strong','','The streaming data service didn’t answer last time.')),empty.append(document.createElement('br'),document.createTextNode('The next scheduled build will try again.'));}
+    else empty.textContent='Nothing new found in the last month.';
+  }else if(!rows.length){empty.hidden=false;empty.textContent=SV.every((s,i)=>!svcCount[i]||store.off.includes(s.id))?'Tick at least one service above.':'Nothing matches these filters.';}
+  else empty.hidden=true;
+}
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{store.tab=b.dataset.tab;save();sync();render(true);}));
+$('seasons').addEventListener('click',()=>{store.seasons=!store.seasons;save();sync();render(true);});
+$('min').addEventListener('change',e=>{store.min=Number(e.target.value)||0;save();render(true);});
+$('sort').addEventListener('change',e=>{store.sort=e.target.value==='imdb'?'imdb':'new';save();render(true);});
+$('more').addEventListener('click',()=>{limit+=BATCH;render(false);});
+function sync(){document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.tab===store.tab)));$('seasons').setAttribute('aria-pressed',String(!!store.seasons));$('min').value=String(store.min||0);$('sort').value=store.sort;}
+{const n=$('note'),a=el('a','',META.source||'Streaming Availability API');a.href=META.sourceUrl||'https://www.movieofthenight.com/about/api';a.target='_blank';a.rel='noopener';
+  n.append(document.createTextNode('Streaming data from the '),a,document.createTextNode('. IMDb ratings from IMDb’s official datasets'+(META.imdbAsOf?' ('+META.imdbAsOf+')':'')+'. Refreshed with each scheduled build (1st and 15th of the month). Links open the service’s own page.'));}
+if(!SV.some((s,i)=>svcCount[i]))$('svc-box').hidden=true;else{let fresh=true;try{fresh=!localStorage.getItem(STORE);}catch{}if(fresh)$('svc-box').open=true;}
+$('theme').addEventListener('click',()=>{const dark=getComputedStyle(document.documentElement).colorScheme==='dark';document.documentElement.dataset.theme=dark?'light':'dark';try{localStorage.setItem('movie-finder-theme',dark?'light':'dark');}catch{}});
+try{const t=localStorage.getItem('movie-finder-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;}catch{}
+stamp();sync();buildServices();render(true);
+</script></body></html>

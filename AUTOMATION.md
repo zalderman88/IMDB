@@ -21,3 +21,11 @@ If any step fails, nothing is deployed and the previous site stays up. The refre
 ## ChatGPT task
 
 The original monthly ChatGPT task (1st of each month, Perth time) still exists in ChatGPT and updates the ChatGPT copy only. It is not connected to this repo. Turn it off in ChatGPT if you only want this version.
+
+## New on streaming (new.html)
+
+`new.html` lists movies and series added to Australian **subscription** streaming services in the last 31 days, with on/off checkboxes per service (saved in the browser under `new-streaming-v1`). The data comes from the official **Streaming Availability API** by Movie of the Night (https://www.movieofthenight.com/about/api), not from scraping:
+
+1. `tools/fetch_new_streaming.py` calls `/countries/au` once and `/changes?change_type=new` for new titles and new seasons (25 changes a page, at most 80 pages a run). It needs the masked CI/CD variable `STREAMING_AVAILABILITY_API_KEY` (free plan, 1,000 requests a month). Without it the page says it is not set up yet and the build still passes.
+2. Scheduled and manual pipelines always fetch. Pushes to `main` reuse the GitLab CI cache (`cache/new_streaming.json`) if it is under 13 days old, so code changes don't spend requests. On HTTP 401/403/429 it stops and keeps the previous data.
+3. `tools/build_new_streaming.py` adds IMDb ratings from the official `title.ratings` dataset and writes `new.html`. `tests/test_new_streaming.py` checks both scripts offline against a fake API.

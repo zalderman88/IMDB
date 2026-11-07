@@ -15,6 +15,10 @@ build:
   stage: build
   image: python:3.12-bookworm
   timeout: 45m
+  # Keeps the New on streaming data between pipelines so code pushes don't spend API requests.
+  cache:
+    key: new-on-streaming
+    paths: [cache/]
   script:
     - apt-get update -qq && apt-get install -y -qq nodejs >/dev/null && node --version
     - mkdir -p /tmp/imdb
@@ -34,10 +38,18 @@ build:
     - python tests/test_tv_pipeline.py
     - node tests/verify_tv_finder.mjs
     - python tools/build_foryou.py --require-tv
+    # New on streaming (Streaming Availability API; needs CI/CD variable STREAMING_AVAILABILITY_API_KEY).
+    # Scheduled and manual pipelines fetch fresh data; pushes reuse the cached copy if under 13 days old.
+    - python tests/test_new_streaming.py
+    - |
+      if [ "$CI_PIPELINE_SOURCE" = "schedule" ] || [ "$CI_PIPELINE_SOURCE" = "web" ]; then FORCE=--force; else FORCE=; fi
+      python tools/fetch_new_streaming.py $FORCE
+    - python tools/build_new_streaming.py --ratings /tmp/imdb/title.ratings.tsv.gz
     - mkdir -p _site
     - cp Australian_Movies_Android.html _site/index.html
     - cp TV_Shows_Android.html _site/tv.html
     - cp ForYou_Android.html _site/foryou.html
+    - cp New_Streaming_Android.html _site/new.html
     - cp -r site/. _site/
     - ls -l _site
   artifacts:
