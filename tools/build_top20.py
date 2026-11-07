@@ -108,9 +108,16 @@ def netflix_charts(path):
     if path:
         text = pathlib.Path(path).read_text(encoding='utf-8')
     else:
-        req = urllib.request.Request(NETFLIX_TSV, headers={'User-Agent': UA})
-        with urllib.request.urlopen(req, timeout=180) as r:
-            text = r.read().decode('utf-8')
+        for attempt in range(4):
+            try:
+                req = urllib.request.Request(NETFLIX_TSV, headers={'User-Agent': UA})
+                with urllib.request.urlopen(req, timeout=180) as r:
+                    text = r.read().decode('utf-8')
+                break
+            except Exception:  # noqa: BLE001 - large file; retry cut-off downloads
+                if attempt == 3:
+                    raise
+                time.sleep(10 * (attempt + 1))
     rows = [r for r in csv.DictReader(io.StringIO(text), delimiter='\t', quoting=csv.QUOTE_NONE)
             if r.get('country_iso2') == 'AU']
     weeks = sorted({r['week'] for r in rows}, reverse=True)

@@ -54,7 +54,12 @@ build:
     # Top 20: Netflix's official AU Top 10 file + services' own top lists (Streaming Availability
     # /shows/top, same key, ~12 requests, cached like New) + optional TMDB_API_KEY + IMDb ratings.
     - python tests/test_top20.py
-    - python tools/build_top20.py --basics /tmp/imdb/title.basics.tsv.gz --ratings /tmp/imdb/title.ratings.tsv.gz $FORCE
+    - |
+      curl --fail --silent --show-error --location --retry 4 --retry-delay 15 --retry-all-errors \
+        -A 'movie-finder-top20/1.0' -o /tmp/netflix_top10.tsv \
+        https://www.netflix.com/tudum/top10/data/all-weeks-countries.tsv || rm -f /tmp/netflix_top10.tsv
+      NF=; [ -s /tmp/netflix_top10.tsv ] && NF="--netflix-tsv /tmp/netflix_top10.tsv"
+      python tools/build_top20.py --basics /tmp/imdb/title.basics.tsv.gz --ratings /tmp/imdb/title.ratings.tsv.gz $NF $FORCE
     - mkdir -p _site
     - cp Australian_Movies_Android.html _site/index.html
     - cp TV_Shows_Android.html _site/tv.html
