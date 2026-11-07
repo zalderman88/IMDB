@@ -1,6 +1,6 @@
 # Movie Finder (Australia)
 
-**Live site (private, Cloudflare Access): https://zac-movies.pages.dev/** — searchable IMDb + Rotten Tomatoes movie finder for Australian streaming services. **TV finder: https://zac-movies.pages.dev/tv.html** — IMDb series and miniseries that aired from 2020, plus shows from 2000 onwards rated above 8.0 (see USER_REQUIREMENTS.md). Works on Android and desktop browsers. IMDb ratings refresh automatically twice a week; see [AUTOMATION.md](AUTOMATION.md).
+**Live site (private, Cloudflare Access): https://zac-movies.zalderman.workers.dev/** — searchable IMDb + Rotten Tomatoes movie finder for Australian streaming services. **TV finder: https://zac-movies.zalderman.workers.dev/tv.html** — IMDb series and miniseries that aired from 2020, plus shows from 2000 onwards rated above 8.0 (see USER_REQUIREMENTS.md). Works on Android and desktop browsers. IMDb ratings refresh automatically twice a week; see [AUTOMATION.md](AUTOMATION.md).
 
 The built HTML is not committed. Run `python rebuild.py` to create `Australian_Movies_Android.html` locally, or download it from the live site. The TV page needs the IMDb TV snapshot first: run `python tools/refresh_tv.py` (downloads about 250 MB of official IMDb datasets), then `python rebuild.py` also writes `TV_Shows_Android.html`.
 
@@ -55,7 +55,7 @@ Or run `python rebuild.py` to rebuild without the Node checks. Run `node tests/v
 | research/tv_finder_template.html, research/build_tv.py | TV finder UI template and builder (writes TV_Shows_Android.html, published as tv.html) |
 | tools/refresh_tv.py | Builds research/imdb/tv_1k.json from IMDb basics/ratings/episode datasets |
 | tests/test_tv_pipeline.py, tests/verify_tv_finder.mjs | Offline TV fixture test and TV UI checks |
-| .gitlab-ci.yml | Twice-weekly IMDb refresh and Cloudflare Pages deploy |
+| .gitlab-ci.yml | Twice-weekly IMDb refresh and Cloudflare deploy |
 | tools/refresh_imdb.py, tools/check_refresh.py | IMDb dataset refresh and post-refresh checks |
 | REFRESH_GUIDE.md | Source-refresh procedure and remaining acquisition gaps |
 | ARCHITECTURE.md | How the runtime, source matching and filters work |

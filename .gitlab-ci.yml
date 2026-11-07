@@ -1,10 +1,7 @@
-# Twice-weekly IMDb refresh, deployed to Cloudflare Pages.
+# Twice-weekly IMDb refresh, deployed to the Cloudflare Worker zac-movies (static assets, see wrangler.jsonc).
 # Schedule it in GitLab: Build > Pipeline schedules > cron "0 4 * * 2,5", timezone Perth.
 # Needs CI/CD variables CLOUDFLARE_API_TOKEN (masked) and CLOUDFLARE_ACCOUNT_ID.
-# Optional variable CF_PAGES_PROJECT (default zac-movies).
-
-variables:
-  CF_PAGES_PROJECT: zac-movies
+# The token needs Account > Workers Scripts > Edit.
 
 workflow:
   rules:
@@ -48,4 +45,4 @@ deploy:
   image: node:22-bookworm-slim
   needs: [build]
   script:
-    - npx --yes wrangler@4 pages deploy _site --project-name "$CF_PAGES_PROJECT" --branch main --commit-dirty=true
+    - npx --yes wrangler@4 deploy

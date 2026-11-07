@@ -1,0 +1,7 @@
+// Cloudflare Worker serving the built site as static assets (zac-movies.zalderman.workers.dev).
+{
+  "name": "zac-movies",
+  "compatibility_date": "2026-11-01",
+  "workers_dev": true,
+  "assets": { "directory": "./_site" }
+}

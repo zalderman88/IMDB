@@ -1,6 +1,6 @@
-# Automatic refresh (GitLab CI to Cloudflare Pages)
+# Automatic refresh (GitLab CI to Cloudflare)
 
-`.gitlab-ci.yml` runs from a GitLab pipeline schedule **twice a week** (cron `0 4 * * 2,5`, Australia/Perth: Tuesday and Friday 4:00 am), on every push to `main`, and on demand (**Build > Pipelines > Run pipeline**). It needs CI/CD variables `CLOUDFLARE_API_TOKEN` (Account > Cloudflare Pages > Edit) and `CLOUDFLARE_ACCOUNT_ID`.
+`.gitlab-ci.yml` runs from a GitLab pipeline schedule **twice a week** (cron `0 4 * * 2,5`, Australia/Perth: Tuesday and Friday 4:00 am), on every push to `main`, and on demand (**Build > Pipelines > Run pipeline**). It needs CI/CD variables `CLOUDFLARE_API_TOKEN` (Account > Workers Scripts > Edit) and `CLOUDFLARE_ACCOUNT_ID`.
 
 Each run:
 
@@ -9,7 +9,7 @@ Each run:
 3. Rebuilds the movie and TV apps from the snapshots (`rebuild.py`).
 4. Runs `tools/check_refresh.py`: every film has 1,000+ IMDb votes and passes a score route, the catalogue has not shrunk by more than 5%, and streaming/RT/classification/language facts are unchanged (baseline `data/non_imdb_facts.json`).
 5. Runs the Node functional tests, then the TV checks: at least 1,000 qualifying shows, the offline fixture test (`tests/test_tv_pipeline.py`) and the TV UI checks (`tests/verify_tv_finder.mjs`).
-6. Deploys `_site/` to Cloudflare Pages with `wrangler pages deploy`: movies at https://zac-movies.pages.dev/ and TV at /tv.html. Cloudflare Access limits the site to allow-listed emails.
+6. Deploys `_site/` to the Cloudflare Worker `zac-movies` with `wrangler deploy` (static assets, wrangler.jsonc): movies at https://zac-movies.zalderman.workers.dev/ and TV at /tv.html. Cloudflare Access limits the site to allow-listed emails.
 
 If any step fails, nothing is deployed and the previous site stays up. The refreshed IMDb data is not committed back; each run starts from the official datasets, so the repo does not grow.
 

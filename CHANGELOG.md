@@ -13,7 +13,7 @@
 11. Added a TV finder (published at `tv.html`, with a Movies / TV shows switch). Built from IMDb's official datasets (basics, ratings, episode). Lists TV series and miniseries with 1,000+ IMDb votes that either have IMDb 6.0+ and aired in 2020 or later (including older shows with episodes released from 2020), or first aired in 2000 or later with IMDb above 8.0. Shows rated 9.0+ with under 10,000 votes are hidden by default as likely vote-stuffed. No streaming, RT, classification, country or language facts for TV yet. Refreshed with the movies twice a week. The movie catalogue and its UI are unchanged.
 11. 7 Nov 2026: cinema-marquee restyle from a Canva visual direction (midnight ink, cinema cream, marquee gold; serif display headings), a Movies / TV shows switch in the header linking to tv.html, and a sticky, larger "Show N movies" button that collapses the filter panel. Layout/CSS only; catalogue, filters and snapshot date unchanged.
 
-## 7 November 2026: moved hosting to Cloudflare Pages
+## 7 November 2026: moved hosting to Cloudflare
 
-- GitHub account suspended, so the GitHub Actions workflow was replaced by `.gitlab-ci.yml` (same build and checks) deploying to Cloudflare Pages, kept private with Cloudflare Access.
+- GitHub account suspended, so the GitHub Actions workflow was replaced by `.gitlab-ci.yml` (same build and checks) deploying to a Cloudflare Worker (static assets), kept private with Cloudflare Access.
 - Merged the title-type filter, the TV finder and the Canva redesign into one `main`.
