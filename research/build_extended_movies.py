@@ -163,7 +163,10 @@ def passes(m):
 
 selected=[m for m in movies.values() if passes(m)]
 selected.sort(key=lambda x:(-(x.get('score') or 0),-(x.get('votes') or 0),x['title']))
-default_movies=[m for m in selected if 'IN' not in m['countries'] and m['genres'] and not set(m['genres'])&{'Horror','Romance','Documentary'}]
+def default_route(m):
+    # Default routes: IMDb OR Tomatometer (Popcornmeter is off by default).
+    return ((m.get('score') or 0)>=6 and (m.get('votes') or 0)>=1000) or ((m.get('critics') or 0)>=60 and (m.get('criticCount') or 0)>=50)
+default_movies=[m for m in selected if default_route(m) and 'IN' not in m['countries'] and m['genres'] and not set(m['genres'])&{'Horror','Romance','Documentary'}]
 manifest=json.loads((BASE/'rt_count_manifest.json').read_text())
 meta={'checked':checked_label,'checkedISO':today.isoformat(),'imdbAsOf':imdb_asof.isoformat(),'total':len(selected),'defaultResults':len(default_movies),'defaultCountryFilter':'exclude',
       'imdbMovieRecordsImported':len(imdb),'imdbBulkQualified':sum(not m['adult'] and m['score']>=6 for m in imdb),

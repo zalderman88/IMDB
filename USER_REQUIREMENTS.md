@@ -12,7 +12,7 @@ Detailed list rows, not tiles; Android touch controls; search, dark theme, pagin
 |---|---:|---:|---|
 | IMDb | 6.0 | 1,000 IMDb votes | 6.0–10.0, step 0.1 |
 | Tomatometer | 60% | 50 critic reviews | 60–100%, step 1 |
-| Popcornmeter | 60% | 1,000 audience ratings | 60–100%, step 1 |
+| Popcornmeter (off by default) | 60% | 1,000 audience ratings | 60–100%, step 1 |
 
 Every film must first have at least 1,000 IMDb votes. The three route checkboxes select which scores can qualify a film within that eligible list. A film passes if ANY selected route has both its score and count minimum. A low/missing score in another system cannot veto it. Each route's count minimum is adjustable upward. Unknown counts cannot pass. Banded audience counts use their lower bound. The displayed audience score and its count must describe the same verified/all-audience group.
 

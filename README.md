@@ -17,7 +17,7 @@ For Claude, start with **CLAUDE_HANDOFF_PROMPT.txt** and **CLAUDE.md**.
 - Country: **Exclude India · allow unknown countries**. Fresh opens and Reset filters use `country=exclude`.
 - Original language: **All languages**. English, Foreign language and Unknown are optional filters.
 - Exclude Romance, Horror and Documentary; all years; no service/classification restriction.
-- Every film needs at least **1,000 IMDb votes**. Within that existing list, qualify by IMDb 6.0+ **OR** Tomatometer 60%+ with 50+ critic reviews **OR** Popcornmeter 60%+ with 1,000+ audience ratings.
+- Every film needs at least **1,000 IMDb votes**. Within that existing list, qualify by IMDb 6.0+ **OR** Tomatometer 60%+ with 50+ critic reviews. Popcornmeter (60%+ with 1,000+ audience ratings) is available but off by default (changed 7 Nov 2026 at the user's request).
 
 This is a filter/metadata change only: no films were added or removed, and no existing ratings or counts changed. See CATALOGUE_INTEGRITY.json and tools/check_catalogue_lock.py.
 
