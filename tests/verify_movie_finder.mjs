@@ -59,8 +59,13 @@ assert.equal(count(),meta.defaultResults);
 assert.equal(ids.movies.children.length,Math.min(50,count()));
 assert.ok(ids.movies.children.every(n=>n.tagName==='LI'&&n.className==='movie-row'));
 assert.ok(ids.movies.children.every(n=>n.children.length===3));
-assert.ok(ids.movies.children.every(n=>n.children[1].children.length===3));
-assert.equal(ids.country.value,'exclude');assert.equal(ids['min-votes'].value,'1000');assert.equal(ids['min-critics'].value,'50');assert.equal(ids['min-audience'].value,'1000');
+assert.ok(ids.movies.children.every(n=>n.children[1].children.length===4),'Released, IMDb, Tomatometer, Popcornmeter');
+assert.equal(ids.country,undefined,'No country option: India is always left out');assert.equal(ids['title-type'],undefined);assert.equal(ids.language.value,'english');assert.equal(ids['lang-english'].attrs['aria-pressed'],'true');
+{const sus=m=>typeof m.score==='number'&&m.score>=8.5&&(m.votes||0)<10000&&typeof m.critics!=='number'&&typeof m.audience!=='number';
+assert.ok(data.every(m=>['movie','tvMovie'].includes(m.kind||'movie')),'No shorts, videos or specials');assert.ok(data.every(m=>!(m.countries||[]).includes('IN')),'No Indian productions');assert.ok(!data.some(sus),'No suspicious ratings');
+assert.ok(data.every(m=>(m.countries||[]).length||typeof m.critics==='number'||typeof m.audience==='number'||m.languageGroup!=='unknown'||m.votes>=25000),'Unconfirmed low-vote titles left out');}
+const GROUPS=Object.fromEntries(JSON.parse(run('JSON.stringify(DATA.map(m=>[m.id,m._groups]))')));
+assert.equal(count(),data.filter(m=>['english','unknown'].includes(m.languageGroup)&&((m.score>=6&&m.votes>=1000)||(m.critics>=60&&m.criticCount>=50))&&m.genres?.length&&!GROUPS[m.id].some(g=>['Romance','Horror','Documentary'].includes(g))).length,'English + unknown by default');assert.equal(ids['min-votes'].value,'1000');assert.equal(ids['min-critics'].value,'50');assert.equal(ids['min-audience'].value,'1000');
 
 // Verify independent score routes and small-sample rejection with boundary cases.
 ctx.fixtureCriteria={imdb:true,critics:true,audience:true,score:6,votes:1000,criticsScore:60,criticCount:50,audienceScore:60,audienceCount:1000};
@@ -75,7 +80,7 @@ const fixtures=[
 ];
 for(const [m,expected] of fixtures){ctx.fixture=m;assert.equal(run('Object.values(routes(fixture,fixtureCriteria)).some(Boolean)'),expected);}
 
-assert.equal(ids['use-audience'].checked,false);setCheck('use-audience',true);fire('country','change','all');assert.equal(ids['title-type'].value,'mainstream');fire('title-type','change','all');fire('clear-genres','click');setCheck('unknown-genres',true);assert.equal(count(),data.length);
+assert.equal(ids['use-audience'].checked,false);setCheck('use-audience',true);fire('lang-all','click');assert.equal(ids.language.value,'all');assert.equal(ids['lang-all'].attrs['aria-pressed'],'true');fire('clear-genres','click');setCheck('unknown-genres',true);assert.equal(count(),data.length);
 for(const type of ['imdb','critics','audience']){
  for(const key of ['imdb','critics','audience'])setCheck('use-'+key,key===type);
  const slider=type==='imdb'?'rating':type;
@@ -105,11 +110,9 @@ for(const classification of ['G','PG','M','MA15+','R18+','X18+','Unclassified','
 }
 const pgBox=walk(ids.classifications).find(x=>x.dataset.classification==='PG'),mBox=walk(ids.classifications).find(x=>x.dataset.classification==='M');pgBox.checked=true;pgBox.events.change();mBox.checked=true;mBox.events.change();assert.equal(count(),data.filter(m=>m.classifications?.some(c=>['PG','M'].includes(c))).length);pgBox.checked=false;pgBox.events.change();mBox.checked=false;mBox.events.change();
 assert.equal(ids.language.value,'all');
-{const sus=m=>typeof m.score==='number'&&m.score>=9&&(m.votes||0)<10000&&typeof m.critics!=='number'&&typeof m.audience!=='number';
-fire('title-type','change','features');assert.equal(count(),data.filter(m=>(m.kind||'movie')==='movie').length);
-fire('title-type','change','mainstream');assert.equal(count(),data.filter(m=>(m.kind||'movie')==='movie'&&!sus(m)).length);assert.ok(!data.some(m=>m.title==='Grief 97% Stream 361'&&(m.kind||'movie')==='movie'&&!sus(m)));
-fire('title-type','change','all');assert.equal(count(),data.length);}
-for(const language of ['english','foreign','unknown','all']){fire('language','change',language);assert.equal(count(),data.filter(m=>language==='all'||m.languageGroup===language).length);}
+assert.ok(!data.some(m=>m.title==='Grief 97% Stream 361'));
+for(const language of ['english','foreign','unknown','all']){fire('language','change',language);assert.equal(count(),data.filter(m=>language==='all'||m.languageGroup===language||(language==='english'&&m.languageGroup==='unknown')).length);}
+fire('lang-foreign','click');assert.equal(count(),data.filter(m=>m.languageGroup==='foreign').length);fire('lang-english','click');assert.equal(count(),data.filter(m=>m.languageGroup!=='foreign').length);fire('lang-all','click');assert.equal(count(),data.length);
 assert.ok(data.some(m=>m.languageGroup==='english'),'Known English-language films loaded');
 assert.ok(data.some(m=>m.languageGroup==='foreign'),'Known foreign-language films loaded');
 assert.ok(data.every(m=>['english','foreign','unknown'].includes(m.languageGroup)));
@@ -128,15 +131,17 @@ fire('search','input','zzzz-no-movie-should-match-xyz');await new Promise(r=>set
 fire('search','input','');await new Promise(r=>setTimeout(r,180));
 
 for(const option of ids.sort.options){fire('sort','change',option.value);const first=ids.movies.children.map(n=>n.dataset.id);assert.equal(first.length,50);const current=JSON.parse(run('JSON.stringify(matches.slice(0,50).map(m=>m.id))'));assert.deepEqual(first,current);if(option.value!=='title'){const field=option.value.replace(/-asc$/,''),asc=option.value.endsWith('-asc');const values=JSON.parse(run(`JSON.stringify(matches.map(m=>m[${JSON.stringify(field)}]))`));let seenNull=false,last=null;for(const value of values){if(value===null||value===undefined){seenNull=true;continue;}assert.ok(!seenNull,'Missing scores remain last');if(last!==null)assert.ok(asc?value>=last:value<=last,option.value);last=value;}}}
+fire('sort','change','score');
+// One-tap sort buttons: first tap newest/highest, second tap oldest/lowest.
+for(const f of ['year','critics','audience','score']){fire('sort-'+f,'click');assert.equal(ids.sort.value,f);assert.equal(ids['sort-'+f].attrs['aria-pressed'],'true');assert.ok(['year','critics','audience','score'].filter(x=>x!==f).every(x=>ids['sort-'+x].attrs['aria-pressed']==='false'));fire('sort-'+f,'click');assert.equal(ids.sort.value,f+'-asc');const v=JSON.parse(run(`JSON.stringify(matches.map(m=>m[${JSON.stringify(f)}]).filter(x=>typeof x==='number'))`));for(let i=1;i<v.length;i++)assert.ok(v[i]>=v[i-1],f);}
 fire('sort','change','score');const firstIds=ids.movies.children.map(n=>n.dataset.id);fire('more','click');assert.equal(ids.movies.children.length,100);assert.deepEqual(ids.movies.children.slice(0,50).map(n=>n.dataset.id),firstIds);
 assert.ok(walk(ids.movies).filter(n=>n.tagName==='A'&&n.href).every(n=>n.href.startsWith('https://')));
 const rtLinks=walk(ids.movies).filter(n=>n.tagName==='A'&&n.href?.startsWith('https://www.rottentomatoes.com/'));assert.ok(rtLinks.length>0);
 assert.ok(walk(ids.movies).filter(n=>n.className.includes('badge')).length>0);
 
-fire('country','change','strict');assert.ok(JSON.parse(run('JSON.stringify(matches)')).every(m=>m.countries.length&&!m.countries.includes('IN')));
-fire('country','change','exclude');assert.ok(JSON.parse(run('JSON.stringify(matches)')).every(m=>!m.countries.includes('IN')));
-const stored=makeContext(env.storage);assert.equal(stored.ids.country.value,'exclude');assert.equal(stored.run('matches.length'),count());
-fire('reset-main','click');assert.equal(count(),meta.defaultResults);assert.ok(walk(ids.classifications).filter(x=>x.tagName==='INPUT').every(x=>!x.checked));assert.equal(ids['rating-value'].textContent,'6.0+');assert.equal(ids['critics-value'].textContent,'60%+');assert.equal(ids['audience-value'].textContent,'60%+');assert.equal(ids.country.value,'exclude');assert.equal(ids['use-imdb'].checked,true);assert.equal(ids['use-critics'].checked,true);assert.equal(ids['use-audience'].checked,false);assert.equal(ids.language.value,'all');assert.equal(ids['title-type'].value,'mainstream');assert.equal(ids['genre-summary'].textContent,'3 excluded');
+fire('lang-foreign','click');
+const stored=makeContext(env.storage);assert.equal(stored.ids.language.value,'foreign');assert.equal(stored.run('matches.length'),count());
+fire('reset-main','click');assert.equal(count(),meta.defaultResults);assert.ok(walk(ids.classifications).filter(x=>x.tagName==='INPUT').every(x=>!x.checked));assert.equal(ids['rating-value'].textContent,'6.0+');assert.equal(ids['critics-value'].textContent,'60%+');assert.equal(ids['audience-value'].textContent,'60%+');assert.equal(ids['use-imdb'].checked,true);assert.equal(ids['use-critics'].checked,true);assert.equal(ids['use-audience'].checked,false);assert.equal(ids.language.value,'english');assert.equal(ids['lang-english'].attrs['aria-pressed'],'true');assert.equal(ids['sort-score'].attrs['aria-pressed'],'true');assert.equal(ids['genre-summary'].textContent,'3 excluded');
 fire('done','click');assert.equal(ids.filters.open,false);fire('theme','click');assert.equal(ctx.document.documentElement.dataset.theme,'dark');fire('export','click');
 
-console.log(JSON.stringify({records:data.length,defaultResults:meta.defaultResults,rtReviewCountsChecked:meta.rtReviewCountsChecked,rtOnlyQualifiers:meta.rtOnlyQualifiers,services:meta.sourceCounts,checks:['Independent OR scores','Minimum vote/review boundary cases','Unverified RT counts rejected','123 slider positions','All adjustable review-count options','Seven Australian services','Year range and crossing handles','Sixteen major genres; compound-genre grouping and exclusions','Australian classification multiselect; Unknown separate','Country default allows unknown; reset preserved','Original-language filters: English, foreign, unknown, all','Search and empty state','Thirteen sorting choices; nulls last','Pagination','IMDb and RT review links','Saved filters, reset, theme and CSV export'],status:'passed'}));
+console.log(JSON.stringify({records:data.length,defaultResults:meta.defaultResults,rtReviewCountsChecked:meta.rtReviewCountsChecked,rtOnlyQualifiers:meta.rtOnlyQualifiers,services:meta.sourceCounts,checks:['Independent OR scores','Minimum vote/review boundary cases','Unverified RT counts rejected','123 slider positions','All adjustable review-count options','Seven Australian services','Year range and crossing handles','Sixteen major genres; compound-genre grouping and exclusions','Australian classification multiselect; Unknown separate','India always left out; unknown countries allowed','No shorts/videos; no suspicious ratings','Original language: English incl. unknown by default, any, non-English','One-tap sort buttons','Search and empty state','Thirteen sorting choices; nulls last','Pagination','IMDb and RT review links','Saved filters, reset, theme and CSV export'],status:'passed'}));

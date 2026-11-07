@@ -19,13 +19,14 @@ build:
     - apt-get update -qq && apt-get install -y -qq nodejs >/dev/null && node --version
     - mkdir -p /tmp/imdb
     - |
-      for f in title.basics title.ratings title.episode; do
+      for f in title.basics title.ratings title.episode title.akas; do
         curl --fail --silent --show-error --location --retry 4 --retry-delay 15 \
           -A 'movie-finder-refresh/1.0' -o "/tmp/imdb/$f.tsv.gz" "https://datasets.imdbws.com/$f.tsv.gz"
       done
       ls -l /tmp/imdb
     - python tools/refresh_imdb.py --basics /tmp/imdb/title.basics.tsv.gz --ratings /tmp/imdb/title.ratings.tsv.gz
     - python tools/refresh_tv.py --basics /tmp/imdb/title.basics.tsv.gz --ratings /tmp/imdb/title.ratings.tsv.gz --episode /tmp/imdb/title.episode.tsv.gz
+    - python tools/refresh_india.py --akas /tmp/imdb/title.akas.tsv.gz
     - python rebuild.py
     - python tools/check_refresh.py
     - node tests/verify_movie_finder.mjs

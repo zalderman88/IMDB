@@ -6,6 +6,7 @@ import re
 import datetime
 from zoneinfo import ZoneInfo
 from movie_data_utils import norm,aliases
+from title_quality import load_india,drop_reason
 
 BASE=pathlib.Path(__file__).parent
 ROOT=BASE.parent
@@ -161,14 +162,21 @@ for m in movies.values():
 def passes(m):
     return (m.get('votes') or 0)>=1000 and (((m.get('score') or 0)>=6) or ((m.get('critics') or 0)>=60 and (m.get('criticCount') or 0)>=50) or ((m.get('audience') or 0)>=60 and (m.get('audienceCount') or 0)>=1000))
 
-selected=[m for m in movies.values() if passes(m)]
+india=load_india()
+dropped=collections.Counter()
+selected=[]
+for m in movies.values():
+    if not passes(m):continue
+    reason=drop_reason(m,india)
+    if reason:dropped[reason]+=1;continue
+    selected.append(m)
 selected.sort(key=lambda x:(-(x.get('score') or 0),-(x.get('votes') or 0),x['title']))
 def default_route(m):
     # Default routes: IMDb OR Tomatometer (Popcornmeter is off by default).
     return ((m.get('score') or 0)>=6 and (m.get('votes') or 0)>=1000) or ((m.get('critics') or 0)>=60 and (m.get('criticCount') or 0)>=50)
-default_movies=[m for m in selected if default_route(m) and m.get('kind','movie')=='movie' and not ((m.get('score') or 0)>=9 and (m.get('votes') or 0)<10000 and m.get('critics') is None and m.get('audience') is None) and 'IN' not in m['countries'] and m['genres'] and not set(m['genres'])&{'Horror','Romance','Documentary'}]
+default_movies=[m for m in selected if default_route(m) and m.get('languageGroup','unknown') in ('english','unknown') and m['genres'] and not set(m['genres'])&{'Horror','Romance','Documentary'}]
 manifest=json.loads((BASE/'rt_count_manifest.json').read_text())
-meta={'checked':checked_label,'checkedISO':today.isoformat(),'imdbAsOf':imdb_asof.isoformat(),'total':len(selected),'defaultResults':len(default_movies),'defaultCountryFilter':'exclude',
+meta={'checked':checked_label,'checkedISO':today.isoformat(),'imdbAsOf':imdb_asof.isoformat(),'total':len(selected),'defaultResults':len(default_movies),'defaultCountryFilter':'exclude','defaultLanguage':'english','dropped':dict(dropped),'defaultLanguage':'english','dropped':dict(dropped),
       'imdbMovieRecordsImported':len(imdb),'imdbBulkQualified':sum(not m['adult'] and m['score']>=6 for m in imdb),
       'justWatchRecords':len(jw),'rtSearchRecords':len(rt),'rtReviewCountsChecked':len(rt_counts),
       'rtCheckedInFinal':sum(bool(m.get('rtCountsChecked')) for m in selected),
@@ -178,8 +186,8 @@ meta={'checked':checked_label,'checkedISO':today.isoformat(),'imdbAsOf':imdb_aso
       'languageCounts':dict(collections.Counter(m['languageGroup'] for m in selected)),
       'rtOnlyQualifiers':sum(not ((m.get('score') or 0)>=6 and (m.get('votes') or 0)>=1000) for m in selected),
       'ambiguousMatchesSkipped':ambiguous,'sourceCounts':{c:sum(c in m['offers'] for m in default_movies) for c in providers},
-      'coverageText':f'IMDb bulk data was checked across {len(imdb):,} movie/short records with at least 1,000 votes. {len(jw):,} JustWatch Australia movie records and {len(rt):,} RT search records were processed. Review counts were confirmed for {len(rt_counts):,} RT film pages before access limits interrupted further checks. Unconfirmed RT counts cannot qualify a movie. The default exclusions show {len(default_movies):,} movies; the file contains {len(selected):,} qualifying records before genre and country filters.',
-      'coverageRows':[['IMDb movie/short records imported (1,000+ votes)',len(imdb)],['IMDb records meeting 6.0+ (all countries/genres)',sum(not m['adult'] and m['score']>=6 for m in imdb)],['JustWatch AU movie records processed',len(jw)],['Rotten Tomatoes search records processed',len(rt)],['RT film pages with confirmed counts',len(rt_counts)],['RT count-checked titles in this file',sum(bool(m.get('rtCountsChecked')) for m in selected)],['Films with an Australian classification',sum(bool(m['classifications']) for m in selected)],['Qualifying records in this file',len(selected)],['Results with your default genre/country exclusions',len(default_movies)]]}
+      'coverageText':f'IMDb bulk data was checked across {len(imdb):,} records with at least 1,000 votes; only feature films and TV movies are kept. {len(jw):,} JustWatch Australia movie records and {len(rt):,} RT search records were processed. Review counts were confirmed for {len(rt_counts):,} RT film pages before access limits interrupted further checks. Unconfirmed RT counts cannot qualify a movie. Left out entirely: {dropped["type"]:,} shorts and videos, {dropped["india"]:,} Indian productions and {dropped["suspicious"]+dropped["unconfirmed"]:,} suspicious or unconfirmed ratings. The default English-language view with genre exclusions shows {len(default_movies):,} movies; the file contains {len(selected):,} qualifying records before genre and country filters.',
+      'coverageRows':[['IMDb records imported (1,000+ votes, all title types)',len(imdb)],['IMDb records meeting 6.0+ (all countries/genres)',sum(not m['adult'] and m['score']>=6 for m in imdb)],['JustWatch AU movie records processed',len(jw)],['Rotten Tomatoes search records processed',len(rt)],['RT film pages with confirmed counts',len(rt_counts)],['RT count-checked titles in this file',sum(bool(m.get('rtCountsChecked')) for m in selected)],['Films with an Australian classification',sum(bool(m['classifications']) for m in selected)],['Qualifying records in this file',len(selected)],['Left out: shorts, TV shorts, videos, specials',dropped['type']],['Left out: Indian productions',dropped['india']],['Left out: IMDb 8.5+ from under 10,000 votes, no RT score',dropped['suspicious']],['Left out: unconfirmed by JustWatch, RT or Wikidata, under 25,000 votes',dropped['unconfirmed']],['Results with your default language and genre settings',len(default_movies)]]}
 years=[m['year'] for m in selected if isinstance(m.get('year'),int)]
 minyear=min(years);maxyear=max(years)
 automation_file=BASE/'movie_refresh_automation.json'

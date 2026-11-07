@@ -63,20 +63,20 @@ const fire=(id,event='change',value)=>{if(value!==undefined)ids[id].value=String
 const setCheck=(id,value)=>{ids[id].checked=value;fire(id);};
 const matches=()=>JSON.parse(run('JSON.stringify(matches)'));
 const DATA=JSON.parse(run('JSON.stringify(DATA)'));
-const suspect=m=>m.score>=9&&m.votes<10000;
+const suspect=m=>m.score>=8.5&&m.votes<10000;
 const DEFAULT_EX=['Romance','Horror','Documentary'];
-const defaultOk=m=>m._groups.length&&!DEFAULT_EX.some(g=>m._groups.includes(g))&&!suspect(m);
+const defaultOk=m=>m._groups.length&&!DEFAULT_EX.some(g=>m._groups.includes(g))
+assert.ok(data.every(m=>!suspect(m)),'Likely vote-stuffed shows are left out of the data');
 
 assert.equal(count(),meta.defaultResults,'Default count matches the builder');
 assert.equal(count(),DATA.filter(defaultOk).length);
 assert.equal(ids.shows.children.length,Math.min(50,count()));
 assert.ok(ids.shows.children.every(n=>n.tagName==='LI'&&n.children.length===3&&n.children[1].children.length===3));
-assert.equal(ids['hide-suspect'].checked,true);assert.equal(ids['min-votes'].value,'1000');
+assert.equal(ids['hide-suspect'],undefined);assert.equal(ids['min-votes'].value,'1000');
 assert.equal(ids.genres.children.length,18);
 
 // Open everything up, then test each control against an independent filter.
-fire('clear-genres','click');setCheck('unknown-genres',true);setCheck('hide-suspect',false);assert.equal(count(),data.length);
-setCheck('hide-suspect',true);assert.equal(count(),data.filter(m=>!suspect(m)).length);setCheck('hide-suspect',false);
+fire('clear-genres','click');setCheck('unknown-genres',true);assert.equal(count(),data.length);
 for(let i=0;i<=40;i++){const v=(60+i)/10;fire('rating','input',v);assert.equal(count(),data.filter(m=>m.score>=v).length,`IMDb ${v}`);}
 fire('rating','input',6);
 for(const o of ids['min-votes'].options){fire('min-votes','change',o.value);assert.equal(count(),data.filter(m=>m.votes>=+o.value).length);}
@@ -103,6 +103,9 @@ assert.deepEqual(JSON.parse(run(`JSON.stringify(majorGenres(['Reality-TV','Game-
 for(const o of ids.sort.options){fire('sort','change',o.value);const got=matches();assert.deepEqual(ids.shows.children.map(n=>n.dataset.id),got.slice(0,50).map(m=>m.id));
  if(o.value!=='title'){const f=o.value.replace(/-asc$/,''),asc=o.value.endsWith('-asc');const vals=got.map(m=>m[f]).filter(v=>typeof v==='number');for(let i=1;i<vals.length;i++)assert.ok(asc?vals[i]>=vals[i-1]:vals[i]<=vals[i-1],o.value);}}
 fire('sort','change','score');
+// One-tap sort buttons: tap once for newest/highest, again for oldest/lowest.
+for(const f of ['startYear','lastYear','votes','score']){fire('sort-'+f,'click');assert.equal(ids.sort.value,f);assert.equal(ids['sort-'+f].attrs['aria-pressed'],'true');fire('sort-'+f,'click');assert.equal(ids.sort.value,f+'-asc');const v=matches().map(m=>m[f]);for(let i=1;i<v.length;i++)assert.ok(v[i]>=v[i-1],f);}
+fire('sort','change','score');
 if(count()>50){fire('more','click');assert.equal(ids.shows.children.length,Math.min(100,count()));}
 assert.ok(walk(ids.shows).filter(n=>n.tagName==='A'&&n.href).every(n=>n.href.startsWith('https://')));
 
@@ -113,17 +116,16 @@ fire('search','input','');await new Promise(r=>setTimeout(r,180));
 
 if(fixtureMode){
  fire('reset-main','click');
- fire('search','input','grief');await new Promise(r=>setTimeout(r,180));assert.equal(count(),0,'Vote-stuffed title hidden by default');
- setCheck('hide-suspect',false);assert.equal(count(),1);setCheck('hide-suspect',true);
+ fire('search','input','grief');await new Promise(r=>setTimeout(r,180));assert.equal(count(),0,'Vote-stuffed title left out');
  fire('search','input','popular nine');await new Promise(r=>setTimeout(r,180));assert.equal(count(),1,'9.1 with 50k votes is not suspect');
  fire('search','input','romantic');await new Promise(r=>setTimeout(r,180));assert.equal(count(),0,'Romance excluded by default');
  fire('search','input','');await new Promise(r=>setTimeout(r,180));
 }
 
 // Saved settings, reset, theme and export.
-fire('rating','input',7.5);setCheck('hide-suspect',false);fire('route-recent','click');
-const saved=makeContext(env.storage);assert.equal(saved.ids.rating.value,'7.5');assert.equal(saved.ids['hide-suspect'].checked,false);assert.equal(saved.run('state.route'),'recent');assert.equal(saved.run('matches.length'),count());
-fire('reset-main','click');assert.equal(count(),meta.defaultResults);assert.equal(ids['rating-value'].textContent,'6.0+');assert.equal(ids['hide-suspect'].checked,true);assert.equal(run('state.route'),'all');
+fire('rating','input',7.5);fire('route-recent','click');
+const saved=makeContext(env.storage);assert.equal(saved.ids.rating.value,'7.5');assert.equal(saved.run('state.route'),'recent');assert.equal(saved.run('matches.length'),count());
+fire('reset-main','click');assert.equal(count(),meta.defaultResults);assert.equal(ids['rating-value'].textContent,'6.0+');assert.equal(run('state.route'),'all');
 fire('done','click');assert.equal(ids.filters.open,false);fire('theme','click');assert.equal(ctx.document.documentElement.dataset.theme,'dark');fire('export','click');
 
 console.log(JSON.stringify({tvRecords:data.length,defaultResults:meta.defaultResults,recent:meta.recent,acclaimedOnly:meta.acclaimedOnly,suspectHidden:meta.suspectHidden,status:'passed'}));

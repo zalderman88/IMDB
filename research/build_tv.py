@@ -11,11 +11,14 @@ import datetime
 import json
 import pathlib
 import re
+import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 SOURCE = ROOT / 'research/imdb/tv_1k.json'
 SNAPSHOT = ROOT / 'research/tv_snapshot.json'
 TEMPLATE = ROOT / 'research/tv_finder_template.html'
+sys.path.insert(0, str(ROOT / 'research'))
+from title_quality import SUSPECT_SCORE, SUSPECT_VOTES, load_india, tv_drop_reason  # noqa: E402
 OUT = ROOT / 'TV_Shows_Android.html'
 EXTRACT = ROOT / 'research/tv_catalogue.json'
 
@@ -23,8 +26,6 @@ MIN_VOTES = 1000
 RECENT_YEAR, RECENT_SCORE = 2020, 6.0
 ACCLAIMED_START, ACCLAIMED_ABOVE = 2000, 8.0
 DEFAULT_EXCLUDED = {'Romance', 'Horror', 'Documentary'}
-# Hidden by default in the browser (not removed): likely vote-stuffed small titles.
-SUSPECT_SCORE, SUSPECT_VOTES = 9.0, 10000
 # Same broad groups as the movie finder, plus two TV-only ones. Keep in step with the template.
 GROUP_RULES = [('Action & adventure', r'\b(action|adventure)\b'), ('Animation', r'animat|anime'),
                ('Comedy', r'comedy|comic|satire|slapstick'), ('Crime & thriller', r'crime|thriller|mystery|noir|suspense|detective'),
@@ -74,12 +75,18 @@ def main():
     snap = json.loads(snapshot.read_text()) if snapshot.exists() else {}
     asof = datetime.date.fromisoformat(snap.get('imdbAsOf', '2026-11-07'))
 
+    india = load_india()
+    dropped = {'india': 0, 'suspicious': 0}
     selected = []
     for s in shows:
         if s.get('adult'):
             continue
         recent, acclaimed = routes(s)
         if not (recent or acclaimed):
+            continue
+        reason = tv_drop_reason(s, india)
+        if reason:
+            dropped[reason] += 1
             continue
         rec = {'id': s['imdbId'], 'title': s['title'], 'type': s['type'], 'startYear': s['startYear'],
                'endYear': s.get('endYear'), 'lastYear': last_year(s), 'seasons': s.get('seasons') or 0,
@@ -93,27 +100,28 @@ def main():
     if len(selected) < a.min_shows:
         raise SystemExit(f'Only {len(selected):,} TV shows qualified (minimum {a.min_shows:,}); not publishing.')
 
-    default = [r for r in selected if (g := groups(r['genres'])) and not g & DEFAULT_EXCLUDED
-               and not (r['score'] >= SUSPECT_SCORE and r['votes'] < SUSPECT_VOTES)]
-    suspect = sum(r['score'] >= SUSPECT_SCORE and r['votes'] < SUSPECT_VOTES for r in selected)
+    default = [r for r in selected if (g := groups(r['genres'])) and not g & DEFAULT_EXCLUDED]
+    suspect = dropped['suspicious']
     recent_n = sum(r['recent'] for r in selected)
     acclaimed_only = sum(r['acclaimed'] and not r['recent'] for r in selected)
     checked = f'{asof.day} {asof:%B %Y}'
     meta = {
         'imdbAsOf': asof.isoformat(), 'total': len(selected), 'defaultResults': len(default),
-        'recent': recent_n, 'acclaimedOnly': acclaimed_only, 'suspectHidden': suspect,
+        'recent': recent_n, 'acclaimedOnly': acclaimed_only, 'suspectHidden': suspect, 'indiaDropped': dropped['india'],
         'rules': {'minVotes': MIN_VOTES, 'recentYear': RECENT_YEAR, 'recentMinScore': RECENT_SCORE,
                   'acclaimedStartYear': ACCLAIMED_START, 'acclaimedScoreAbove': ACCLAIMED_ABOVE},
         'coverageText': (f'IMDb data checked {checked}: {len(shows):,} TV series and miniseries with at least '
                          f'1,000 votes were read. {recent_n:,} aired in 2020 or later with IMDb 6.0+, and '
                          f'{acclaimed_only:,} more are listed only because they first aired in 2000 or later with IMDb '
-                         f'above 8.0. With the default genre exclusions and {suspect:,} likely vote-stuffed titles hidden, '
-                         f'{len(default):,} shows are listed.'),
+                         f'above 8.0. Left out entirely: {dropped["india"]:,} Indian shows (Wikidata country of origin) '
+                         f'and {suspect:,} likely vote-stuffed shows (IMDb {SUSPECT_SCORE}+ from under {SUSPECT_VOTES:,} votes). '
+                         f'With the default genre exclusions, {len(default):,} shows are listed.'),
         'coverageRows': [['IMDb TV series/miniseries read (1,000+ votes)', len(shows)],
                          ['Aired 2020 or later, IMDb 6.0+', recent_n],
                          ['Listed only as acclaimed (2000+, above 8.0)', acclaimed_only],
                          ['Shows in this file', len(selected)],
-                         ['Hidden by default: 9.0+ with under 10,000 votes', suspect],
+                         ['Left out: Indian shows', dropped['india']],
+                         ['Left out: IMDb 8.5+ from under 10,000 votes', suspect],
                          ['Results with the default exclusions', len(default)]],
         'refreshText': ('IMDb ratings, votes and episode years refresh automatically twice a week (Tuesday and '
                         'Friday, around 4:00 am Perth time) from IMDb\'s official datasets.'),

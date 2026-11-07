@@ -113,6 +113,13 @@ h2,.empty h2,.section h2{font-family:var(--display);font-weight:700;letter-spaci
 .actions .like,.mini .like{background:var(--like-bg);border-color:var(--like);color:var(--like)}
 .desktop-head{background:var(--soft)}
 @media(min-width:760px){h1,.masthead h1{font-size:48px}}
+/* Results & filters cleanup (Nov 2026): big Movies/TV switch, prominent reset, language and sort controls, stronger headings */
+.topline{flex-direction:column;align-items:stretch;gap:14px}
+.mode-switch{order:-1;display:flex;width:100%;max-width:560px;padding:4px;gap:4px;border-radius:16px;background:var(--surface);box-shadow:inset 0 0 0 1px var(--line)}
+.mode-switch a{flex:1;justify-content:center;min-height:54px;padding:10px 12px;border-radius:12px;font-size:17px;font-weight:800;letter-spacing:-.01em;font-family:var(--display)}
+.mode-switch a[aria-current=page]{background:var(--accent);color:var(--on-accent);box-shadow:0 6px 16px -8px color-mix(in srgb,var(--accent) 80%,transparent)}
+@media(min-width:760px){.topline{flex-direction:row;align-items:center;flex-wrap:wrap}.mode-switch{order:0;width:auto;flex:0 1 560px;margin-left:auto}}
+.section-head h2,.section h2{font-size:22px;font-weight:800}
 </style></head><body><main class="shell">
 <header class="masthead"><div class="marquee-bulbs" aria-hidden="true"></div><div class="topline"><p class="kicker"><svg class="reel" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5"></circle><circle cx="12" cy="12" r="1.6"></circle><circle cx="12" cy="6.6" r="2.1"></circle><circle cx="12" cy="17.4" r="2.1"></circle><circle cx="6.6" cy="12" r="2.1"></circle><circle cx="17.4" cy="12" r="2.1"></circle></svg>PICKED FOR YOU</p><nav class="mode-switch" aria-label="Finder"><a href="index.html">Movies</a><a href="tv.html">TV shows</a><a href="foryou.html" aria-current="page">For you</a></nav></div><div class="heading"><h1>For <em>you</em></h1><button class="theme" id="theme" type="button" aria-label="Switch colour theme" title="Switch colour theme"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="display:block;margin:auto"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button></div>
 <p class="intro"><strong>Tap 👍 on things you’ve enjoyed.</strong> Picks are worked out on this phone from your likes and saved here, nowhere else.</p>

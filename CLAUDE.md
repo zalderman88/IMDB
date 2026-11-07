@@ -3,8 +3,8 @@
 This is the user's personal Australian-account movie finder. Source files and source snapshots are included so the app can be changed and rebuilt without losing its data or filters.
 
 1. Preserve the working detailed-list UI and offline browser operation. Do not replace the project with a small demonstration catalogue.
-2. Country defaults to `exclude`: exclude known Indian productions, allow unknown countries. Reset must restore this exact default. Strict known-country checking remains optional.
-3. Language defaults to `all`; explicit English/Foreign/Unknown filters use recorded original-language facts. Unknown is not Foreign. See USER_REQUIREMENTS.md for multilingual semantics.
+2. India is always excluded (no country option since 7 Nov 2026); unknown countries are allowed. Indian titles, shorts/videos/specials and suspicious ratings are dropped at build time by research/title_quality.py, using research/imdb/india_titles.json (Wikidata P495=India + an IMDb alternative-title pattern; refreshed by tools/refresh_india.py in CI). TV uses the Wikidata list only.
+3. Language defaults to `english`, which also includes Unknown; Any language and Non-English are one tap away. Filters use recorded original-language facts. Unknown is not Foreign. See USER_REQUIREMENTS.md for multilingual semantics.
 4. Scores use OR within the existing catalogue. Every film must have at least 1,000 IMDb votes. RT score paths also need their own confirmed sample counts. Do not apply the IMDb score minimum to an independently qualified RT path. During filter/UI work, preserve all existing film IDs and rating/count values; verify the catalogue lock. Process large JSON snapshots with code rather than loading them into the conversation context.
 5. No fabricated scores, review counts, certification badges, direct review links, classifications or language facts. Keep last-check dates and coverage limitations visible.
 6. Use the source template and data-fusion script, then rebuild and run the checks. Inspect actual browser/mobile layout when browser execution is available; the included Node harness is functional verification, not a full rendering test.
