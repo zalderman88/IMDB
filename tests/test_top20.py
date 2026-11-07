@@ -59,6 +59,8 @@ def main():
             {'id': 7, 'title': 'Disney Film', 'release_date': '2025-01-01', 'original_language': 'en'}]}))
         (tm / 'discover-movie-9.json').write_text(json.dumps({'results': [
             {'id': 8, 'title': 'Should Not Appear', 'release_date': '2025-01-01', 'original_language': 'en'}]}))
+        (tm / 'find-tt9000010.json').write_text(json.dumps({'movie_results': [
+            {'id': 6, 'poster_path': '/alpha.jpg', 'overview': 'A film about alpha.'}], 'tv_results': []}))
         for i, tt in ((5, 'tt9000040'), (6, 'tt9000010'), (7, 'tt9000041'), (8, 'tt9000042')):
             (tm / f'movie-{i}-external_ids.json').write_text(json.dumps({'imdb_id': tt}))
         out, js = t / 'top20.html', t / 'top20.json'
@@ -77,6 +79,9 @@ def main():
         assert movies['Stan Film']['chartPts'] == 6 and movies['Disney Film']['charts'][0]['src'] == 'tmdb'
         assert 'Should Not Appear' not in movies
         assert {w['svc'] for w in a['where']} == {'netflix', 'prime', 'stan'}
+        assert {w['code'] for w in a['where']} == {'nfx', 'prv', 'stn'} and a['kind'] == 'movie'
+        assert a['poster'] == '/alpha.jpg' and a['overview'] == 'A film about alpha.' and a['tmdb'] == 'movie/6'
+        assert d['shows'][0]['kind'] == 'tv' and 'docplay' not in d['names']
         # Old Classic: #2 of 3 -> 6.667 points, + a quarter of last week's #1 (10 * 0.25 = 2.5);
         # matched to the 1980 film (the 2005 one has under 200 votes), bonus (8.5-6)*1.5 = 3.75.
         o = movies['Old Classic']

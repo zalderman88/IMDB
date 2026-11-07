@@ -10,6 +10,7 @@ It combines only official, published data and documented APIs (no scraping):
    HBO Max where the API has them. Needs the API key (env var below); skipped without it.
 3. TMDB popularity for titles TMDB lists as streaming on each Australian subscription service
    that has no official chart (Stan, Binge, Foxtel Now, BritBox, ABC iview, SBS On Demand ...).
+   Also gives each title's poster and synopsis (TMDB /find by IMDb id, cached).
    Optional: only with a TMDB_API_KEY. Uses TMDB's watch-provider data (from JustWatch).
 4. IMDb ratings and votes from IMDb's official datasets (title.basics + title.ratings), which
    are also used to identify Netflix chart titles. Optional locally, always present in CI.
@@ -57,7 +58,7 @@ SA_SERVICES = ['netflix', 'prime', 'disney', 'apple', 'paramount', 'hbo']
 NAMES = {'netflix': 'Netflix', 'prime': 'Prime Video', 'disney': 'Disney+', 'apple': 'Apple TV+',
          'paramount': 'Paramount+', 'hbo': 'HBO Max', 'stan': 'Stan', 'binge': 'Binge',
          'foxtel': 'Foxtel Now', 'britbox': 'BritBox', 'iview': 'ABC iview', 'sbs': 'SBS On Demand',
-         'shudder': 'Shudder', 'docplay': 'DocPlay', 'crunchyroll': 'Crunchyroll'}
+         'shudder': 'Shudder', 'crunchyroll': 'Crunchyroll'}
 # TMDB AU provider names -> our service id. Services with an official chart above are not
 # repeated here, so TMDB only fills the gaps.
 # TMDB AU provider names (lower-case, letters and digits only) -> our service id. TMDB fills
@@ -65,10 +66,15 @@ NAMES = {'netflix': 'Netflix', 'prime': 'Prime Video', 'disney': 'Disney+', 'app
 # Streaming Availability API gave no chart for them (no key, or the API was down).
 TMDB_PROVIDERS = {'stan': 'stan', 'binge': 'binge', 'foxtelnow': 'foxtel', 'foxtel': 'foxtel',
                   'britbox': 'britbox', 'abciview': 'iview', 'sbsondemand': 'sbs', 'shudder': 'shudder',
-                  'docplay': 'docplay', 'amazonprimevideo': 'prime', 'primevideo': 'prime',
+                  'amazonprimevideo': 'prime', 'primevideo': 'prime',
                   'disneyplus': 'disney', 'disney': 'disney', 'appletvplus': 'apple', 'appletv': 'apple',
                   'paramountplus': 'paramount', 'paramount': 'paramount', 'hbomax': 'hbo', 'max': 'hbo'}
 TMDB_WEIGHT = 0.6
+POOL = 60  # titles kept per list, so the page can still show 20 after filtering to "my services"
+# Service codes shared with the other pages (movie/TV finders, New, my-services-v1 in the browser).
+CODES = {'netflix': 'nfx', 'prime': 'prv', 'disney': 'dnp', 'stan': 'stn', 'paramount': 'pmp', 'hbo': 'mxx',
+         'apple': 'atp', 'binge': 'bng', 'foxtel': 'fxn', 'britbox': 'bbx', 'iview': 'abc', 'sbs': 'sbs',
+         'shudder': 'shd', 'crunchyroll': 'cru'}
 MIN_VOTES = 1000
 csv.field_size_limit(sys.maxsize)
 
@@ -300,6 +306,64 @@ def pick_imdb(cands, info, this_year):
     return max(recent or good, key=lambda c: info[c]['votes'])
 
 
+def tmdb_details(ids, fixture_dir, cache):
+    """Poster path, overview and TMDB id for IMDb ids (GET /find). Cached between pipelines."""
+    key = os.environ.get('TMDB_API_KEY', '').strip()
+    store = {}
+    if cache and cache.exists():
+        try:
+            store = json.loads(cache.read_text())
+        except ValueError:
+            store = {}
+    for tt in ids:
+        if tt in store:
+            continue
+        try:
+            if fixture_dir:
+                f = pathlib.Path(fixture_dir) / f'find-{tt}.json'
+                if not f.exists():
+                    continue
+                data = json.loads(f.read_text())
+            elif key:
+                headers, params = {'Accept': 'application/json'}, {'external_source': 'imdb_id', 'language': 'en-AU'}
+                if key.startswith('ey'):
+                    headers['Authorization'] = f'Bearer {key}'
+                else:
+                    params['api_key'] = key
+                time.sleep(0.15)
+                data = get_json(f'https://api.themoviedb.org/3/find/{tt}?{urllib.parse.urlencode(params)}', headers)
+            else:
+                return store
+        except Exception:  # noqa: BLE001 - a missing poster is fine
+            continue
+        hit = (data.get('movie_results') or []) + (data.get('tv_results') or [])
+        if hit:
+            h = hit[0]
+            store[tt] = {'poster': h.get('poster_path') or '', 'overview': (h.get('overview') or '').strip(),
+                         'tmdb': f"{'movie' if data.get('movie_results') else 'tv'}/{h['id']}"}
+        else:
+            store[tt] = {}
+    if cache and not fixture_dir:
+        cache.parent.mkdir(parents=True, exist_ok=True)
+        cache.write_text(json.dumps(store))
+    return store
+
+
+def live_offers():
+    """Where-to-watch codes per IMDb id from the TMDB AU sweep (tools/fetch_tmdb_au.py), if any."""
+    try:
+        sys.path.insert(0, str(ROOT / 'research'))
+        from streaming_au import load_live
+        live = load_live()
+    except Exception:  # noqa: BLE001
+        return {}, {}
+    if not live:
+        return {}, {}
+    back = {v: k for k, v in CODES.items()}
+    conv = lambda d: {tt: {back[c]: u for c, u in offers.items() if c in back} for tt, offers in d.items()}
+    return conv(live['movies']), conv(live['tv'])
+
+
 # ---------- combine ----------
 
 def main():
@@ -400,8 +464,13 @@ def main():
             it['charts'].append({'svc': svc, 'rank': rank, 'src': 'tmdb'})
             it['where'].setdefault(svc, '')
 
+    live_m, live_t = live_offers()
+    sources['tmdb_where'] = {'ok': bool(live_m or live_t)}
     out = {'movie': [], 'series': []}
     for it in items.values():
+        for svc, link in ((live_m if it['kind'] == 'movie' else live_t).get(it['imdb']) or {}).items():
+            if not it['where'].get(svc):
+                it['where'][svc] = link
         if it['imdb'] in india:
             continue
         if not it['svc'] and not it.get('tmdb_pts'):  # only on last week's Netflix chart
@@ -427,23 +496,32 @@ def main():
             'title': it['title'], 'year': it['year'], 'imdb': it['imdb'],
             'imdbScore': meta.get('score'), 'imdbVotes': meta.get('votes'), 'saRating': it['sa'],
             'genres': meta.get('genres', [])[:3], 'charts': charts, 'lastRank': it.get('last_rank'),
-            'where': [{'svc': s, 'name': NAMES.get(s, s.title()), 'link': l if l.startswith('https://') else ''}
+            'kind': 'movie' if it['kind'] == 'movie' else 'tv',
+            'where': [{'svc': s, 'code': CODES.get(s, s), 'name': NAMES.get(s, s.title()),
+                       'link': l if l.startswith('https://') else ''}
                       for s, l in it['where'].items() if s in NAMES],
             'chartPts': round(chart, 2), 'bonus': bonus, 'bonusFrom': qsrc,
             'total': round(chart + bonus, 2)})
     for kind in out:
         out[kind].sort(key=lambda x: (-x['total'], -x['chartPts'], x['title'] or ''))
-        out[kind] = out[kind][:20]
+        out[kind] = out[kind][:POOL]
         for i, x in enumerate(out[kind], 1):
             x['rank'] = i
+    details = tmdb_details([x['imdb'] for k in out for x in out[k] if x['imdb']], a.tmdb_fixture,
+                           pathlib.Path(a.cache_dir) / 'top20_find.json' if a.cache_dir else None)
+    for x in (y for k in out for y in out[k]):
+        d = details.get(x['imdb']) or {}
+        x['poster'] = d.get('poster') or ''
+        x['overview'] = d.get('overview') or ''
+        x['tmdb'] = d.get('tmdb') or ''
 
     payload = {'built': today.isoformat(), 'netflixWeek': nf_week, 'sources': sources, 'notes': notes,
-               'names': NAMES, 'movies': out['movie'], 'shows': out['series']}
+               'names': NAMES, 'codes': CODES, 'movies': out['movie'], 'shows': out['series']}
     pathlib.Path(a.json).write_text(json.dumps(payload, ensure_ascii=False, indent=1))
     data = json.dumps(payload, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
     html = TEMPLATE.read_text().replace('@@DATA@@', data)
     pathlib.Path(a.out).write_text(html)
-    print(json.dumps({'movies': len(out['movie']), 'shows': len(out['series']), 'sources': sources,
+    print(json.dumps({'movies': len(out['movie']), 'shows': len(out['series']), 'posters': sum(bool(x['poster']) for k in out for x in out[k]), 'sources': sources,
                       'notes': notes}, ensure_ascii=False))
 
 

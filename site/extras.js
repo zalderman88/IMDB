@@ -1,4 +1,4 @@
-// Add-ons shared by the Movies, TV and For you pages:
+// Add-ons shared by the Movies, TV, For you and Top 20 pages:
 //  - search by actor or director (people.json, built from IMDb bulk files by tools/build_people.py)
 //  - "Trailer" and "More like this" on each title (TMDB, via the Worker at /api/title)
 //  - "Coming up" next-episode dates for TV shows you liked on For you (TVmaze, via /api/tvnext)
@@ -8,9 +8,9 @@
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
-  const page = $('movies') ? 'movies' : $('shows') ? 'tv' : $('picks') ? 'foryou' : null;
+  const page = $('movies') ? 'movies' : $('shows') ? 'tv' : $('picks') ? 'foryou' : $('top20list') ? 'top20' : null;
   if (!page) return;
-  const LIST = $(page === 'movies' ? 'movies' : page === 'tv' ? 'shows' : 'picks');
+  const LIST = $(page === 'movies' ? 'movies' : page === 'tv' ? 'shows' : page === 'top20' ? 'top20list' : 'picks');
   const g = globalThis;
   const hasData = () => { try { return Array.isArray(DATA); } catch { return false; } };
   const pageData = () => { try { return DATA; } catch { return []; } };
@@ -80,6 +80,11 @@
     return peopleLoading;
   }
   function searchFor(name) {
+    if (page === 'top20') {
+      const li = LIST.querySelector('li[data-id="' + currentRowId + '"]');
+      location.href = (li && li.dataset.kind === 'tv' ? 'tv.html' : 'index.html') + '?q=' + encodeURIComponent(name);
+      return;
+    }
     if (page === 'foryou') {
       const it = byIdSafe(currentRowId);
       location.href = (it && it.kind === 't' ? 'tv.html' : 'index.html') + '?q=' + encodeURIComponent(name);
@@ -322,6 +327,7 @@
   function kindOf(li) {
     if (page === 'tv') return 'tv';
     if (page === 'movies') return 'movie';
+    if (page === 'top20') return li.dataset.kind === 'tv' ? 'tv' : 'movie';
     const it = byIdSafe(tt(li.dataset.id));
     return it && it.kind === 't' ? 'tv' : 'movie';
   }

@@ -11,7 +11,7 @@ from title_quality import load_india,drop_reason
 BASE=pathlib.Path(__file__).parent
 ROOT=BASE.parent
 OUT=ROOT/'Australian_Movies_Android.html'
-providers={'nfx':'Netflix','prv':'Prime Video','pmp':'Paramount+','stn':'Stan','dnp':'Disney+','mxx':'HBO Max','atp':'Apple TV'}
+providers={'nfx':'Netflix','prv':'Prime Video','pmp':'Paramount+','stn':'Stan','dnp':'Disney+','mxx':'HBO Max','atp':'Apple TV','bng':'Binge','fxn':'Foxtel Now'}  # bng/fxn come from the live TMDB sweep
 snapshot=json.loads((BASE/'source_snapshot.json').read_text())
 today=datetime.date.fromisoformat(snapshot['dataAsOf'])
 imdb_asof=datetime.date.fromisoformat(snapshot['imdbAsOf']) if snapshot.get('imdbAsOf') else today
@@ -233,7 +233,7 @@ refresh_recipe={
     'rtReviewCounts':'The public movie page has script#media-scorecard-json. criticsScore.reviewCount is the critic count. Use audienceScore.scorePercent with its corresponding bandedRatingCount and reviewsPageUrl. A 1,000+ band is a lower bound, not an exact count. Verified and all-audience groups cannot be mixed. Use conservative request rates; stop further film-page requests immediately on HTTP 403 or 429. Never retry through another channel to evade access limits.',
     'staleData':'Keep last-known RT facts with their actual rtCheckedDate if a refresh is blocked, and show that they were not refreshed. Do not replace old checked dates with the run date. Do not invent missing counts or let them qualify films.',
     'identityMatching':'Use IMDb identifiers where present, otherwise exact normalized title/alias and release year only when unambiguous. Skip ambiguous matches; never fabricate direct review URLs.',
-    'validation':'Check independent OR score gates and minimum review counts; seven service filters; year range; Australian classification multiselect; 16 broad genre groups with exclusion winning over inclusion; reset; sorting; review links; pagination; offline functionality. Replace the same Library file only after validation.',
+    'validation':'Check independent OR score gates and minimum review counts; nine service filters; year range; Australian classification multiselect; 16 broad genre groups with exclusion winning over inclusion; reset; sorting; review links; pagination; offline functionality. Replace the same Library file only after validation.',
     'languageFilter':'Default all. Match original-language facts through IMDb P345 identifiers and Wikidata P364. English means English is one of the recorded original languages; Foreign means known original languages without English. Do not infer languages from countries or title spelling. Preserve Unknown separately. This is not a dubbed-audio availability filter.',
     'fullDatabaseLimitation':'IMDb bulk datasets cover eligible movie records. A complete RT database is not available in this file; a complete authorised RT data feed/export would be required to claim full coverage.'}
 recipe_payload=json.dumps(refresh_recipe,ensure_ascii=False,separators=(',',':')).replace('<','\\u003c')

@@ -20,7 +20,7 @@ assert.ok(data.every(m=>!m.rt||m.rt.startsWith('https://www.rottentomatoes.com/m
 assert.ok(data.every(m=>!m.imdb||/^https:\/\/www\.imdb\.com\/title\/tt\d+\/$/.test(m.imdb)));
 assert.ok(data.every(m=>!m.audienceCount||m.rtCountsChecked));
 assert.ok(data.every(m=>!m.criticCount||m.rtCountsChecked));
-assert.ok(data.every(m=>Object.keys(m.offers).every(k=>['nfx','prv','pmp','stn','dnp','mxx','atp'].includes(k))));
+assert.ok(data.every(m=>Object.keys(m.offers).every(k=>['nfx','prv','pmp','stn','dnp','mxx','atp','bng','fxn'].includes(k))));
 
 class Element{
   constructor(tag='div'){this.tagName=tag.toUpperCase();this.children=[];this.attrs={};this.dataset={};this.events={};this._text='';this.value='';this.checked=false;this.disabled=false;this.hidden=false;this.open=false;this.className='';this.options=[];this.type='';this.min='';this.max='';this.classList={toggle:(name,flag)=>{const s=new Set(this.className.split(' ').filter(Boolean));flag?s.add(name):s.delete(name);this.className=[...s].join(' ');}};}
@@ -99,7 +99,7 @@ for(const [id,field,scoreField,threshold] of [['min-votes','votes','score',6],['
  fire(id,'change',id==='min-critics'?50:1000);
 }
 for(const key of ['imdb','critics','audience'])setCheck('use-'+key,true);
-for(const service of ['nfx','prv','pmp','stn','dnp','mxx','atp']){
+for(const service of ['nfx','prv','pmp','stn','dnp','mxx','atp','bng','fxn']){
  const box=walk(ids.services).find(x=>x.dataset.service===service);box.checked=true;box.events.change();assert.equal(count(),data.filter(m=>m.offers[service]).length);box.checked=false;box.events.change();
 }
 assert.equal(ids.genres.children.length,16,'Only 16 high-level genre controls');
@@ -144,4 +144,4 @@ const stored=makeContext(env.storage);assert.equal(stored.ids.language.value,'fo
 fire('reset-main','click');assert.equal(count(),meta.defaultResults);assert.ok(walk(ids.classifications).filter(x=>x.tagName==='INPUT').every(x=>!x.checked));assert.equal(ids['rating-value'].textContent,'6.0+');assert.equal(ids['critics-value'].textContent,'60%+');assert.equal(ids['audience-value'].textContent,'60%+');assert.equal(ids['use-imdb'].checked,true);assert.equal(ids['use-critics'].checked,true);assert.equal(ids['use-audience'].checked,false);assert.equal(ids.language.value,'english');assert.equal(ids['lang-english'].attrs['aria-pressed'],'true');assert.equal(ids['sort-score'].attrs['aria-pressed'],'true');assert.equal(ids['genre-summary'].textContent,'3 excluded');
 fire('done','click');assert.equal(ids.filters.open,false);fire('theme','click');assert.equal(ctx.document.documentElement.dataset.theme,'dark');fire('export','click');
 
-console.log(JSON.stringify({records:data.length,defaultResults:meta.defaultResults,rtReviewCountsChecked:meta.rtReviewCountsChecked,rtOnlyQualifiers:meta.rtOnlyQualifiers,services:meta.sourceCounts,checks:['Independent OR scores','Minimum vote/review boundary cases','Unverified RT counts rejected','123 slider positions','All adjustable review-count options','Seven Australian services','Year range and crossing handles','Sixteen major genres; compound-genre grouping and exclusions','Australian classification multiselect; Unknown separate','India always left out; unknown countries allowed','No shorts/videos; no suspicious ratings','Original language: English incl. unknown by default, any, non-English','One-tap sort buttons','Search and empty state','Thirteen sorting choices; nulls last','Pagination','IMDb and RT review links','Saved filters, reset, theme and CSV export'],status:'passed'}));
+console.log(JSON.stringify({records:data.length,defaultResults:meta.defaultResults,rtReviewCountsChecked:meta.rtReviewCountsChecked,rtOnlyQualifiers:meta.rtOnlyQualifiers,services:meta.sourceCounts,checks:['Independent OR scores','Minimum vote/review boundary cases','Unverified RT counts rejected','123 slider positions','All adjustable review-count options','Nine Australian services','Year range and crossing handles','Sixteen major genres; compound-genre grouping and exclusions','Australian classification multiselect; Unknown separate','India always left out; unknown countries allowed','No shorts/videos; no suspicious ratings','Original language: English incl. unknown by default, any, non-English','One-tap sort buttons','Search and empty state','Thirteen sorting choices; nulls last','Pagination','IMDb and RT review links','Saved filters, reset, theme and CSV export'],status:'passed'}));

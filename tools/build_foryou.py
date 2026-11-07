@@ -19,7 +19,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 TEMPLATE = ROOT / 'research/foryou_template.html'
 CATALOGUE = re.compile(r'<script id="catalogue" type="application/json">(.*?)</script>', re.S)
 METADATA = re.compile(r'<script id="metadata" type="application/json">(.*?)</script>', re.S)
-PROVIDERS = ['nfx', 'prv', 'pmp', 'stn', 'dnp', 'mxx', 'atp']
+PROVIDERS = ['nfx', 'prv', 'pmp', 'stn', 'dnp', 'mxx', 'atp', 'bng', 'fxn']
 
 # One genre vocabulary for movies (already tidied) and TV (raw IMDb spellings).
 SPLIT = {'Mystery & thriller': ['Mystery', 'Thriller'], 'Music & Musical': ['Music', 'Musical']}

@@ -124,12 +124,22 @@ h2,.empty h2,.section h2{font-family:var(--display);font-weight:700;letter-spaci
 /* Top 20 page */
 .tabs.big{display:flex;max-width:420px;margin:0 0 14px}.tabs.big button{flex:1;min-height:48px;font-size:15px;font-weight:750}
 .toplist{list-style:none;margin:0;padding:0;display:grid;gap:8px}
-.top{display:grid;grid-template-columns:44px minmax(0,1fr);gap:4px 12px;padding:14px 14px 12px;border-radius:12px;background:var(--surface)}
-.top .rk{grid-row:span 5;align-self:start;font-family:var(--display);font-weight:800;font-size:30px;line-height:1.05;letter-spacing:-.04em;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.top{display:grid;grid-template-columns:30px 62px minmax(0,1fr);gap:0 12px;padding:14px 14px 12px;border-radius:12px;background:var(--surface);cursor:pointer;align-items:start}
+.top .rk{font-family:var(--display);font-weight:800;font-size:26px;line-height:1.05;letter-spacing:-.04em;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
 .top:nth-child(-n+3) .rk{color:var(--accent)}
+.top .pf-poster{float:none;width:62px;margin:2px 0 0}.top .noposter{display:block;width:62px;aspect-ratio:2/3;border-radius:6px;background:var(--soft)}
+.top.pf-open .pf-poster,.top.pf-open .noposter{width:62px}
+.top .body{display:grid;gap:5px;min-width:0}
+.top>.pf-synopsis{grid-column:1/-1;margin-top:10px}
 .top h3{margin:0;font-family:var(--display);font-weight:700;font-size:19px;line-height:1.25;letter-spacing:-.02em;overflow-wrap:anywhere}.top h3 a{text-decoration:none}.top h3 a:hover{text-decoration:underline}
 .top h3 .yr{font-family:Inter,system-ui,sans-serif;font-weight:500;font-size:14px;color:var(--muted);letter-spacing:0}
 .top .line{margin:0;font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.top .xf-bar{margin-top:2px}
+.myservices{display:flex;gap:6px;flex-wrap:wrap}.myservices label{display:flex;align-items:center;gap:8px;min-height:42px;padding:6px 12px 6px 10px;border-radius:999px;font-size:13px;font-weight:600;background:var(--page);color:var(--muted);cursor:pointer}
+.myservices label:has(input:checked){color:var(--ink);background:var(--green-bg);box-shadow:inset 0 0 0 1px var(--accent)}.myservices input{width:18px;height:18px;margin:0;accent-color:var(--accent)}
+.svc-actions{display:flex;gap:8px;margin-top:10px}.svc-actions button{min-height:40px;padding:6px 14px;border-radius:999px;background:var(--soft);font-size:13px;font-weight:700;color:var(--accent)}
+.filter-note{margin:-4px 2px 12px;font-size:12px;color:var(--muted)}
+#svc-sum{font-weight:600;color:var(--muted);margin-left:6px}
 .chip{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:6px;font-size:12px;font-weight:700;background:var(--soft);color:var(--ink)}
 .chip b{color:var(--accent);font-variant-numeric:tabular-nums}.chip.tmdb{background:none;box-shadow:inset 0 0 0 1px var(--line);color:var(--muted);font-weight:600}
 .imdbs strong{color:var(--imdb);font-family:var(--display);font-weight:800;font-size:16px}
@@ -139,17 +149,22 @@ h2,.empty h2,.section h2{font-family:var(--display);font-weight:700;letter-spaci
 details.box .inner p,details.box .inner li{font-size:13px;color:var(--muted)}details.box .inner ul{padding-left:18px;margin:6px 0}
 details.box .inner strong{color:var(--ink)}
 .src-ok{color:var(--accent);font-weight:700}.src-no{color:var(--danger);font-weight:700}
-@media(min-width:760px){.top{grid-template-columns:56px minmax(0,1fr)}.top .rk{font-size:36px}}
+@media(min-width:760px){.top{grid-template-columns:44px 80px minmax(0,1fr)}.top .rk{font-size:34px}.top .pf-poster,.top .noposter,.top.pf-open .pf-poster{width:80px}}
 /* Five-tab nav (Top 20 added Nov 2026): tabs size to their labels and stay on one line on phones */
 .mode-switch a{flex:1 1 auto;white-space:nowrap;padding:10px 8px;font-size:15px}
 @media(max-width:420px){.mode-switch{gap:2px;padding:3px}.mode-switch a{padding:8px 5px;font-size:13.5px;min-height:48px}}
-</style></head><body><main class="shell">
+</style><link rel="stylesheet" href="posters.css"></head><body><main class="shell">
 <header class="masthead"><div class="topline"><p class="kicker">WHAT AUSTRALIA IS STREAMING</p><nav class="mode-switch" aria-label="Finder"><a href="index.html">Movies</a><a href="tv.html">TV shows</a><a href="foryou.html">For you</a><a href="new.html">New</a><a href="top20.html" aria-current="page">Top 20</a></nav></div><div class="heading"><h1>Top <em>20</em></h1><button class="theme" id="theme" type="button" aria-label="Switch colour theme" title="Switch colour theme"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="display:block;margin:auto"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button></div>
 <p class="intro"><strong>The most popular movies and shows across Australian streaming services,</strong> combined from the services’ own top 10 charts, with a small boost for well-rated titles.</p>
 <p class="stamp"><span class="dot"></span><span id="loaded">Loading…</span></p></header>
 
 <div class="tabs big" role="group" aria-label="Show"><button type="button" data-tab="movies" aria-pressed="true">Top 20 movies</button><button type="button" data-tab="shows" aria-pressed="false">Top 20 TV</button></div>
-<ol class="toplist" id="list"></ol>
+<details class="box" id="svc-box"><summary>My services <span id="svc-sum"></span></summary><div class="inner">
+<div class="myservices" id="services"></div>
+<div class="svc-actions"><button type="button" id="svc-all">Tick all</button><button type="button" id="svc-none">Untick all</button></div>
+<p class="help">Tick the services you have and the Top 20 only shows titles you can watch. Saved on this device.</p></div></details>
+<p class="filter-note" id="filter-note" hidden></p>
+<ol class="toplist" id="top20list"></ol>
 <div class="empty" id="empty" hidden></div>
 
 <section class="section" style="margin-top:22px">
@@ -173,26 +188,60 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const fmt=d=>{if(!d)return'';const x=new Date(d+'T00:00:00');return x.toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'});};
 let tab='movies';
 try{const t=localStorage.getItem('top20-tab');if(t==='movies'||t==='shows')tab=t;}catch{}
-function card(x){
+// Services the viewer has, shared between pages: my-services-v1 = {have:[codes]}. Seeded once from
+// the New page's or For you's saved choice so Zac doesn't have to tick them twice.
+const MY='my-services-v1';
+const allCodes=[...new Set([...D.movies,...D.shows].flatMap(x=>x.where.map(w=>w.code)))];
+const nameOf=Object.fromEntries([...D.movies,...D.shows].flatMap(x=>x.where.map(w=>[w.code,w.name])));
+let have=null;
+try{const m=JSON.parse(localStorage.getItem(MY));if(m&&Array.isArray(m.have))have=m.have;}catch{}
+if(!have){try{const n=JSON.parse(localStorage.getItem('new-streaming-v1'));if(n&&Array.isArray(n.off)&&n.off.length)have=allCodes.filter(c=>!n.off.includes(c));}catch{}}
+if(!have){try{const f=JSON.parse(localStorage.getItem('foryou-v1'));if(f&&Array.isArray(f.services)&&f.services.length)have=f.services.slice();}catch{}}
+const saveHave=()=>{try{localStorage.setItem(MY,JSON.stringify({have:have||[],at:Date.now()}));}catch{}};
+const filtering=()=>have&&have.length&&allCodes.some(c=>!have.includes(c));
+function buildServices(){
+  const box=$('services');box.replaceChildren();
+  const order=['nfx','prv','dnp','stn','bng','fxn','pmp','mxx','atp','bbx','abc','sbs','shd','cru'];
+  for(const c of [...allCodes].sort((a,b)=>(order.indexOf(a)+99)%99-(order.indexOf(b)+99)%99)){
+    const l=document.createElement('label'),i=document.createElement('input');i.type='checkbox';i.value=c;i.checked=!have||!have.length||have.includes(c);
+    i.addEventListener('change',()=>{have=[...box.querySelectorAll('input:checked')].map(x=>x.value);saveHave();summary();render();});
+    l.append(i,document.createTextNode(nameOf[c]||c));box.append(l);
+  }
+  summary();
+}
+function summary(){const n=have&&have.length?allCodes.filter(c=>have.includes(c)).length:allCodes.length;$('svc-sum').textContent=n===allCodes.length?'· All':`· ${n} of ${allCodes.length}`;}
+const setAll=on=>{have=on?allCodes.slice():[];saveHave();buildServices();render();};
+$('svc-all').addEventListener('click',()=>setAll(true));$('svc-none').addEventListener('click',()=>setAll(false));
+const IMG='https://image.tmdb.org/t/p/';
+function card(x,rank){
   const charts=x.charts.map(c=>`<span class="chip${c.src==='tmdb'?' tmdb':''}" title="${c.src==='tmdb'?'TMDB popularity on this service':c.src==='netflix'?'Netflix official weekly Top 10':'Official top list'}"><b>#${c.rank}</b> ${esc(D.names[c.svc]||c.svc)}${c.src==='tmdb'?' (popular)':''}</span>`).join('');
   const nf=x.charts.find(c=>c.src==='netflix');
   let trend='';
   if(nf){trend=nf.weeks<=1?'<span class="trend new">New this week</span>':`<span class="trend">${nf.weeks} weeks in Netflix top 10</span>`;}
   const score=x.imdbScore!=null&&x.imdbVotes>=1000?`<span class="imdbs">IMDb <strong>${x.imdbScore.toFixed(1)}</strong> · ${x.imdbVotes.toLocaleString('en-AU')} votes</span>`:x.saRating!=null?`<span class="imdbs">Rating <strong>${x.saRating}</strong>/100</span>`:'<span>No rating yet</span>';
-  const watch=x.where.map(w=>w.link?`<a href="${esc(w.link)}" target="_blank" rel="noopener">${esc(w.name)}</a>`:`<span>${esc(w.name)}</span>`).join('');
+  const mine=filtering()?x.where.filter(w=>have.includes(w.code)):x.where;
+  const watch=mine.map(w=>w.link?`<a href="${esc(w.link)}" target="_blank" rel="noopener">${esc(w.name)}</a>`:`<span>${esc(w.name)}</span>`).join('');
   const title=x.imdb?`<a href="https://www.imdb.com/title/${esc(x.imdb)}/" target="_blank" rel="noopener">${esc(x.title)}</a>`:esc(x.title);
-  return `<li class="top"><span class="rk">${x.rank}</span><h3>${title}${x.year?` <span class="yr">${x.year}</span>`:''}</h3>
+  const pic=x.poster?`<span class="pf-poster" aria-hidden="true"><img loading="lazy" decoding="async" alt="" referrerpolicy="no-referrer" src="${IMG}w92${esc(x.poster)}" srcset="${IMG}w92${esc(x.poster)} 1x, ${IMG}w185${esc(x.poster)} 2x" onerror="this.parentNode.className='noposter';this.remove()"></span>`:'<span class="noposter" aria-hidden="true"></span>';
+  const syn=x.overview?`<button type="button" class="pf-more" aria-expanded="false">Synopsis<span class="pf-caret">▾</span></button>`:'';
+  return `<li class="top${x.overview?' pf-row':''}"${x.imdb?` data-id="${esc(x.imdb)}"`:''} data-kind="${x.kind}"><span class="rk">${rank}</span>${pic}<div class="body movie-info"><h3>${title}${x.year?` <span class="yr">${x.year}</span>`:''}</h3>
 <p class="line">${charts}${trend}</p><p class="line">${score}${x.genres.length?`<span>· ${esc(x.genres.join(', '))}</span>`:''}</p>
-<p class="line watch">${watch}</p><p class="line pts">${x.chartPts} chart points${x.bonus?` + ${x.bonus} quality bonus`:''} = ${x.total}</p></li>`;
+<p class="line watch">${watch}</p><p class="line pts">${x.chartPts} chart points${x.bonus?` + ${x.bonus} quality bonus`:''} = ${x.total}</p>${syn}</div>${x.overview?`<div class="pf-synopsis"><p>${esc(x.overview)}</p><p class="pf-credit">From <a href="https://www.themoviedb.org/${esc(x.tmdb)}" target="_blank" rel="noopener noreferrer">TMDB</a></p></div>`:''}</li>`;
 }
+function toggle(li){const open=!li.classList.contains('pf-open');li.classList.toggle('pf-open',open);const b=li.querySelector('.pf-more');if(b){b.setAttribute('aria-expanded',String(open));b.firstChild.textContent=open?'Less':'Synopsis';}}
+$('top20list').addEventListener('click',e=>{const li=e.target.closest('li.top');if(!li||!li.classList.contains('pf-row'))return;if(e.target.closest('.pf-more')){toggle(li);return;}if(e.target.closest('a,button,input,select,label,.pf-synopsis,.xf-recs'))return;if(String(getSelection&&getSelection()))return;toggle(li);});
 function render(){
   document.querySelectorAll('[data-tab]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.tab===tab)));
-  const list=D[tab]||[];
-  $('list').innerHTML=list.map(card).join('');
+  const pool=D[tab]||[];
+  const list=(filtering()?pool.filter(x=>x.where.some(w=>have.includes(w.code))):pool).slice(0,20);
+  $('top20list').innerHTML=list.map((x,i)=>card(x,i+1)).join('');
+  $('filter-note').hidden=!filtering();
+  $('filter-note').textContent=filtering()?`Only showing titles on your ${have.length} ticked service${have.length===1?'':'s'}. Rank is within your services.`:'';
   $('empty').hidden=list.length>0;
-  $('empty').textContent='The charts couldn’t be loaded in the last update. They’ll be tried again in the next one.';
+  $('empty').textContent=pool.length?'Nothing in the charts is on the services you ticked. Tick more in “My services”.':'The charts couldn’t be loaded in the last update. They’ll be tried again in the next one.';
 }
 document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{tab=b.dataset.tab;try{localStorage.setItem('top20-tab',tab);}catch{}render();}));
+buildServices();
 const S=D.sources;
 $('loaded').textContent=`Updated ${fmt(D.built)}${D.netflixWeek?` · Netflix chart for the week to ${fmt(D.netflixWeek)}`:''}`;
 const row=(ok,name,detail)=>`<li><span class="${ok?'src-ok':'src-no'}">${ok?'✓':'✗'}</span> <strong>${name}</strong> ${detail}</li>`;
@@ -202,9 +251,11 @@ $('sources').innerHTML='<ul>'+
   row(S.streaming_availability.ok,'Services’ own top lists', S.streaming_availability.ok?`via the Streaming Availability API: ${esc(svcList(S.streaming_availability.lists))}.`:'via the Streaming Availability API: not available this time.')+
   row(S.tmdb.ok,'TMDB popularity', S.tmdb.ok?`for ${esc(svcList(S.tmdb.lists))}.`:'not available this time, so services without an official chart aren’t covered.')+
   row(S.imdb.ok,'IMDb ratings', S.imdb.ok?'from IMDb’s official datasets.':'not available in this build.')+
-  '</ul><p>Charts refresh with each scheduled update (the 1st and 15th of the month), so they can be up to two weeks old. No websites are scraped: only published files and official APIs.</p>';
+  row(S.tmdb_where&&S.tmdb_where.ok,'Where to watch','from TMDB’s Australian watch-provider data (JustWatch), for the My services filter.')+
+  '</ul><p>Posters and synopses come from TMDB. This product uses the TMDB API but is not endorsed or certified by TMDB.</p><p>Charts refresh with each scheduled update (the 1st and 15th of the month), so they can be up to two weeks old. No websites are scraped: only published files and official APIs.</p>';
 render();
 $('theme').addEventListener('click',()=>{const dark=getComputedStyle(document.documentElement).colorScheme==='dark';document.documentElement.dataset.theme=dark?'light':'dark';try{localStorage.setItem('movie-finder-theme',dark?'light':'dark');}catch{}});
 try{const t=localStorage.getItem('movie-finder-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;}catch{}
 </script>
+<script src="extras.js" defer></script>
 </body></html>

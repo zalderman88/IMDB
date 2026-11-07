@@ -36,6 +36,7 @@ The original monthly ChatGPT task (1st of each month, Perth time) still exists i
 services. Sources (no scraping; published files and documented APIs only):
 
 1. Netflix's official weekly Top 10 for Australia (`all-weeks-countries.tsv` from netflix.com/tudum/top10), no key.
+   (DocPlay was removed from Top 20 on Zac's request, 7 Nov 2026.)
 2. The services' own AU top lists from the Streaming Availability API `GET /shows/top` (Netflix, Prime Video,
    Disney+, Apple TV+, Paramount+, HBO Max), using the same `STREAMING_AVAILABILITY_API_KEY` as the New page.
    About 12 requests per scheduled run; cached in `cache/top20_sa.json` so code pushes spend none.
@@ -46,6 +47,9 @@ services. Sources (no scraping; published files and documented APIs only):
 Scoring: 10 points for #1 down to 1 for #10 on each chart; best chart per service; services add up; Netflix
 adds 25% of last week's points; quality bonus (IMDb - 6) x 1.5, capped at 4.5, needs 1,000+ votes. India is
 excluded. A source failing never fails the build; the page lists which sources worked. Tests: `tests/test_top20.py`.
+The page keeps 60 titles per list and shows the top 20 on the viewer's ticked services (localStorage
+`my-services-v1` = {have:[codes]}, seeded from the New page or For you choice). Posters and synopses come from
+TMDB `/find` (cached in `cache/top20_find.json`); Trailer / More like this come from site/extras.js.
 
 ### TMDB: live where-to-watch, and New without a second key
 
