@@ -81,7 +81,7 @@ function card(it){
 // TV shows: a bell to turn new-season alerts on, and what TVmaze says about the next season.
 function seasonRow(it){
   const row=el('div','wl-season'),bell=el('button','wl-bell'),st=el('span','wl-st','Checking seasons…');bell.type='button';
-  const on=!!it.alert;bell.setAttribute('aria-pressed',String(on));bell.textContent=on?'🔔 New season alerts on':'🔕 Alert me to new seasons';
+  const on=!!it.alert;bell.setAttribute('aria-pressed',String(on));bell.textContent=(on?'🔔 ':'🔕 ')+'Notify me when new season released';
   bell.title=on?'Tap to stop new-season alerts for this show':'Show a message on this site when a new season of this show comes out';
   bell.addEventListener('click',()=>{WL.setAlert(it.id,!it.alert);if(!it.alert)toast('You’ll see a message here when '+it.title+' gets a new season');});
   row.append(bell,st);
