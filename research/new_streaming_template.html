@@ -75,7 +75,7 @@ select.pill{padding-right:30px;appearance:auto}
 <p class="intro"><strong>Movies and shows that recently arrived on Australian subscription services.</strong> Tick the services you have; your choice is saved on this device.</p>
 <p class="stamp"><span class="dot"></span><span id="stamp">Loading…</span></p></header>
 
-<details class="box" id="svc-box"><summary>My services <span id="svc-sum"></span></summary><div class="inner">
+<details class="box" id="svc-box" open><summary>My services <span id="svc-sum"></span></summary><div class="inner">
 <div class="services" id="services"></div>
 <div class="svc-actions"><button type="button" id="svc-all">Tick all</button><button type="button" id="svc-none">Untick all</button></div>
 <p class="help">Only services with something new are listed. Your choice is shared with the Top 20 page.</p></div></details>
@@ -101,8 +101,8 @@ try{const s=JSON.parse(localStorage.getItem(STORE));if(s&&typeof s==='object')st
 if(!Array.isArray(store.off))store.off=[];
 function save(){try{localStorage.setItem(STORE,JSON.stringify(store));}catch{}}
 // One "my services" choice shared with Top 20 (my-services-v1 = {have:[codes]}); TMDB data uses the same codes.
-const MY='my-services-v1',SHARED=META.mode==='tmdb';
-if(SHARED){try{const m=JSON.parse(localStorage.getItem(MY));if(m&&Array.isArray(m.have))store.off=SV.map(s=>s.id).filter(id=>!m.have.includes(id));}catch{}}
+const MY='my-services-v1',SHARED=true;
+if(SHARED){try{const m=JSON.parse(localStorage.getItem(MY));if(m&&Array.isArray(m.have))store.off=m.have.length?SV.map(s=>s.id).filter(id=>!m.have.includes(id)):[];}catch{}}
 function saveShared(){if(!SHARED)return;try{let have=[];const m=JSON.parse(localStorage.getItem(MY));if(m&&Array.isArray(m.have))have=m.have.filter(c=>!SV.some(s=>s.id===c));have=have.concat(SV.map(s=>s.id).filter(id=>!store.off.includes(id)));localStorage.setItem(MY,JSON.stringify({have,at:Date.now()}));}catch{}}
 function el(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e;}
 const fmt=n=>Number(n).toLocaleString('en-AU'),votesShort=v=>v>=1e6?(v/1e6).toFixed(1).replace(/\.0$/,'')+'M':v>=1e3?Math.round(v/1e3)+'k':String(v);

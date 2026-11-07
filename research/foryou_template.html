@@ -171,6 +171,7 @@ const items=RAW.map(r=>{const tv=r[0]==='t',it={kind:r[0],id:r[1],title:r[2],yea
 const byId=new Map(items.map(it=>[it.id,it]));
 let store={likes:[],nopes:[],tab:'all',era:0,svc:false,services:null};
 try{const s=JSON.parse(localStorage.getItem(STORE));if(s&&Array.isArray(s.likes))store=Object.assign(store,s);}catch{}
+{const my=(()=>{try{const m=JSON.parse(localStorage.getItem('my-services-v1'));return m&&Array.isArray(m.have)?m.have:null;}catch{return null;}})();if(my)store.services=my.filter(c=>PROVIDERS[c]);}
 if(!Array.isArray(store.services)){store.services=[];try{const mf=JSON.parse(localStorage.getItem('movie-finder-rt-v4')||localStorage.getItem('movie-finder-rt-v3'));if(mf&&Array.isArray(mf.services))store.services=mf.services.filter(c=>PROVIDERS[c]);}catch{}}
 function save(){try{localStorage.setItem(STORE,JSON.stringify(store));}catch{}}
 const rated=()=>new Set([...store.likes,...store.nopes]);
@@ -255,7 +256,7 @@ function renderLists(){for(const key of ['likes','nopes']){const box=$(key),frag
 
 // ---------- controls ----------
 function syncControls(){for(const b of document.querySelectorAll('[data-tab]'))b.setAttribute('aria-pressed',String(b.dataset.tab===store.tab));$('on-services').setAttribute('aria-pressed',String(store.svc));$('services').hidden=!store.svc;$('era').value=String(store.era||0);for(const box of $('services').querySelectorAll('input'))box.checked=store.services.includes(box.value);}
-for(const [code,name] of Object.entries(PROVIDERS)){const label=el('label'),box=el('input');box.type='checkbox';box.value=code;box.addEventListener('change',()=>{store.services=Object.keys(PROVIDERS).filter(c=>c===code?box.checked:store.services.includes(c));save();refresh();});label.append(box,name);$('services').append(label);}
+for(const [code,name] of Object.entries(PROVIDERS)){const label=el('label'),box=el('input');box.type='checkbox';box.value=code;box.addEventListener('change',()=>{store.services=Object.keys(PROVIDERS).filter(c=>c===code?box.checked:store.services.includes(c));save();try{localStorage.setItem('my-services-v1',JSON.stringify({have:store.services,at:Date.now()}));}catch{}refresh();});label.append(box,name);$('services').append(label);}
 $('services').append(el('p','note','With none ticked, any listed service counts. TV shows are left out here because their streaming isn’t collected.'));
 function refresh(){save();syncControls();recompute();renderPicks(true);renderStarters();}
 for(const b of document.querySelectorAll('[data-tab]'))b.addEventListener('click',()=>{store.tab=b.dataset.tab;refresh();});
