@@ -221,4 +221,4 @@ addEventListener('scroll',()=>{$('backtop').hidden=scrollY<700;},{passive:true})
 $('loaded').textContent=fmt(DATA.length)+' movie records';$('coverage-detail').textContent=META.coverageText;
 for(const [label,value] of META.coverageRows){const tr=el('tr');tr.append(el('td','',label),el('td','',fmt(value)));$('coverage-table').append(tr);}
 restore();apply();
-</script></body></html>
+</script><script src="extras.js" defer></script></body></html>

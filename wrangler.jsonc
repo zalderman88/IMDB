@@ -4,5 +4,7 @@
   "compatibility_date": "2026-11-01",
   "workers_dev": true,
   "preview_urls": false,
-  "assets": { "directory": "./_site" }
+  // worker/index.js answers /api/* (trailers, suggestions, next episodes); everything else is a static file.
+  "main": "worker/index.js",
+  "assets": { "directory": "./_site", "binding": "ASSETS" }
 }

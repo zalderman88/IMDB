@@ -31,3 +31,10 @@ Review counts are sample-size filters, not a guarantee of quality or that a rati
 Four Indian animated films with missing country tags were explicitly marked IN using their known IMDb IDs in the fusion script. Other unknown production countries are allowed by the user's latest default. No language is guessed from country, title spelling or an alternate translated title.
 
 This handover contains factual metadata, not downloaded film media, posters or critic-review text. Preserve the included IMDb attribution and source notices. The package is for the user's individual personal project; it does not grant upstream data licences or publisher API access.
+
+## Trailers, "More like this", Coming up and people search (added 7 Nov 2026)
+
+- **Actor/director search** (`tools/build_people.py` → `_site/people.json`): IMDb non-commercial bulk files `title.principals` and `name.basics`, downloaded in CI with the other IMDb files. Directors plus the first five billed cast for titles on the Movies and TV pages. `site/extras.js` adds the names to the search text and shows them on each row; tapping a name searches for it.
+- **Trailer and More like this**: TMDB API, looked up on demand by `worker/index.js` at `/api/title` (`/find` by IMDb id, then videos + recommendations) and cached at the edge for 7 days. Needs the `TMDB_API_KEY` CI variable, which the deploy job sets as a Worker secret. Suggestions are matched back to the site's own catalogue by title and year (±1); unmatched ones say "Not in your list". TMDB attribution is shown wherever its data appears.
+- **Coming up**: TVmaze API (no key, CC BY-SA), on demand via `/api/tvnext`, cached 6 hours at the edge and in the browser. Uses the shows liked on For you (`foryou-v1` in localStorage). Air dates are TVmaze's, usually the home network's, so Australian dates can differ.
+- Nothing here is scraped; all calls are documented public APIs, made only when someone taps or opens a page.

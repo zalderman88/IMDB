@@ -14,7 +14,7 @@ stages: [build, deploy]
 build:
   stage: build
   image: python:3.12-bookworm
-  timeout: 45m
+  timeout: 60m
   # Keeps the New on streaming data between pipelines so code pushes don't spend API requests.
   cache:
     key: new-on-streaming
@@ -56,6 +56,15 @@ build:
     - cp New_Streaming_Android.html _site/new.html
     - cp Top20_Android.html _site/top20.html
     - cp -r site/. _site/
+    # Actor/director search: IMDb credits for titles on the site (site/extras.js loads people.json).
+    - |
+      for f in title.principals name.basics; do
+        curl --fail --silent --show-error --location --retry 4 --retry-delay 15 \
+          -A 'movie-finder-refresh/1.0' -o "/tmp/imdb/$f.tsv.gz" "https://datasets.imdbws.com/$f.tsv.gz"
+      done
+    - python tools/build_people.py --principals /tmp/imdb/title.principals.tsv.gz --names /tmp/imdb/name.basics.tsv.gz --out _site/people.json
+    - python tests/test_people.py
+    - node tests/test_worker.mjs
     - ls -l _site
   artifacts:
     paths: [_site/]
@@ -67,3 +76,6 @@ deploy:
   needs: [build]
   script:
     - npx --yes wrangler@4 deploy
+    # Trailers and "More like this" (worker/index.js) read TMDB_API_KEY as a Worker secret.
+    - |
+      if [ -n "$TMDB_API_KEY" ]; then printf '%s' "$TMDB_API_KEY" | npx --yes wrangler@4 secret put TMDB_API_KEY; else echo "TMDB_API_KEY not set: trailers and suggestions stay off"; fi
