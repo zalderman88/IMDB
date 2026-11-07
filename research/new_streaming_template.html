@@ -69,6 +69,7 @@ select.pill{padding-right:30px;appearance:auto}
 /* Five-tab nav (Top 20 added Nov 2026): tabs size to their labels and stay on one line on phones */
 .mode-switch a{flex:1 1 auto;white-space:nowrap;padding:10px 8px;font-size:15px}
 @media(max-width:420px){.mode-switch{gap:2px;padding:3px}.mode-switch a{padding:8px 5px;font-size:13.5px;min-height:48px}}
+.reset-small{min-height:40px;padding:6px 14px;border-radius:999px;border:1.5px solid var(--accent);background:transparent;color:var(--accent);font-size:13px;font-weight:750;cursor:pointer;white-space:nowrap}.reset-small:hover{background:var(--accent);color:var(--on-accent)}
 </style></head><body><main class="shell">
 <header class="masthead"><div class="topline"><p class="kicker">JUST ADDED IN AUSTRALIA</p><nav class="mode-switch" aria-label="Finder"><a href="index.html">Movies</a><a href="tv.html">TV shows</a><a href="foryou.html">For you</a><a href="new.html" aria-current="page">New</a><a href="top20.html">Top 20</a></nav></div><div class="heading"><h1>New on <em>streaming</em></h1><button class="theme" id="theme" type="button" aria-label="Switch colour theme" title="Switch colour theme"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="display:block;margin:auto"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button></div>
 <p class="intro"><strong>Movies and shows that recently arrived on Australian subscription services.</strong> Tick the services you have; your choice is saved on this device.</p>
@@ -82,7 +83,7 @@ select.pill{padding-right:30px;appearance:auto}
 <div class="controls"><div class="tabs" role="group" aria-label="Show"><button type="button" data-tab="all" aria-pressed="true">All</button><button type="button" data-tab="movie" aria-pressed="false">Movies</button><button type="button" data-tab="series" aria-pressed="false">Series</button></div>
 <button class="pill" id="seasons" type="button" aria-pressed="true">Include new seasons</button>
 <label class="sr-only" for="min">Minimum IMDb rating</label><select class="pill" id="min"><option value="0">Any rating</option><option value="6">IMDb 6+</option><option value="7">IMDb 7+</option><option value="8">IMDb 8+</option></select>
-<label class="sr-only" for="sort">Sort</label><select class="pill" id="sort"><option value="new">Newest first</option><option value="imdb">Highest IMDb</option></select></div>
+<label class="sr-only" for="sort">Sort</label><select class="pill" id="sort"><option value="new">Newest first</option><option value="imdb">Highest IMDb</option></select><button type="button" class="reset-small" id="reset-filters">↺ Reset filters</button></div>
 <p class="count" id="count" aria-live="polite"></p>
 <div id="list"></div><div class="empty" id="empty" hidden></div>
 <button class="more" id="more" type="button" hidden>Show more</button>
@@ -192,4 +193,5 @@ if(!SV.some((s,i)=>svcCount[i]))$('svc-box').hidden=true;else{let fresh=true;try
 $('theme').addEventListener('click',()=>{const dark=getComputedStyle(document.documentElement).colorScheme==='dark';document.documentElement.dataset.theme=dark?'light':'dark';try{localStorage.setItem('movie-finder-theme',dark?'light':'dark');}catch{}});
 try{const t=localStorage.getItem('movie-finder-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;}catch{}
 stamp();sync();buildServices();render(true);
+$('reset-filters').addEventListener('click',()=>{try{localStorage.removeItem(STORE);localStorage.removeItem(MY);}catch{}location.reload();});
 </script></body></html>

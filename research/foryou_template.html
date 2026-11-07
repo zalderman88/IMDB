@@ -123,6 +123,7 @@ h2,.empty h2,.section h2{font-family:var(--display);font-weight:700;letter-spaci
 /* Five-tab nav (Top 20 added Nov 2026): tabs size to their labels and stay on one line on phones */
 .mode-switch a{flex:1 1 auto;white-space:nowrap;padding:10px 8px;font-size:15px}
 @media(max-width:420px){.mode-switch{gap:2px;padding:3px}.mode-switch a{padding:8px 5px;font-size:13.5px;min-height:48px}}
+.reset-small{min-height:40px;padding:6px 14px;border-radius:999px;border:1.5px solid var(--accent);background:transparent;color:var(--accent);font-size:13px;font-weight:750;cursor:pointer;white-space:nowrap}.reset-small:hover{background:var(--accent);color:var(--on-accent)}
 </style><link rel="stylesheet" href="posters.css"><script src="posters.js" defer></script></head><body><main class="shell">
 <header class="masthead"><div class="marquee-bulbs" aria-hidden="true"></div><div class="topline"><p class="kicker"><svg class="reel" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5"></circle><circle cx="12" cy="12" r="1.6"></circle><circle cx="12" cy="6.6" r="2.1"></circle><circle cx="12" cy="17.4" r="2.1"></circle><circle cx="6.6" cy="12" r="2.1"></circle><circle cx="17.4" cy="12" r="2.1"></circle></svg>PICKED FOR YOU</p><nav class="mode-switch" aria-label="Finder"><a href="index.html">Movies</a><a href="tv.html">TV shows</a><a href="foryou.html" aria-current="page">For you</a><a href="new.html">New</a><a href="top20.html">Top 20</a></nav></div><div class="heading"><h1>For <em>you</em></h1><button class="theme" id="theme" type="button" aria-label="Switch colour theme" title="Switch colour theme"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="display:block;margin:auto"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button></div>
 <p class="intro"><strong>Tap 👍 on things you’ve enjoyed.</strong> Picks are worked out on this phone from your likes and saved here, nowhere else.</p>
@@ -139,7 +140,7 @@ h2,.empty h2,.section h2{font-family:var(--display);font-weight:700;letter-spaci
 <section class="section" aria-labelledby="picks-h"><div class="section-head"><h2 id="picks-h">Picks for you</h2><p id="picks-note"></p></div>
 <div class="controls"><div class="tabs" role="group" aria-label="Show"><button type="button" data-tab="all" aria-pressed="true">All</button><button type="button" data-tab="m" aria-pressed="false">Movies</button><button type="button" data-tab="t" aria-pressed="false">TV</button></div>
 <button class="pill" id="on-services" type="button" aria-pressed="false">On my services</button>
-<label class="sr-only" for="era">Released</label><select class="pill" id="era"><option value="0">Any year</option><option value="1990">1990 or later</option><option value="2000">2000 or later</option><option value="2010">2010 or later</option><option value="2020">2020 or later</option></select>
+<label class="sr-only" for="era">Released</label><select class="pill" id="era"><option value="0">Any year</option><option value="1990">1990 or later</option><option value="2000">2000 or later</option><option value="2010">2010 or later</option><option value="2020">2020 or later</option></select><button type="button" class="reset-small" id="reset-filters">↺ Reset filters</button>
 <button class="pill" id="rate-more" type="button" hidden>Rate more</button></div>
 <div class="services" id="services" hidden></div>
 <ol class="cards" id="picks"></ol><div class="empty" id="picks-empty" hidden></div>
@@ -170,7 +171,7 @@ const items=RAW.map(r=>{const tv=r[0]==='t',it={kind:r[0],id:r[1],title:r[2],yea
 const byId=new Map(items.map(it=>[it.id,it]));
 let store={likes:[],nopes:[],tab:'all',era:0,svc:false,services:null};
 try{const s=JSON.parse(localStorage.getItem(STORE));if(s&&Array.isArray(s.likes))store=Object.assign(store,s);}catch{}
-if(!Array.isArray(store.services)){store.services=[];try{const mf=JSON.parse(localStorage.getItem('movie-finder-rt-v3'));if(mf&&Array.isArray(mf.services))store.services=mf.services.filter(c=>PROVIDERS[c]);}catch{}}
+if(!Array.isArray(store.services)){store.services=[];try{const mf=JSON.parse(localStorage.getItem('movie-finder-rt-v4')||localStorage.getItem('movie-finder-rt-v3'));if(mf&&Array.isArray(mf.services))store.services=mf.services.filter(c=>PROVIDERS[c]);}catch{}}
 function save(){try{localStorage.setItem(STORE,JSON.stringify(store));}catch{}}
 const rated=()=>new Set([...store.likes,...store.nopes]);
 function el(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e;}
@@ -271,4 +272,5 @@ try{const t=localStorage.getItem('movie-finder-theme');if(t==='light'||t==='dark
 $('loaded').textContent=fmt(META.movies)+' movies · '+fmt(META.shows)+' TV shows'+(META.movieChecked?' · IMDb checked '+META.movieChecked:'');
 $('sources').textContent='Titles, genres, IMDb ratings and votes come from the movie and TV finders (IMDb datasets). Streaming services are the Australian JustWatch subscription listings already in the movie finder; RT scores show only where 50+ critic reviews were confirmed. Movies hide known Indian productions and suspicious 9.0+ ratings, like the movie finder defaults.';
 buildStarters();syncControls();recompute();renderPicks(true);renderStarters();renderLists();
-</script><script src="extras.js" defer></script></body></html>
+</script><script src="extras.js" defer>$('reset-filters').addEventListener('click',()=>{store.tab='all';store.era=0;store.svc=false;save();location.reload();});
+</script></body></html>
