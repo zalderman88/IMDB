@@ -91,7 +91,9 @@ def main():
             dropped[reason] += 1
             continue
         rec = {'id': s['imdbId'], 'title': s['title'], 'type': s['type'], 'startYear': s['startYear'],
-               'endYear': s.get('endYear'), 'lastYear': last_year(s), 'seasons': s.get('seasons') or 0,
+               'endYear': min(s['endYear'], asof.year) if s.get('endYear') else s.get('endYear'),
+               'lastYear': min(last_year(s), asof.year),
+               'seasons': s.get('seasons') or 0,
                'seasonsSince2020': s.get('seasonsSince2020') or 0, 'episodes': s.get('episodes') or 0,
                'runtime': s.get('runtime'), 'genres': s.get('genres') or [], 'score': s['score'], 'votes': s['votes'],
                'imdb': 'https://www.imdb.com/title/' + s['imdbId'] + '/', 'recent': recent, 'acclaimed': acclaimed}
