@@ -18,8 +18,8 @@ Scoring (shown on the page too):
   * Each chart gives 10 points to its #1 down to 1 point for #10 (scaled for other lengths).
   * A service counts once per title: the best of its charts. Netflix adds a quarter of the points
     of the previous week's official chart, so staying power counts a little.
-  * TMDB popularity lists count at 60%, because they are worldwide interest in titles that
-    are on that AU service, not an AU viewing chart.
+  * TMDB popularity lists (recent titles only) count at 60%, once per title (its best list),
+    because they are worldwide interest in titles on that AU service, not an AU viewing chart.
   * Points from different services add up, so a hit on two services ranks higher.
   * Quality bonus: up to 4.5 points from the IMDb rating (needs 1,000+ votes): (rating - 6) x 1.5.
     Without an IMDb rating, the Streaming Availability rating (0-100, average of online
@@ -210,7 +210,7 @@ def sa_where(show):
 
 # ---------- source 3: TMDB popularity on AU services with no chart (optional) ----------
 
-def tmdb_lists(fixture_dir, skip=()):
+def tmdb_lists(fixture_dir, today, skip=()):
     key = os.environ.get('TMDB_API_KEY', '').strip()
     if not fixture_dir and not key:
         return {}, ['TMDB key not set (optional)']
@@ -238,9 +238,14 @@ def tmdb_lists(fixture_dir, skip=()):
                 if svc and svc not in ids and (svc, kind) not in skip:
                     ids[svc] = prov['provider_id']
             for svc, pid in ids.items():
+                # Recent titles only, so evergreen classics don't crowd out what people watch now:
+                # films released in the last 18 months, shows with an episode in the last 60 days.
+                recent = ({'primary_release_date.gte': (today - datetime.timedelta(days=548)).isoformat()}
+                          if tk == 'movie' else
+                          {'air_date.gte': (today - datetime.timedelta(days=60)).isoformat()})
                 res = call(f'/discover/{tk}', watch_region='AU', with_watch_providers=str(pid),
                            with_watch_monetization_types='flatrate', sort_by='popularity.desc',
-                           include_adult='false', **{'vote_count.gte': '50'}).get('results', [])[:10]
+                           include_adult='false', **{'vote_count.gte': '20'}, **recent).get('results', [])[:10]
                 items = []
                 for r in res:
                     ext = call(f'/{tk}/{r["id"]}/external_ids')
@@ -326,7 +331,7 @@ def main():
     notes += sa_notes
     sources['streaming_availability'] = {'ok': bool(sa), 'lists': sorted(f'{s}-{k}' for s, k in sa),
                                          'fetched': datetime.date.fromtimestamp(sa_at).isoformat() if sa_at else None}
-    tm, tm_notes = tmdb_lists(a.tmdb_fixture, skip=set(sa))
+    tm, tm_notes = tmdb_lists(a.tmdb_fixture, today, skip=set(sa))
     notes += tm_notes
     sources['tmdb'] = {'ok': bool(tm), 'lists': sorted(f'{s}-{k}' for s, k in tm)}
 
@@ -390,20 +395,24 @@ def main():
             if e['lang'] in ('hi', 'ta', 'te', 'ml', 'kn', 'bn', 'mr', 'pa') or 'IN' in e['countries']:
                 continue
             it = item(kind, e['imdb'], e['title'], e['year'])
-            credit(it, svc, round(points(rank, len(lst)) * TMDB_WEIGHT, 3), {'svc': svc, 'rank': rank, 'src': 'tmdb'})
+            pts = round(points(rank, len(lst)) * TMDB_WEIGHT, 3)
+            it['tmdb_pts'] = max(it.get('tmdb_pts', 0), pts)
+            it['charts'].append({'svc': svc, 'rank': rank, 'src': 'tmdb'})
             it['where'].setdefault(svc, '')
 
     out = {'movie': [], 'series': []}
     for it in items.values():
         if it['imdb'] in india:
             continue
-        if not it['svc']:  # only on last week's Netflix chart
+        if not it['svc'] and not it.get('tmdb_pts'):  # only on last week's Netflix chart
             continue
         meta = info.get(it['imdb']) or {}
         if meta:
             it['title'] = it['title'] or meta['title']
             it['year'] = it['year'] or meta['year']
-        chart = sum(it['svc'].values()) + (it.get('bonus_last', 0) if 'netflix' in it['svc'] else 0)
+        # Official charts add up across services; TMDB popularity counts once (its best list),
+        # because several services share catalogues (Stan, Foxtel Now, Binge ...).
+        chart = sum(it['svc'].values()) + it.get('tmdb_pts', 0) + (it.get('bonus_last', 0) if 'netflix' in it['svc'] else 0)
         q, qsrc = None, None
         if meta.get('score') is not None and meta.get('votes', 0) >= MIN_VOTES:
             q, qsrc = meta['score'], 'imdb'
