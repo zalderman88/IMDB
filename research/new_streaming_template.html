@@ -77,7 +77,7 @@ select.pill{padding-right:30px;appearance:auto}
 <details class="box" id="svc-box"><summary>My services <span id="svc-sum"></span></summary><div class="inner">
 <div class="services" id="services"></div>
 <div class="svc-actions"><button type="button" id="svc-all">Tick all</button><button type="button" id="svc-none">Untick all</button></div>
-<p class="help">Only services with something new this month are listed.</p></div></details>
+<p class="help">Only services with something new are listed. Your choice is shared with the Top 20 page.</p></div></details>
 
 <div class="controls"><div class="tabs" role="group" aria-label="Show"><button type="button" data-tab="all" aria-pressed="true">All</button><button type="button" data-tab="movie" aria-pressed="false">Movies</button><button type="button" data-tab="series" aria-pressed="false">Series</button></div>
 <button class="pill" id="seasons" type="button" aria-pressed="true">Include new seasons</button>
@@ -99,6 +99,10 @@ let store={off:[],tab:'all',seasons:true,min:0,sort:'new'};
 try{const s=JSON.parse(localStorage.getItem(STORE));if(s&&typeof s==='object')store=Object.assign(store,s);}catch{}
 if(!Array.isArray(store.off))store.off=[];
 function save(){try{localStorage.setItem(STORE,JSON.stringify(store));}catch{}}
+// One "my services" choice shared with Top 20 (my-services-v1 = {have:[codes]}); TMDB data uses the same codes.
+const MY='my-services-v1',SHARED=META.mode==='tmdb';
+if(SHARED){try{const m=JSON.parse(localStorage.getItem(MY));if(m&&Array.isArray(m.have))store.off=SV.map(s=>s.id).filter(id=>!m.have.includes(id));}catch{}}
+function saveShared(){if(!SHARED)return;try{let have=[];const m=JSON.parse(localStorage.getItem(MY));if(m&&Array.isArray(m.have))have=m.have.filter(c=>!SV.some(s=>s.id===c));have=have.concat(SV.map(s=>s.id).filter(id=>!store.off.includes(id)));localStorage.setItem(MY,JSON.stringify({have,at:Date.now()}));}catch{}}
 function el(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e;}
 const fmt=n=>Number(n).toLocaleString('en-AU'),votesShort=v=>v>=1e6?(v/1e6).toFixed(1).replace(/\.0$/,'')+'M':v>=1e3?Math.round(v/1e3)+'k':String(v);
 const dayFmt=new Intl.DateTimeFormat('en-AU',{weekday:'short',day:'numeric',month:'short',timeZone:'Australia/Perth'});
@@ -118,12 +122,12 @@ function stamp(){
 function buildServices(){
   const box=$('services');box.replaceChildren();
   SV.forEach((s,i)=>{if(!svcCount[i])return;const l=el('label'),c=el('input');c.type='checkbox';c.checked=!store.off.includes(s.id);c.dataset.id=s.id;
-    c.addEventListener('change',()=>{store.off=store.off.filter(x=>x!==s.id);if(!c.checked)store.off.push(s.id);save();render(true);});
+    c.addEventListener('change',()=>{store.off=store.off.filter(x=>x!==s.id);if(!c.checked)store.off.push(s.id);save();saveShared();render(true);});
     l.append(c,el('span','',s.name),el('span','n',String(svcCount[i])));box.append(l);});
   summary();
 }
 function summary(){const shown=SV.filter((s,i)=>svcCount[i]),on=shown.filter(s=>!store.off.includes(s.id));$('svc-sum').textContent=on.length===shown.length?'All '+shown.length:on.length+' of '+shown.length;}
-function setAll(on){store.off=on?[]:SV.map(s=>s.id);save();buildServices();render(true);}
+function setAll(on){store.off=on?[]:SV.map(s=>s.id);save();saveShared();buildServices();render(true);}
 $('svc-all').addEventListener('click',()=>setAll(true));$('svc-none').addEventListener('click',()=>setAll(false));
 
 function visible(it){
