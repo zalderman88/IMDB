@@ -31,3 +31,12 @@ Certified Fresh and Verified Hot are reported source designations, not inferred 
 
 Browser-stored preferences override fresh defaults after the user chooses settings. A fresh open and Reset are both tested with the latest country/language defaults.
 - Title type (added 7 Nov 2026): default `mainstream` = IMDb title type `movie` only, hiding suspicious ratings (IMDb 9.0+ from under 10,000 votes with no RT score). `features` keeps all ratings; `all` also includes TV movies, shorts and videos. Reset restores `mainstream`.
+
+## TV finder (requested 7 November 2026)
+
+- Separate page (`tv.html`) with a Movies / TV shows switch; same look as the movie finder.
+- Only IMDb TV series and miniseries with at least **1,000 IMDb votes**; adult titles omitted.
+- Listed if **IMDb 6.0+ and aired in 2020 or later**: first aired 2020+, or started earlier but has an end year or any episode released in 2020 or later (episode years from `title.episode` joined to each episode's own year; future announced episodes ignored).
+- **Exception:** first aired in 2000 or later with **IMDb above 8.0** is listed even if it has not aired since 2020.
+- Defaults mirror the movie finder: IMDb 6.0+, 1,000+ votes, Romance/Horror/Documentary excluded. Shows at **9.0+ with under 10,000 votes are hidden by default** (likely vote-stuffed); a tick box shows them.
+- No AU streaming, RT, classification, country or language data for TV yet, so the Indian-production default cannot apply. Do not invent these facts.

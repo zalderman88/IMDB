@@ -1,8 +1,8 @@
 # Movie Finder (Australia)
 
-**Live site: https://zalderman88.github.io/IMDB/** — searchable IMDb + Rotten Tomatoes movie finder for Australian streaming services. Works on Android and desktop browsers. IMDb ratings refresh automatically twice a week; see [AUTOMATION.md](AUTOMATION.md).
+**Live site: https://zalderman88.github.io/IMDB/** — searchable IMDb + Rotten Tomatoes movie finder for Australian streaming services. **TV finder: https://zalderman88.github.io/IMDB/tv.html** — IMDb series and miniseries that aired from 2020, plus shows from 2000 onwards rated above 8.0 (see USER_REQUIREMENTS.md). Works on Android and desktop browsers. IMDb ratings refresh automatically twice a week; see [AUTOMATION.md](AUTOMATION.md).
 
-The built HTML is not committed. Run `python rebuild.py` to create `Australian_Movies_Android.html` locally, or download it from the live site.
+The built HTML is not committed. Run `python rebuild.py` to create `Australian_Movies_Android.html` locally, or download it from the live site. The TV page needs the IMDb TV snapshot first: run `python tools/refresh_tv.py` (downloads about 250 MB of official IMDb datasets), then `python rebuild.py` also writes `TV_Shows_Android.html`.
 
 ---
 
@@ -52,6 +52,9 @@ Or run `python rebuild.py` to rebuild without the Node checks. Run `node tests/v
 | research/language_movies.json | Original-language facts, matched by IMDb IDs |
 | data/ | Extracted final data, metadata and refresh recipe for easy inspection |
 | tests/verify_movie_finder.mjs | Browser-logic checks using a lightweight DOM harness |
+| research/tv_finder_template.html, research/build_tv.py | TV finder UI template and builder (writes TV_Shows_Android.html, published as tv.html) |
+| tools/refresh_tv.py | Builds research/imdb/tv_1k.json from IMDb basics/ratings/episode datasets |
+| tests/test_tv_pipeline.py, tests/verify_tv_finder.mjs | Offline TV fixture test and TV UI checks |
 | .github/workflows/refresh.yml | Twice-weekly IMDb refresh and GitHub Pages deploy |
 | tools/refresh_imdb.py, tools/check_refresh.py | IMDb dataset refresh and post-refresh checks |
 | REFRESH_GUIDE.md | Source-refresh procedure and remaining acquisition gaps |

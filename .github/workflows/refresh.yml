@@ -7,6 +7,9 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
+  # Pull requests build and test the site with fresh IMDb data but never deploy it.
+  pull_request:
+    branches: [main]
 
 permissions:
   contents: read
@@ -14,8 +17,8 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
-  cancel-in-progress: false
+  group: ${{ github.event_name == 'pull_request' && format('ci-{0}', github.ref) || 'pages' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   build:
@@ -30,10 +33,24 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Download IMDb official datasets and refresh ratings/votes
-        run: python tools/refresh_imdb.py
+      - name: Download IMDb official datasets
+        run: |
+          mkdir -p "$RUNNER_TEMP/imdb"
+          for f in title.basics title.ratings title.episode; do
+            curl --fail --silent --show-error --location --retry 4 --retry-delay 15 \
+              -A 'movie-finder-refresh/1.0' -o "$RUNNER_TEMP/imdb/$f.tsv.gz" "https://datasets.imdbws.com/$f.tsv.gz"
+          done
+          ls -l "$RUNNER_TEMP/imdb"
 
-      - name: Rebuild the app from snapshots
+      - name: Refresh movie ratings/votes
+        run: python tools/refresh_imdb.py --basics "$RUNNER_TEMP/imdb/title.basics.tsv.gz" --ratings "$RUNNER_TEMP/imdb/title.ratings.tsv.gz"
+
+      - name: Build TV series data (series, ratings, episode years)
+        run: >
+          python tools/refresh_tv.py --basics "$RUNNER_TEMP/imdb/title.basics.tsv.gz"
+          --ratings "$RUNNER_TEMP/imdb/title.ratings.tsv.gz" --episode "$RUNNER_TEMP/imdb/title.episode.tsv.gz"
+
+      - name: Rebuild the movie and TV apps from snapshots
         run: python rebuild.py
 
       - name: Check refreshed catalogue
@@ -42,19 +59,29 @@ jobs:
       - name: Run functional checks
         run: node tests/verify_movie_finder.mjs
 
+      - name: Check TV finder
+        run: |
+          python research/build_tv.py --min-shows 1000
+          python tests/test_tv_pipeline.py
+          node tests/verify_tv_finder.mjs
+
       - name: Prepare site
         run: |
           mkdir -p _site
           cp Australian_Movies_Android.html _site/index.html
           cp Australian_Movies_Android.html _site/Australian_Movies_Android.html
+          cp TV_Shows_Android.html _site/tv.html
           touch _site/.nojekyll
+          ls -l _site
 
       - uses: actions/upload-pages-artifact@v3
+        if: github.event_name != 'pull_request'
         with:
           path: _site
 
   deploy:
     needs: build
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
