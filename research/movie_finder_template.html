@@ -248,5 +248,5 @@ $('loaded').textContent=fmt(DATA.length)+' movie records';$('coverage-detail').t
 for(const [label,value] of META.coverageRows){const tr=el('tr');tr.append(el('td','',label),el('td','',fmt(value)));$('coverage-table').append(tr);}
 restore();apply();
 addEventListener('storage',e=>{if(e.key===MY_KEY){const my=readMy()||[];state.services=new Set(my.filter(c=>PROVIDERS[c]));syncChecks();apply();}});
-</script><script src="extras.js" defer></script><script src="watchlist.js" defer></script>
+</script><script src="extras.js" defer></script><script src="watchlist.js" defer></script><script src="account.js" defer></script>
 </body></html>

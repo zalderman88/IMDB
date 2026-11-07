@@ -253,5 +253,5 @@ for(const [code,name] of Object.entries(TV_PROVIDERS)){const label=el('label','c
 if(!META.streamingLive)$('svc-help').textContent='Australian streaming isn’t loaded for TV in this copy, so ticking services here only saves your choice for the other pages.';
 restore();syncChecks();apply();
 addEventListener('storage',e=>{if(e.key===MY_KEY){state.services=new Set((readMy()||[]).filter(c=>TV_PROVIDERS_ALL.includes(c)));syncChecks();apply();}});
-</script><script src="extras.js" defer></script><script src="watchlist.js" defer></script>
+</script><script src="extras.js" defer></script><script src="watchlist.js" defer></script><script src="account.js" defer></script>
 </body></html>

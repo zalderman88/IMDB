@@ -196,5 +196,5 @@ $('theme').addEventListener('click',()=>{const dark=getComputedStyle(document.do
 try{const t=localStorage.getItem('movie-finder-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;}catch{}
 stamp();sync();buildServices();render(true);
 $('reset-filters').addEventListener('click',()=>{try{localStorage.removeItem(STORE);localStorage.removeItem(MY);}catch{}location.reload();});
-</script><script src="watchlist.js" defer></script>
+</script><script src="watchlist.js" defer></script><script src="account.js" defer></script>
 </body></html>

@@ -276,5 +276,5 @@ $('loaded').textContent=fmt(META.movies)+' movies · '+fmt(META.shows)+' TV show
 $('sources').textContent='Titles, genres, IMDb ratings and votes come from the movie and TV finders (IMDb datasets). Streaming services are the Australian JustWatch subscription listings already in the movie finder; RT scores show only where 50+ critic reviews were confirmed. Movies hide known Indian productions and suspicious 9.0+ ratings, like the movie finder defaults.';
 buildStarters();syncControls();recompute();renderPicks(true);renderStarters();renderLists();
 </script><script src="extras.js" defer>$('reset-filters').addEventListener('click',()=>{store.tab='all';store.era=0;store.svc=false;save();location.reload();});
-</script><script src="watchlist.js" defer></script>
+</script><script src="watchlist.js" defer></script><script src="account.js" defer></script>
 </body></html>
