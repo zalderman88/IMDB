@@ -16,6 +16,8 @@ build:
   image: python:3.12-bookworm
   timeout: 60m
   # Keeps the New on streaming data between pipelines so code pushes don't spend API requests.
+  # Also holds the poster/synopsis lookups (cache/posters.json.gz) so refreshes only look up new titles;
+  # data/posters_seed.json.gz in the repo is the fallback if this cache is lost.
   cache:
     key: new-on-streaming
     paths: [cache/]
@@ -61,6 +63,9 @@ build:
       NF=; [ -s /tmp/netflix_top10.tsv ] && NF="--netflix-tsv /tmp/netflix_top10.tsv"
       python tools/build_top20.py --basics /tmp/imdb/title.basics.tsv.gz --ratings /tmp/imdb/title.ratings.tsv.gz $NF $FORCE
     - mkdir -p _site
+    # Posters and synopses: TMDB if the masked CI/CD variable TMDB_API_KEY is set, then Wikipedia and TVmaze.
+    - python tests/test_posters.py
+    - python tools/fetch_posters.py --cache cache/posters.json.gz --out _site/posters --budget-minutes 20
     - cp Australian_Movies_Android.html _site/index.html
     - cp TV_Shows_Android.html _site/tv.html
     - cp ForYou_Android.html _site/foryou.html
