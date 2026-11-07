@@ -47,7 +47,8 @@ SERVICES = {
     'mxx': ('HBO Max', ['hbomax', 'max']),
     'atp': ('Apple TV', ['appletvplus', 'appletv']),
     'bng': ('Binge', ['binge']),
-    'fxn': ('Foxtel Now', ['foxtelnow']),
+    'sbs': ('SBS On Demand', ['sbsondemand']),
+    'abc': ('ABC iview', ['abciview']),
 }
 KINDS = {'m': 'movie', 't': 'tv'}
 
@@ -164,7 +165,7 @@ def main():
             old = json.loads(out.read_text())
         except ValueError:
             old = {}
-    if old.get('fetchedAtUnix') and old.get('complete') and not a.force and (time.time() - old['fetchedAtUnix']) / 86400 < a.max_age_days:
+    if old.get('fetchedAtUnix') and old.get('complete') and not a.force and old.get('swept') == sorted(SERVICES) and (time.time() - old['fetchedAtUnix']) / 86400 < a.max_age_days:
         print(f"tmdb-au: cached sweep is {(time.time() - old['fetchedAtUnix']) / 86400:.1f} days old, not fetching")
         return
     key = os.environ.get('TMDB_API_KEY', '').strip()
@@ -237,6 +238,7 @@ def main():
         'requests': api.count,
         'totals': totals,
         'providers': {c: {'name': SERVICES[c][0], 'tmdb': ids} for c, ids in pids.items()},
+        'swept': sorted(SERVICES),  # a changed service list forces a fresh sweep
         'genres': genres,
         'imdb': {k: v for k, v in imdb_map.items() if k in titles},
         'titles': titles,

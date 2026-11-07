@@ -11,7 +11,7 @@ from title_quality import load_india,drop_reason
 BASE=pathlib.Path(__file__).parent
 ROOT=BASE.parent
 OUT=ROOT/'Australian_Movies_Android.html'
-providers={'nfx':'Netflix','prv':'Prime Video','pmp':'Paramount+','stn':'Stan','dnp':'Disney+','mxx':'HBO Max','atp':'Apple TV','bng':'Binge','fxn':'Foxtel Now'}  # bng/fxn come from the live TMDB sweep
+providers={'nfx':'Netflix','prv':'Prime Video','pmp':'Paramount+','stn':'Stan','dnp':'Disney+','mxx':'HBO Max','atp':'Apple TV','bng':'Binge','sbs':'SBS On Demand','abc':'ABC iview'}  # bng/sbs/abc come from the live TMDB sweep
 snapshot=json.loads((BASE/'source_snapshot.json').read_text())
 today=datetime.date.fromisoformat(snapshot['dataAsOf'])
 imdb_asof=datetime.date.fromisoformat(snapshot['imdbAsOf']) if snapshot.get('imdbAsOf') else today

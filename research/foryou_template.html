@@ -160,7 +160,7 @@ h2,.empty h2,.section h2{font-family:var(--display);font-weight:700;letter-spaci
 'use strict';
 const RAW=JSON.parse(document.getElementById('catalogue').textContent),META=JSON.parse(document.getElementById('metadata').textContent);
 const $=id=>document.getElementById(id),G=META.genres;
-const PROVIDERS={nfx:'Netflix',prv:'Prime Video',pmp:'Paramount+',stn:'Stan',dnp:'Disney+',mxx:'HBO Max',atp:'Apple TV',bng:'Binge',fxn:'Foxtel Now'},PCODES=META.providers;
+const PROVIDERS={nfx:'Netflix',prv:'Prime Video',pmp:'Paramount+',stn:'Stan',dnp:'Disney+',mxx:'HBO Max',atp:'Apple TV',bng:'Binge',sbs:'SBS On Demand',abc:'ABC iview'},PCODES=META.providers;
 const TYPES={tvSeries:'TV series',tvMiniSeries:'Miniseries'};
 const STORE='foryou-v1',BATCH=12;
 const clamp=(x,a,b)=>Math.min(b,Math.max(a,x)),fmt=n=>Number(n).toLocaleString('en-AU');

@@ -195,14 +195,14 @@ const MY='my-services-v1';
 const allCodes=[...new Set([...D.movies,...D.shows].flatMap(x=>x.where.map(w=>w.code)))];
 const nameOf=Object.fromEntries([...D.movies,...D.shows].flatMap(x=>x.where.map(w=>[w.code,w.name])));
 let have=null;
-try{const m=JSON.parse(localStorage.getItem(MY));if(m&&Array.isArray(m.have))have=m.have;}catch{}
+try{const m=JSON.parse(localStorage.getItem(MY));if(m&&Array.isArray(m.have))have=m.have.filter(c=>!['fxn','bbx','shd'].includes(c));}catch{}
 if(!have){try{const n=JSON.parse(localStorage.getItem('new-streaming-v1'));if(n&&Array.isArray(n.off)&&n.off.length)have=allCodes.filter(c=>!n.off.includes(c));}catch{}}
 if(!have){try{const f=JSON.parse(localStorage.getItem('foryou-v1'));if(f&&Array.isArray(f.services)&&f.services.length)have=f.services.slice();}catch{}}
 const saveHave=()=>{try{localStorage.setItem(MY,JSON.stringify({have:have||[],at:Date.now()}));}catch{}};
 const filtering=()=>have&&have.length&&allCodes.some(c=>!have.includes(c));
 function buildServices(){
   const box=$('services');box.replaceChildren();
-  const order=['nfx','prv','dnp','stn','bng','fxn','pmp','mxx','atp','bbx','abc','sbs','shd','cru'];
+  const order=['nfx','prv','dnp','stn','bng','pmp','mxx','atp','abc','sbs','cru'];
   for(const c of [...allCodes].sort((a,b)=>(order.indexOf(a)+99)%99-(order.indexOf(b)+99)%99)){
     const l=document.createElement('label'),i=document.createElement('input');i.type='checkbox';i.value=c;i.checked=!have||!have.length||have.includes(c);
     i.addEventListener('change',()=>{have=[...box.querySelectorAll('input:checked')].map(x=>x.value);saveHave();summary();render();});

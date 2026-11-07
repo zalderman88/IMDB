@@ -102,8 +102,8 @@ if(!Array.isArray(store.off))store.off=[];
 function save(){try{localStorage.setItem(STORE,JSON.stringify(store));}catch{}}
 // One "my services" choice shared with Top 20 (my-services-v1 = {have:[codes]}); TMDB data uses the same codes.
 const MY='my-services-v1',SHARED=true;
-if(SHARED){try{const m=JSON.parse(localStorage.getItem(MY));if(m&&Array.isArray(m.have))store.off=m.have.length?SV.map(s=>s.id).filter(id=>!m.have.includes(id)):[];}catch{}}
-function saveShared(){if(!SHARED)return;try{let have=[];const m=JSON.parse(localStorage.getItem(MY));if(m&&Array.isArray(m.have))have=m.have.filter(c=>!SV.some(s=>s.id===c));have=have.concat(SV.map(s=>s.id).filter(id=>!store.off.includes(id)));localStorage.setItem(MY,JSON.stringify({have,at:Date.now()}));}catch{}}
+if(SHARED){try{const m=JSON.parse(localStorage.getItem(MY));if(m&&Array.isArray(m.have))m.have=m.have.filter(c=>!['fxn','bbx','shd'].includes(c));if(m&&Array.isArray(m.have))store.off=m.have.length?SV.map(s=>s.id).filter(id=>!m.have.includes(id)):[];}catch{}}
+function saveShared(){if(!SHARED)return;try{let have=[];const m=JSON.parse(localStorage.getItem(MY));if(m&&Array.isArray(m.have))have=m.have.filter(c=>!SV.some(s=>s.id===c)&&!['fxn','bbx','shd'].includes(c));have=have.concat(SV.map(s=>s.id).filter(id=>!store.off.includes(id)));localStorage.setItem(MY,JSON.stringify({have,at:Date.now()}));}catch{}}
 function el(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e;}
 const fmt=n=>Number(n).toLocaleString('en-AU'),votesShort=v=>v>=1e6?(v/1e6).toFixed(1).replace(/\.0$/,'')+'M':v>=1e3?Math.round(v/1e3)+'k':String(v);
 const dayFmt=new Intl.DateTimeFormat('en-AU',{weekday:'short',day:'numeric',month:'short',timeZone:'Australia/Perth'});

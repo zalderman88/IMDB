@@ -53,7 +53,7 @@ def build_tmdb(data, ratings_path=None, imdb_as_of=None, india=None):
     """Rows for titles that appeared on a service since the previous TMDB sweep."""
     if not data or not data.get('titles'):
         return [], {'state': 'no-key', 'services': []}
-    codes = list(data.get('providers') or {})
+    codes = [c for c in (data.get('providers') or {}) if c not in ('fxn', 'bbx', 'shd')]  # Zac removed Foxtel, BritBox, Shudder
     sidx = {c: i for i, c in enumerate(codes)}
     services = [{'id': c, 'name': data['providers'][c]['name'], 'color': None} for c in codes]
     base = {'services': services, 'fetchedAt': data.get('fetchedAtUnix'), 'from': data.get('previousAtUnix'),

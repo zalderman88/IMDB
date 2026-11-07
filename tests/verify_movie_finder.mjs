@@ -20,7 +20,7 @@ assert.ok(data.every(m=>!m.rt||m.rt.startsWith('https://www.rottentomatoes.com/m
 assert.ok(data.every(m=>!m.imdb||/^https:\/\/www\.imdb\.com\/title\/tt\d+\/$/.test(m.imdb)));
 assert.ok(data.every(m=>!m.audienceCount||m.rtCountsChecked));
 assert.ok(data.every(m=>!m.criticCount||m.rtCountsChecked));
-assert.ok(data.every(m=>Object.keys(m.offers).every(k=>['nfx','prv','pmp','stn','dnp','mxx','atp','bng','fxn'].includes(k))));
+assert.ok(data.every(m=>Object.keys(m.offers).every(k=>['nfx','prv','pmp','stn','dnp','mxx','atp','bng','sbs','abc'].includes(k))));
 
 class Element{
   constructor(tag='div'){this.tagName=tag.toUpperCase();this.children=[];this.attrs={};this.dataset={};this.events={};this._text='';this.value='';this.checked=false;this.disabled=false;this.hidden=false;this.open=false;this.className='';this.options=[];this.type='';this.min='';this.max='';this.classList={toggle:(name,flag)=>{const s=new Set(this.className.split(' ').filter(Boolean));flag?s.add(name):s.delete(name);this.className=[...s].join(' ');}};}
@@ -99,7 +99,7 @@ for(const [id,field,scoreField,threshold] of [['min-votes','votes','score',6],['
  fire(id,'change',id==='min-critics'?50:1000);
 }
 for(const key of ['imdb','critics','audience'])setCheck('use-'+key,true);
-for(const service of ['nfx','prv','pmp','stn','dnp','mxx','atp','bng','fxn']){
+for(const service of ['nfx','prv','pmp','stn','dnp','mxx','atp','bng','sbs','abc']){
  const box=walk(ids.services).find(x=>x.dataset.service===service);box.checked=true;box.events.change();assert.equal(count(),data.filter(m=>m.offers[service]).length);box.checked=false;box.events.change();
 }
 assert.equal(ids.genres.children.length,16,'Only 16 high-level genre controls');

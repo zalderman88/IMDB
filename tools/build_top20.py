@@ -57,15 +57,14 @@ UA = 'movie-finder-top20/1.0 (private, fortnightly)'
 SA_SERVICES = ['netflix', 'prime', 'disney', 'apple', 'paramount', 'hbo']
 NAMES = {'netflix': 'Netflix', 'prime': 'Prime Video', 'disney': 'Disney+', 'apple': 'Apple TV+',
          'paramount': 'Paramount+', 'hbo': 'HBO Max', 'stan': 'Stan', 'binge': 'Binge',
-         'foxtel': 'Foxtel Now', 'britbox': 'BritBox', 'iview': 'ABC iview', 'sbs': 'SBS On Demand',
-         'shudder': 'Shudder', 'crunchyroll': 'Crunchyroll'}
+         'iview': 'ABC iview', 'sbs': 'SBS On Demand', 'crunchyroll': 'Crunchyroll'}
 # TMDB AU provider names -> our service id. Services with an official chart above are not
 # repeated here, so TMDB only fills the gaps.
 # TMDB AU provider names (lower-case, letters and digits only) -> our service id. TMDB fills
 # services that have no official chart; services from SA_SERVICES are used only when the
 # Streaming Availability API gave no chart for them (no key, or the API was down).
-TMDB_PROVIDERS = {'stan': 'stan', 'binge': 'binge', 'foxtelnow': 'foxtel', 'foxtel': 'foxtel',
-                  'britbox': 'britbox', 'abciview': 'iview', 'sbsondemand': 'sbs', 'shudder': 'shudder',
+TMDB_PROVIDERS = {'stan': 'stan', 'binge': 'binge',
+                  'abciview': 'iview', 'sbsondemand': 'sbs',
                   'amazonprimevideo': 'prime', 'primevideo': 'prime',
                   'disneyplus': 'disney', 'disney': 'disney', 'appletvplus': 'apple', 'appletv': 'apple',
                   'paramountplus': 'paramount', 'paramount': 'paramount', 'hbomax': 'hbo', 'max': 'hbo'}
@@ -73,8 +72,7 @@ TMDB_WEIGHT = 0.6
 POOL = 60  # titles kept per list, so the page can still show 20 after filtering to "my services"
 # Service codes shared with the other pages (movie/TV finders, New, my-services-v1 in the browser).
 CODES = {'netflix': 'nfx', 'prime': 'prv', 'disney': 'dnp', 'stan': 'stn', 'paramount': 'pmp', 'hbo': 'mxx',
-         'apple': 'atp', 'binge': 'bng', 'foxtel': 'fxn', 'britbox': 'bbx', 'iview': 'abc', 'sbs': 'sbs',
-         'shudder': 'shd', 'crunchyroll': 'cru'}
+         'apple': 'atp', 'binge': 'bng', 'iview': 'abc', 'sbs': 'sbs', 'crunchyroll': 'cru'}
 MIN_VOTES = 1000
 csv.field_size_limit(sys.maxsize)
 

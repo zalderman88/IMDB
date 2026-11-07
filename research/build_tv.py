@@ -98,7 +98,7 @@ def main():
         if s.get('originalTitle') and s['originalTitle'] != s['title']:
             rec['originalTitle'] = s['originalTitle']
         if live:
-            rec['offers'] = dict(sorted(live['tv'].get(s['imdbId'], {}).items()))
+            rec['offers'] = {c: u for c, u in sorted(live['tv'].get(s['imdbId'], {}).items()) if c not in ('fxn', 'bbx', 'shd')}
         selected.append(rec)
     selected.sort(key=lambda r: (-r['score'], -r['votes'], r['title']))
     if len(selected) < a.min_shows:

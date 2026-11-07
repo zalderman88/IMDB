@@ -195,10 +195,10 @@ h2,.empty h2,.section h2{font-family:var(--display);font-weight:700;letter-spaci
 <script id="metadata" type="application/json">@@META@@</script>
 <script>
 'use strict';
-const MY_KEY='my-services-v1';function readMy(){try{const m=JSON.parse(localStorage.getItem(MY_KEY));if(m&&Array.isArray(m.have))return m.have;}catch{}return null;}function writeMy(have){try{localStorage.setItem(MY_KEY,JSON.stringify({have:[...have],at:Date.now()}));}catch{}}
+const MY_KEY='my-services-v1';function readMy(){try{const m=JSON.parse(localStorage.getItem(MY_KEY));if(m&&Array.isArray(m.have))return m.have.filter(c=>!['fxn','bbx','shd'].includes(c));}catch{}return null;}function writeMy(have){try{localStorage.setItem(MY_KEY,JSON.stringify({have:[...have],at:Date.now()}));}catch{}}
 const DATA=JSON.parse(document.getElementById('catalogue').textContent),META=JSON.parse(document.getElementById('metadata').textContent);
 const $=id=>document.getElementById(id),fmt=n=>Number(n).toLocaleString('en-AU'),number=n=>typeof n==='number'&&Number.isFinite(n);
-const PROVIDERS={nfx:'Netflix',prv:'Prime Video',pmp:'Paramount+',stn:'Stan',dnp:'Disney+',bng:'Binge',mxx:'HBO Max',atp:'Apple TV',fxn:'Foxtel Now'};
+const PROVIDERS={nfx:'Netflix',prv:'Prime Video',pmp:'Paramount+',stn:'Stan',dnp:'Disney+',bng:'Binge',mxx:'HBO Max',atp:'Apple TV',sbs:'SBS On Demand',abc:'ABC iview'};
 const state={included:new Set(),excluded:new Set(['Romance','Horror','Documentary']),services:new Set(),classifications:new Set()};
 const BASE_MIN=Number($('year-min').min),BASE_MAX=Number($('year-max').max),BATCH=50;
 let matches=[],limit=BATCH,searchTimer;
