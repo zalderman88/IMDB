@@ -1,13 +1,23 @@
 {
-  "name": "For You · Movie & TV picks",
-  "short_name": "For You",
-  "start_url": "foryou.html",
-  "scope": "./",
+  "id": "/",
+  "name": "Movie Finder · Movies & TV",
+  "short_name": "Movies",
+  "description": "Zac's movie and TV finder: IMDb and Rotten Tomatoes scores, Australian streaming, watch list.",
+  "start_url": "/index.html",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#14181c",
   "theme_color": "#14181c",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "TV shows", "url": "/tv.html", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Watch list", "url": "/watchlist.html", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Coming soon", "url": "/coming.html", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] }
   ]
 }
