@@ -1,7 +1,7 @@
 """Build the offline TV finder (TV_Shows_Android.html) from research/imdb/tv_1k.json.
 
 Inclusion (Zac, 7 Nov 2026): TV series or miniseries with 1,000+ IMDb votes that
-  * have IMDb 6.0+ and aired in 2020 or later (first aired 2020+, or started earlier but
+  * have IMDb 5.0+ (6.0+ until 8 Nov 2026; the default filter still starts at 6.0) and aired in 2020 or later (first aired 2020+, or started earlier but
     has an end year or an episode released in 2020 or later), or
   * first aired in 2000 or later and have IMDb above 8.0.
 No network access. Facts other than IMDb's are not collected for TV.
@@ -24,7 +24,8 @@ OUT = ROOT / 'TV_Shows_Android.html'
 EXTRACT = ROOT / 'research/tv_catalogue.json'
 
 MIN_VOTES = 1000
-RECENT_YEAR, RECENT_SCORE = 2020, 6.0
+RECENT_YEAR, RECENT_SCORE = 2020, 5.0
+DEFAULT_MIN_SCORE = 6.0  # the page's IMDb slider starts here
 ACCLAIMED_START, ACCLAIMED_ABOVE = 2000, 8.0
 DEFAULT_EXCLUDED = {'Romance', 'Horror', 'Documentary'}
 # Same broad groups as the movie finder, plus two TV-only ones. Keep in step with the template.
@@ -106,7 +107,7 @@ def main():
     if len(selected) < a.min_shows:
         raise SystemExit(f'Only {len(selected):,} TV shows qualified (minimum {a.min_shows:,}); not publishing.')
 
-    default = [r for r in selected if (g := groups(r['genres'])) and not g & DEFAULT_EXCLUDED]
+    default = [r for r in selected if r['score'] >= DEFAULT_MIN_SCORE and (g := groups(r['genres'])) and not g & DEFAULT_EXCLUDED]
     suspect = dropped['suspicious']
     recent_n = sum(r['recent'] for r in selected)
     acclaimed_only = sum(r['acclaimed'] and not r['recent'] for r in selected)
@@ -115,16 +116,16 @@ def main():
         'imdbAsOf': asof.isoformat(), 'total': len(selected), 'defaultResults': len(default),
         'streamingLive': live['label'] if live else None,
         'recent': recent_n, 'acclaimedOnly': acclaimed_only, 'suspectHidden': suspect, 'indiaDropped': dropped['india'],
-        'rules': {'minVotes': MIN_VOTES, 'recentYear': RECENT_YEAR, 'recentMinScore': RECENT_SCORE,
+        'rules': {'minVotes': MIN_VOTES, 'recentYear': RECENT_YEAR, 'recentMinScore': RECENT_SCORE, 'defaultMinScore': DEFAULT_MIN_SCORE,
                   'acclaimedStartYear': ACCLAIMED_START, 'acclaimedScoreAbove': ACCLAIMED_ABOVE},
         'coverageText': (f'IMDb data checked {checked}: {len(shows):,} TV series and miniseries with at least '
-                         f'1,000 votes were read. {recent_n:,} aired in 2020 or later with IMDb 6.0+, and '
+                         f'1,000 votes were read. {recent_n:,} aired in 2020 or later with IMDb {RECENT_SCORE}+, and '
                          f'{acclaimed_only:,} more are listed only because they first aired in 2000 or later with IMDb '
                          f'above 8.0. Left out entirely: {dropped["india"]:,} Indian shows (Wikidata country of origin) '
                          f'and {suspect:,} likely vote-stuffed shows (IMDb {SUSPECT_SCORE}+ from under {SUSPECT_VOTES:,} votes). '
                          f'With the default genre exclusions, {len(default):,} shows are listed.'),
         'coverageRows': [['IMDb TV series/miniseries read (1,000+ votes)', len(shows)],
-                         ['Aired 2020 or later, IMDb 6.0+', recent_n],
+                         [f'Aired 2020 or later, IMDb {RECENT_SCORE}+', recent_n],
                          ['Listed only as acclaimed (2000+, above 8.0)', acclaimed_only],
                          ['Shows in this file', len(selected)],
                          ['Left out: Indian shows', dropped['india']],

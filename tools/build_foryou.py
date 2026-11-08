@@ -83,6 +83,8 @@ def main():
             continue
         if not num(m.get('votes')) or m['votes'] < 1000 or not num(m.get('score')):
             continue
+        if m['score'] < 6:  # the catalogue goes down to 5.0 for search; picks stay 6.0+
+            continue
         if m['score'] >= 9 and m['votes'] < 10000 and not num(m.get('critics')) and not num(m.get('audience')):
             continue
         tt = m['id'].split(':')[-1]
@@ -92,7 +94,7 @@ def main():
                      offers, m.get('info') if str(m.get('info', '')).startswith('https://www.justwatch.com/') else None])
     n_movies = len(pool)
     for s in shows:
-        if not num(s.get('score')) or not num(s.get('votes')) or s['votes'] < 1000:
+        if not num(s.get('score')) or not num(s.get('votes')) or s['votes'] < 1000 or s['score'] < 6:
             continue
         if s['score'] >= 9 and s['votes'] < 10000:
             continue

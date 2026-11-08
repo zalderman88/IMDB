@@ -14,7 +14,7 @@ assert.equal(new Set(data.map(m=>m.id)).size,data.length);
 assert.ok(!html.includes('@@DATA@@'));
 assert.ok(html.includes('Rotten Tomatoes coverage is partial'));
 assert.ok(html.includes('not complete copies'));
-const passes=m=>(m.score>=6&&m.votes>=1000)||(m.critics>=60&&m.criticCount>=50)||(m.audience>=60&&m.audienceCount>=1000);
+const passes=m=>(m.score>=5&&m.votes>=1000)||(m.critics>=60&&m.criticCount>=50)||(m.audience>=60&&m.audienceCount>=1000);
 assert.ok(data.every(passes));assert.ok(data.every(m=>m.votes>=1000));
 assert.ok(data.every(m=>!m.rt||m.rt.startsWith('https://www.rottentomatoes.com/m/')));
 assert.ok(data.every(m=>!m.imdb||/^https:\/\/www\.imdb\.com\/title\/tt\d+\/$/.test(m.imdb)));
@@ -80,19 +80,19 @@ const fixtures=[
 ];
 for(const [m,expected] of fixtures){ctx.fixture=m;assert.equal(run('Object.values(routes(fixture,fixtureCriteria)).some(Boolean)'),expected);}
 
-assert.equal(ids['use-audience'].checked,false);setCheck('use-audience',true);fire('lang-all','click');assert.equal(ids.language.value,'all');assert.equal(ids['lang-all'].attrs['aria-pressed'],'true');fire('clear-genres','click');setCheck('unknown-genres',true);assert.equal(count(),data.length);
+assert.equal(ids['use-audience'].checked,false);setCheck('use-audience',true);fire('lang-all','click');assert.equal(ids.language.value,'all');assert.equal(ids['lang-all'].attrs['aria-pressed'],'true');fire('clear-genres','click');setCheck('unknown-genres',true);assert.equal(count(),data.filter(m=>passes(m)&&(m.score>=6||m.critics>=60&&m.criticCount>=50||m.audience>=60&&m.audienceCount>=1000)).length,'IMDb 5.x without an RT path waits for the slider');fire('rating','input',5);assert.equal(count(),data.length,'everything shows at IMDb 5.0');
 for(const type of ['imdb','critics','audience']){
  for(const key of ['imdb','critics','audience'])setCheck('use-'+key,key===type);
  const slider=type==='imdb'?'rating':type;
- for(let i=0;i<=40;i++){
-  const value=type==='imdb'?(60+i)/10:60+i;fire(slider,'input',value);
+ for(let i=0;i<=(type==='imdb'?50:40);i++){
+  const value=type==='imdb'?(50+i)/10:60+i;fire(slider,'input',value);
   const expected=data.filter(m=>type==='imdb'?m.score>=value&&m.votes>=1000:type==='critics'?m.critics>=value&&m.criticCount>=50:m.audience>=value&&m.audienceCount>=1000).length;
   assert.equal(count(),expected,`${type} ${value}`);
  }
- fire(slider,'input',type==='imdb'?6:60);
+ fire(slider,'input',type==='imdb'?5:60);
 }
 for(const key of ['imdb','critics','audience'])setCheck('use-'+key,true);
-for(const [id,field,scoreField,threshold] of [['min-votes','votes','score',6],['min-critics','criticCount','critics',60],['min-audience','audienceCount','audience',60]]){
+for(const [id,field,scoreField,threshold] of [['min-votes','votes','score',5],['min-critics','criticCount','critics',60],['min-audience','audienceCount','audience',60]]){
  const source=id==='min-votes'?'imdb':id==='min-critics'?'critics':'audience';
  for(const key of ['imdb','critics','audience'])setCheck('use-'+key,key===source);
  for(const option of ids[id].options){fire(id,'change',option.value);assert.equal(count(),data.filter(m=>m[field]>=+option.value&&m[scoreField]>=threshold).length);}
@@ -129,6 +129,11 @@ fire('clear-genres','click');
 fire('search','input','Interstellar');await new Promise(r=>setTimeout(r,180));assert.ok(count()>0);assert.ok(ids.movies.children.every(n=>n.children[0].children[0].textContent.toLowerCase().includes('interstellar')));
 fire('search','input','zzzz-no-movie-should-match-xyz');await new Promise(r=>setTimeout(r,180));assert.equal(count(),0);assert.equal(ids.empty.hidden,false);
 fire('search','input','');await new Promise(r=>setTimeout(r,180));
+{// Searching ignores every filter (Zac, 8 Nov 2026); clearing the search brings the filters back unchanged.
+ const before=count(),low=data.find(m=>m.score<6&&(m.genres||[]).some(g=>/horror/i.test(g))&&m.languageGroup!=='english')||data.find(m=>m.score<6);
+ assert.ok(low,'catalogue includes IMDb 5.x films');
+ fire('search','input',low.title);await new Promise(r=>setTimeout(r,180));assert.ok(JSON.parse(run('JSON.stringify(matches.map(m=>m.id))')).includes(low.id),'search finds a film the filters hide');
+ fire('search','input','');await new Promise(r=>setTimeout(r,180));assert.equal(count(),before,'filters apply again after clearing the search');}
 
 for(const option of ids.sort.options){fire('sort','change',option.value);const first=ids.movies.children.map(n=>n.dataset.id);assert.equal(first.length,50);const current=JSON.parse(run('JSON.stringify(matches.slice(0,50).map(m=>m.id))'));assert.deepEqual(first,current);if(option.value!=='title'){const field=option.value.replace(/-asc$/,''),asc=option.value.endsWith('-asc');const values=JSON.parse(run(`JSON.stringify(matches.map(m=>m[${JSON.stringify(field)}]))`));let seenNull=false,last=null;for(const value of values){if(value===null||value===undefined){seenNull=true;continue;}assert.ok(!seenNull,'Missing scores remain last');if(last!==null)assert.ok(asc?value>=last:value<=last,option.value);last=value;}}}
 fire('sort','change','score');

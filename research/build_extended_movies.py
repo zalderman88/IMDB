@@ -170,8 +170,10 @@ for m in movies.values():
     m['languageLabels']=[l['label'] for l in entry.get('languages',[])]
     if entry:m['languageSourceUrl']=entry.get('sourceUrl')
 
+# Database floor (Zac, 8 Nov 2026): IMDb 5.0+ so lower-rated films can be found by search.
+# The default IMDb filter stays at 6.0 (default_route and the page's slider value).
 def passes(m):
-    return (m.get('votes') or 0)>=1000 and (((m.get('score') or 0)>=6) or ((m.get('critics') or 0)>=60 and (m.get('criticCount') or 0)>=50) or ((m.get('audience') or 0)>=60 and (m.get('audienceCount') or 0)>=1000))
+    return (m.get('votes') or 0)>=1000 and (((m.get('score') or 0)>=5) or ((m.get('critics') or 0)>=60 and (m.get('criticCount') or 0)>=50) or ((m.get('audience') or 0)>=60 and (m.get('audienceCount') or 0)>=1000))
 
 india=load_india()
 dropped=collections.Counter()
@@ -195,7 +197,7 @@ meta={'checked':checked_label,'checkedISO':today.isoformat(),'imdbAsOf':imdb_aso
       'knownAustralianClassifications':sum(bool(m['classifications']) for m in selected),
       'classificationCounts':dict(collections.Counter(c for m in selected for c in m['classifications'])),
       'languageCounts':dict(collections.Counter(m['languageGroup'] for m in selected)),
-      'rtOnlyQualifiers':sum(not ((m.get('score') or 0)>=6 and (m.get('votes') or 0)>=1000) for m in selected),
+      'rtOnlyQualifiers':sum(not ((m.get('score') or 0)>=5 and (m.get('votes') or 0)>=1000) for m in selected),
       'ambiguousMatchesSkipped':ambiguous,'streamingLive':live['label'] if live else None,'sourceCounts':{c:sum(c in m['offers'] for m in default_movies) for c in providers},
       'coverageText':f'IMDb bulk data was checked across {len(imdb):,} records with at least 1,000 votes; only feature films and TV movies are kept. {len(jw):,} JustWatch Australia movie records and {len(rt):,} RT search records were processed. Review counts were confirmed for {len(rt_counts):,} RT film pages before access limits interrupted further checks. Unconfirmed RT counts cannot qualify a movie. Left out entirely: {dropped["type"]:,} shorts and videos, {dropped["india"]:,} Indian productions and {dropped["suspicious"]+dropped["unconfirmed"]:,} suspicious or unconfirmed ratings. The default English-language view with genre exclusions shows {len(default_movies):,} movies; the file contains {len(selected):,} qualifying records before genre and country filters.',
       'coverageRows':[['IMDb records imported (1,000+ votes, all title types)',len(imdb)],['IMDb records meeting 6.0+ (all countries/genres)',sum(not m['adult'] and m['score']>=6 for m in imdb)],['JustWatch AU movie records processed',len(jw)],['Rotten Tomatoes search records processed',len(rt)],['RT film pages with confirmed counts',len(rt_counts)],['RT count-checked titles in this file',sum(bool(m.get('rtCountsChecked')) for m in selected)],['Films with an Australian classification',sum(bool(m['classifications']) for m in selected)],['Qualifying records in this file',len(selected)],['Left out: shorts, TV shorts, videos, specials',dropped['type']],['Left out: Indian productions',dropped['india']],['Left out: IMDb 8.5+ from under 10,000 votes, no RT score',dropped['suspicious']],['Left out: unconfirmed by JustWatch, RT or Wikidata, under 25,000 votes',dropped['unconfirmed']],['Results with your default language and genre settings',len(default_movies)]]}
@@ -203,7 +205,9 @@ years=[m['year'] for m in selected if isinstance(m.get('year'),int)]
 minyear=min(years);maxyear=max(years)
 automation_file=BASE/'movie_refresh_automation.json'
 if automation_file.exists():meta['refresh']=json.loads(automation_file.read_text())
-payload=json.dumps(selected,ensure_ascii=False,separators=(',',':')).replace('<','\\u003c')
+# Unknown (None) facts are left out of the page to keep index.html well under Cloudflare's 25 MiB
+# per-file limit; the page and the Python checks treat a missing key the same as null.
+payload=json.dumps([{k:v for k,v in m.items() if v is not None} for m in selected],ensure_ascii=False,separators=(',',':')).replace('<','\\u003c')
 meta_payload=json.dumps(meta,ensure_ascii=False,separators=(',',':')).replace('<','\\u003c')
 template=(BASE/'movie_finder_template.html').read_text()
 for key,value in {'@@MINYEAR@@':str(minyear),'@@MAXYEAR@@':str(maxyear),'@@DATA@@':payload,'@@META@@':meta_payload}.items():template=template.replace(key,value)

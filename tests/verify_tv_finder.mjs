@@ -20,7 +20,7 @@ assert.ok(data.length>0);assert.equal(data.length,meta.total);
 for(const m of data){
  assert.ok(['tvSeries','tvMiniSeries'].includes(m.type),m.id);
  assert.ok(m.votes>=1000,m.id);
- const recent=m.score>=6&&m.lastYear>=2020,acclaimed=m.startYear>=2000&&m.score>8;
+ const recent=m.score>=5&&m.lastYear>=2020,acclaimed=m.startYear>=2000&&m.score>8;
  assert.equal(m.recent,recent,m.id);assert.equal(m.acclaimed,acclaimed,m.id);assert.ok(recent||acclaimed,m.id);
  assert.ok(m.lastYear>=m.startYear,m.id);
  assert.match(m.imdb,/^https:\/\/www\.imdb\.com\/title\/tt\d+\/$/);
@@ -69,16 +69,16 @@ const defaultOk=m=>m._groups.length&&!DEFAULT_EX.some(g=>m._groups.includes(g))
 assert.ok(data.every(m=>!suspect(m)),'Likely vote-stuffed shows are left out of the data');
 
 assert.equal(count(),meta.defaultResults,'Default count matches the builder');
-assert.equal(count(),DATA.filter(defaultOk).length);
+assert.equal(count(),DATA.filter(m=>defaultOk(m)&&m.score>=6).length,'IMDb slider starts at 6.0');
 assert.equal(ids.shows.children.length,Math.min(50,count()));
 assert.ok(ids.shows.children.every(n=>n.tagName==='LI'&&n.children.length===3&&n.children[1].children.length===3));
 assert.equal(ids['hide-suspect'],undefined);assert.equal(ids['min-votes'].value,'1000');
 assert.equal(ids.genres.children.length,18);
 
 // Open everything up, then test each control against an independent filter.
-fire('clear-genres','click');setCheck('unknown-genres',true);assert.equal(count(),data.length);
-for(let i=0;i<=40;i++){const v=(60+i)/10;fire('rating','input',v);assert.equal(count(),data.filter(m=>m.score>=v).length,`IMDb ${v}`);}
-fire('rating','input',6);
+fire('clear-genres','click');setCheck('unknown-genres',true);fire('rating','input',5);assert.equal(count(),data.length);
+for(let i=0;i<=50;i++){const v=(50+i)/10;fire('rating','input',v);assert.equal(count(),data.filter(m=>m.score>=v).length,`IMDb ${v}`);}
+fire('rating','input',5);
 for(const o of ids['min-votes'].options){fire('min-votes','change',o.value);assert.equal(count(),data.filter(m=>m.votes>=+o.value).length);}
 fire('min-votes','change',1000);
 fire('route-recent','click');assert.equal(count(),data.filter(m=>m.recent).length);assert.equal(ids['route-recent'].attrs['aria-pressed'],'true');
@@ -118,7 +118,8 @@ if(fixtureMode){
  fire('reset-main','click');
  fire('search','input','grief');await new Promise(r=>setTimeout(r,180));assert.equal(count(),0,'Vote-stuffed title left out');
  fire('search','input','popular nine');await new Promise(r=>setTimeout(r,180));assert.equal(count(),1,'9.1 with 50k votes is not suspect');
- fire('search','input','romantic');await new Promise(r=>setTimeout(r,180));assert.equal(count(),0,'Romance excluded by default');
+ fire('search','input','romantic');await new Promise(r=>setTimeout(r,180));assert.equal(count(),1,'Search ignores the Romance default exclusion');
+ fire('search','input','below six');await new Promise(r=>setTimeout(r,180));assert.equal(count(),1,'Search finds a 5.9 show below the 6.0 slider');
  fire('search','input','');await new Promise(r=>setTimeout(r,180));
 }
 

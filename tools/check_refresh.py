@@ -18,7 +18,7 @@ baseline_path = root / 'data/non_imdb_facts.json'
 
 
 def passes(m):
-    return (m.get('votes') or 0) >= 1000 and ((m.get('score') or 0) >= 6
+    return (m.get('votes') or 0) >= 1000 and ((m.get('score') or 0) >= 5
         or ((m.get('critics') or 0) >= 60 and (m.get('criticCount') or 0) >= 50)
         or ((m.get('audience') or 0) >= 60 and (m.get('audienceCount') or 0) >= 1000))
 

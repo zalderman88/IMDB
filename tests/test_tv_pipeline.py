@@ -20,7 +20,7 @@ BASICS = [
     ('tt0000102', 'tvSeries', 'Acclaimed Finished', 0, 2010, 2015, 50, 'Crime,Drama'),  # acclaimed only
     ('tt0000103', 'tvSeries', 'Nineties Classic', 0, 1995, 1999, 25, 'Comedy'),         # too old for both
     ('tt0000104', 'tvSeries', 'Boundary Six', 0, 2022, N, 30, 'Comedy'),                # 6.0 boundary
-    ('tt0000105', 'tvSeries', 'Below Six', 0, 2022, N, 30, 'Comedy'),                   # 5.9
+    ('tt0000105', 'tvSeries', 'Below Six', 0, 2022, N, 30, 'Comedy'),                   # 5.9: in the data, hidden by the 6.0 default
     ('tt0000106', 'tvSeries', 'Exactly Eight', 0, 2005, 2010, 40, 'Drama'),             # 8.0 is not above 8.0
     ('tt0000107', 'tvMiniSeries', 'Stuffed Votes', 0, 2021, 2021, 60, 'Drama'),         # 9.5, 2,000 votes
     ('tt0000108', 'movie', 'A Film', 0, 2021, N, 120, 'Drama'),                         # not TV
@@ -44,7 +44,7 @@ EPISODES = [('tt0001011', 'tt0000101', 1, 1, 2015), ('tt0001012', 'tt0000101', 1
             ('tt0001111', 'tt0000111', 1, 1, 2018), ('tt0001112', 'tt0000111', 2, 1, 2099),
             ('tt0001121', 'tt0000112', 1, 1, 2016), ('tt0001122', 'tt0000112', 2, 1, 2020)]
 # 107 and 114 qualify but are dropped as likely vote-stuffed (IMDb 8.5+ from under 10,000 votes).
-EXPECTED = {'tt0000101': (True, False), 'tt0000102': (False, True), 'tt0000104': (True, False),
+EXPECTED = {'tt0000101': (True, False), 'tt0000102': (False, True), 'tt0000104': (True, False), 'tt0000105': (True, False),
             'tt0000112': (True, False), 'tt0000113': (True, False), 'tt0000115': (False, True),
             'tt0000116': (True, False)}
 
@@ -82,8 +82,8 @@ def main():
         got = {s['id']: (s['recent'], s['acclaimed']) for s in built['shows']}
         assert got == EXPECTED, f'qualification mismatch:\n got {got}\n want {EXPECTED}'
         meta = built['metadata']
-        # Default view hides Romance (112); the two 9.0+/<10k titles (107, 114) are not in the data at all.
-        assert meta['defaultResults'] == len(EXPECTED) - 1, meta
+        # Default view hides Romance (112) and 5.9 (105, below the 6.0 default slider); the two 9.0+/<10k titles (107, 114) are not in the data at all.
+        assert meta['defaultResults'] == len(EXPECTED) - 2, meta
         assert meta['suspectHidden'] == 2, meta
         subprocess.run(['node', str(ROOT / 'tests/verify_tv_finder.mjs'), str(html), '--fixture'], check=True, cwd=ROOT)
         print(json.dumps({'tvPipelineFixture': 'passed', 'shows': len(got), 'defaultResults': meta['defaultResults']}))
