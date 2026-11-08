@@ -20,7 +20,7 @@ assert.ok(data.length>0);assert.equal(data.length,meta.total);
 for(const m of data){
  assert.ok(['tvSeries','tvMiniSeries'].includes(m.type),m.id);
  assert.ok(m.votes>=1000,m.id);
- const recent=m.score>=5&&m.lastYear>=2020,acclaimed=m.startYear>=2000&&m.score>8;
+ const recent=m.score>=5&&m.lastYear>=2010,acclaimed=m.startYear>=2000&&m.score>8;
  assert.equal(m.recent,recent,m.id);assert.equal(m.acclaimed,acclaimed,m.id);assert.ok(recent||acclaimed,m.id);
  assert.ok(m.lastYear>=m.startYear,m.id);
  assert.match(m.imdb,/^https:\/\/www\.imdb\.com\/title\/tt\d+\/$/);

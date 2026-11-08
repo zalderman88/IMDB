@@ -17,16 +17,16 @@ N = r'\N'
 # tconst, type, title, adult, start, end, runtime, genres
 BASICS = [
     ('tt0000101', 'tvSeries', 'Old Show Back For More', 0, 2015, N, 45, 'Drama'),       # recent via 2021 episode
-    ('tt0000102', 'tvSeries', 'Acclaimed Finished', 0, 2010, 2015, 50, 'Crime,Drama'),  # acclaimed only
+    ('tt0000102', 'tvSeries', 'Acclaimed Finished', 0, 2003, 2008, 50, 'Crime,Drama'),  # acclaimed only
     ('tt0000103', 'tvSeries', 'Nineties Classic', 0, 1995, 1999, 25, 'Comedy'),         # too old for both
     ('tt0000104', 'tvSeries', 'Boundary Six', 0, 2022, N, 30, 'Comedy'),                # 6.0 boundary
     ('tt0000105', 'tvSeries', 'Below Six', 0, 2022, N, 30, 'Comedy'),                   # 5.9: in the data, hidden by the 6.0 default
-    ('tt0000106', 'tvSeries', 'Exactly Eight', 0, 2005, 2010, 40, 'Drama'),             # 8.0 is not above 8.0
+    ('tt0000106', 'tvSeries', 'Exactly Eight', 0, 2002, 2008, 40, 'Drama'),             # 8.0 is not above 8.0, ended before 2010
     ('tt0000107', 'tvMiniSeries', 'Stuffed Votes', 0, 2021, 2021, 60, 'Drama'),         # 9.5, 2,000 votes
     ('tt0000108', 'movie', 'A Film', 0, 2021, N, 120, 'Drama'),                         # not TV
     ('tt0000109', 'tvSeries', 'Too Few Votes', 0, 2021, N, 30, 'Drama'),                # 999 votes
     ('tt0000110', 'tvSeries', 'Adult Show', 1, 2021, N, 30, 'Drama'),
-    ('tt0000111', 'tvSeries', 'Announced Revival', 0, 2018, N, 30, 'Drama'),            # only a future episode after 2018
+    ('tt0000111', 'tvSeries', 'Announced Revival', 0, 2018, N, 30, 'Drama'),            # recent via 2018 start; a future episode must not count
     ('tt0000112', 'tvSeries', 'Romantic Return', 0, 2016, N, 30, 'Drama,Romance'),      # recent, hidden by genre default
     ('tt0000113', 'tvSeries', 'Ended In 2020', 0, 2012, 2020, 30, 'Action'),            # recent via end year
     ('tt0000114', 'tvSeries', 'Grief Style Video', 0, 2026, N, 30, 'Drama'),            # 9.9 with 1,900 votes
@@ -40,12 +40,12 @@ RATINGS = {'tt0000101': (7.0, 5000), 'tt0000102': (8.5, 20000), 'tt0000103': (9.
 # episode tconst, parent, season, number, year
 EPISODES = [('tt0001011', 'tt0000101', 1, 1, 2015), ('tt0001012', 'tt0000101', 1, 2, 2016), ('tt0001013', 'tt0000101', 2, 1, 2019),
             ('tt0001014', 'tt0000101', 3, 1, 2021), ('tt0001015', 'tt0000101', 3, 2, 2022),
-            ('tt0001021', 'tt0000102', 1, 1, 2010), ('tt0001022', 'tt0000102', 2, 1, 2015),
+            ('tt0001021', 'tt0000102', 1, 1, 2003), ('tt0001022', 'tt0000102', 2, 1, 2008),
             ('tt0001111', 'tt0000111', 1, 1, 2018), ('tt0001112', 'tt0000111', 2, 1, 2099),
             ('tt0001121', 'tt0000112', 1, 1, 2016), ('tt0001122', 'tt0000112', 2, 1, 2020)]
 # 107 and 114 qualify but are dropped as likely vote-stuffed (IMDb 8.5+ from under 10,000 votes).
-EXPECTED = {'tt0000101': (True, False), 'tt0000102': (False, True), 'tt0000104': (True, False), 'tt0000105': (True, False),
-            'tt0000112': (True, False), 'tt0000113': (True, False), 'tt0000115': (False, True),
+EXPECTED = {'tt0000101': (True, False), 'tt0000102': (False, True), 'tt0000111': (True, False), 'tt0000104': (True, False), 'tt0000105': (True, False),
+            'tt0000112': (True, False), 'tt0000113': (True, False), 'tt0000115': (True, True),
             'tt0000116': (True, False)}
 
 
