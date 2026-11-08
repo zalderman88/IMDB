@@ -1,7 +1,7 @@
 {
   "id": "/",
-  "name": "Movie Finder · Movies & TV",
-  "short_name": "Movies",
+  "name": "Streaming Finder",
+  "short_name": "Streaming",
   "description": "Zac's movie and TV finder: IMDb and Rotten Tomatoes scores, Australian streaming, watch list.",
   "start_url": "/index.html",
   "scope": "/",
