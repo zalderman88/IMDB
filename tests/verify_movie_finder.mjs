@@ -126,7 +126,12 @@ tick('included','Action & adventure');tick('included','Science fiction');tick('e
 assert.equal(count(),JSON.parse(run('JSON.stringify(DATA)')).filter(m=>(m._groups.includes('Action & adventure')||m._groups.includes('Science fiction'))&&!m._groups.includes('Crime & thriller')&&!m._groups.includes('Comedy')).length);
 tick('included','Crime & thriller');assert.equal(genreBox('excluded','Crime & thriller').checked,false);tick('excluded','Action & adventure');assert.equal(genreBox('included','Action & adventure').checked,false);
 fire('clear-genres','click');
-fire('search','input','Interstellar');await new Promise(r=>setTimeout(r,180));assert.ok(count()>0);assert.ok(ids.movies.children.every(n=>n.children[0].children[0].textContent.toLowerCase().includes('interstellar')));
+fire('search','input','Interstellar');await new Promise(r=>setTimeout(r,180));assert.ok(count()>0);assert.ok(ids.movies.children[0].children[0].children[0].textContent.toLowerCase().includes('interstellar'),'exact match listed first');
+{const ids_=q=>{fire('search','input',q);return new Promise(r=>setTimeout(r,180)).then(()=>JSON.parse(run('JSON.stringify(matches.slice(0,5).map(m=>m.title.toLowerCase()))')));};
+ for(const q of ['intersteller','interstel','INTERSTELLAR!']){const top=await ids_(q);assert.ok(top.some(t=>t.includes('interstellar')),'forgiving search: '+q);}
+ const t0=Date.now();await ids_('godfathr');assert.ok((await ids_('godfathr')).some(t=>t.includes('godfather')),'typo');console.error('fuzzy search ms',Date.now()-t0-360);
+ assert.equal((await ids_('1999')).length>0,true);assert.ok(JSON.parse(run('JSON.stringify(matches.every(m=>String(m.year).includes("1999")||m._search.includes("1999")))')),'numbers are not fuzzed');
+ fire('search-go','click');ids.search.events.keydown({key:'Enter'});assert.ok(count()>0,'Search button and Enter run the search');}
 fire('search','input','zzzz-no-movie-should-match-xyz');await new Promise(r=>setTimeout(r,180));assert.equal(count(),0);assert.equal(ids.empty.hidden,false);
 fire('search','input','');await new Promise(r=>setTimeout(r,180));
 {// Searching ignores every filter (Zac, 8 Nov 2026); clearing the search brings the filters back unchanged.
