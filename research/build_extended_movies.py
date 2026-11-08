@@ -183,8 +183,8 @@ for m in movies.values():
     selected.append(m)
 selected.sort(key=lambda x:(-(x.get('score') or 0),-(x.get('votes') or 0),x['title']))
 def default_route(m):
-    # Default routes: IMDb OR Tomatometer (Popcornmeter is off by default).
-    return ((m.get('score') or 0)>=6 and (m.get('votes') or 0)>=1000) or ((m.get('critics') or 0)>=60 and (m.get('criticCount') or 0)>=50)
+    # Default route: IMDb only (Zac, Nov 2026). Tomatometer and Popcornmeter start unticked.
+    return (m.get('score') or 0)>=6 and (m.get('votes') or 0)>=1000
 default_movies=[m for m in selected if default_route(m) and m.get('languageGroup','unknown') in ('english','unknown') and m['genres'] and not set(m['genres'])&{'Horror','Romance','Documentary'}]
 manifest=json.loads((BASE/'rt_count_manifest.json').read_text())
 meta={'checked':checked_label,'checkedISO':today.isoformat(),'imdbAsOf':imdb_asof.isoformat(),'total':len(selected),'defaultResults':len(default_movies),'defaultCountryFilter':'exclude','defaultLanguage':'english','dropped':dict(dropped),'defaultLanguage':'english','dropped':dict(dropped),

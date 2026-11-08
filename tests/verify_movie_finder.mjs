@@ -65,7 +65,7 @@ assert.equal(ids.country,undefined,'No country option: India is always left out'
 assert.ok(data.every(m=>['movie','tvMovie'].includes(m.kind||'movie')),'No shorts, videos or specials');assert.ok(data.every(m=>!(m.countries||[]).includes('IN')),'No Indian productions');assert.ok(!data.some(sus),'No suspicious ratings');
 assert.ok(data.every(m=>(m.countries||[]).length||typeof m.critics==='number'||typeof m.audience==='number'||m.languageGroup!=='unknown'||m.votes>=25000),'Unconfirmed low-vote titles left out');}
 const GROUPS=Object.fromEntries(JSON.parse(run('JSON.stringify(DATA.map(m=>[m.id,m._groups]))')));
-assert.equal(count(),data.filter(m=>['english','unknown'].includes(m.languageGroup)&&((m.score>=6&&m.votes>=1000)||(m.critics>=60&&m.criticCount>=50))&&m.genres?.length&&!GROUPS[m.id].some(g=>['Romance','Horror','Documentary'].includes(g))).length,'English + unknown by default');assert.equal(ids['min-votes'].value,'1000');assert.equal(ids['min-critics'].value,'50');assert.equal(ids['min-audience'].value,'1000');
+assert.equal(count(),data.filter(m=>['english','unknown'].includes(m.languageGroup)&&m.score>=6&&m.votes>=1000&&m.genres?.length&&!GROUPS[m.id].some(g=>['Romance','Horror','Documentary'].includes(g))).length,'English + unknown by default');assert.equal(ids['min-votes'].value,'1000');assert.equal(ids['min-critics'].value,'50');assert.equal(ids['min-audience'].value,'1000');
 
 // Verify independent score routes and small-sample rejection with boundary cases.
 ctx.fixtureCriteria={imdb:true,critics:true,audience:true,score:6,votes:1000,criticsScore:60,criticCount:50,audienceScore:60,audienceCount:1000};
