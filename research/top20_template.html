@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en-AU"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark light"><meta name="theme-color" content="#14181c">
+<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Movies">
+<link rel="manifest" href="manifest.webmanifest" crossorigin="use-credentials">
+<link rel="icon" href="icon-192.png" type="image/png"><link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>Top 20 · Streaming in Australia</title>
+<style>
+:root{color-scheme:dark;--page:#14181c;--surface:#1c2229;--ink:#e6edf3;--muted:#8b98a5;--line:#2c3440;--soft:#262e38;--accent:#00c46a;--on-accent:#06140c;--tomato:#ff6b4a;--gold:#ffb02e;--gold-bg:#3a2d12;--green-bg:#123224;--danger:#ff8a7a;--focus:#40bcf4;--hover:#212831;--imdb:#f5c518;--link:#40bcf4;--dot-1:#ff8000;--dot-2:#00e054;--dot-3:#40bcf4;--marquee:#1c2229;--marquee-2:#1c2229;--marquee-ink:#e6edf3;--marquee-muted:#8b98a5;--marquee-gold:#00c46a;--like:#00c46a;--like-bg:#123224;--display:"Inter Tight",Inter,system-ui,sans-serif}
+:root[data-theme=light]{color-scheme:light;--page:#e4e9ee;--surface:#f3f6f8;--ink:#14181c;--muted:#55616d;--line:#cdd5dd;--soft:#dfe5eb;--accent:#00803f;--on-accent:#ffffff;--tomato:#c4432f;--gold:#94620a;--gold-bg:#f6e7c4;--green-bg:#d3eadc;--danger:#b3402f;--focus:#1a8fd0;--hover:#eaeff3;--imdb:#8a6a00;--link:#0b6fa8;--dot-1:#e06f00;--dot-2:#00a845;--dot-3:#1a8fd0;--marquee:#f3f6f8;--marquee-2:#f3f6f8;--marquee-ink:#14181c;--marquee-muted:#55616d;--marquee-gold:#00803f;--like:#00803f;--like-bg:#d3eadc;--display:"Inter Tight",Inter,system-ui,sans-serif}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%;font-size:16px}
+body{margin:0;background:radial-gradient(1200px 420px at 50% -120px,var(--soft),transparent 70%),var(--page);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5}
+button,input,select{font:inherit;color:inherit}button,select{cursor:pointer}button{border:0;background:none}a{color:inherit}[hidden]{display:none!important}
+button,input,select,a,summary{-webkit-tap-highlight-color:transparent}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.shell{max-width:980px;margin:auto;padding:16px max(14px,env(safe-area-inset-right)) max(90px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left))}
+.masthead{position:relative;overflow:hidden;margin:0 0 18px;padding:28px 20px 20px;border-radius:16px;color:var(--marquee-ink);background:radial-gradient(700px 260px at 85% -40px,color-mix(in srgb,var(--marquee-gold) 18%,transparent),transparent 70%),linear-gradient(160deg,var(--marquee-2),var(--marquee) 62%);box-shadow:0 18px 40px -22px color-mix(in srgb,var(--marquee) 60%,transparent),inset 0 0 0 1px color-mix(in srgb,var(--marquee-gold) 25%,transparent)}
+.marquee-bulbs{position:absolute;inset:9px 14px auto;height:4px;background:radial-gradient(circle,var(--marquee-gold) 0 1.6px,transparent 2.2px) 0 0/14px 4px repeat-x;opacity:.45}
+.topline{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.kicker{display:flex;align-items:center;gap:8px;margin:0;color:var(--marquee-gold);font-size:10px;font-weight:750;letter-spacing:.2em}
+.reel{width:16px;height:16px;fill:none;stroke:var(--marquee-gold);stroke-width:1.4}
+.mode-switch{display:inline-flex;padding:3px;border-radius:999px;background:#00000040;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--marquee-gold) 35%,transparent)}
+.mode-switch a{display:inline-flex;align-items:center;min-height:38px;padding:6px 14px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:.02em;color:var(--marquee-muted);text-decoration:none;white-space:nowrap}
+.mode-switch a[aria-current=page]{background:var(--marquee-gold);color:var(--marquee)}
+.heading{display:flex;align-items:center;justify-content:space-between;gap:10px}
+h1{font-family:var(--display);font-weight:500;font-size:40px;letter-spacing:-.03em;line-height:1.13;margin:12px 0 8px;color:var(--marquee-ink)}h1 em{font-style:italic;color:var(--marquee-gold)}
+.theme{min-width:44px;min-height:44px;border:1px solid color-mix(in srgb,var(--marquee-gold) 40%,transparent);border-radius:50%;background:#ffffff10;font-size:19px;color:var(--marquee-gold)}
+.intro{margin:0;color:var(--marquee-muted);font-size:13px}.intro strong{color:var(--marquee-ink)}
+.stamp{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:9px 0 0;font-size:11px;color:var(--marquee-muted)}.dot{width:6px;height:6px;border-radius:50%;background:var(--marquee-gold);box-shadow:0 0 8px var(--marquee-gold)}
+h2{font-family:var(--display);font-weight:600;font-size:22px;letter-spacing:-.01em;margin:0}
+.section{margin:0 0 22px}.section-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:0 2px 10px;flex-wrap:wrap}.section-head p{margin:0;color:var(--muted);font-size:12px}
+.searchbox{position:relative;display:block;margin-bottom:8px}.searchbox svg{position:absolute;left:14px;top:16px;width:19px;height:19px;fill:none;stroke:var(--muted);stroke-width:1.7;pointer-events:none}
+.searchbox input{width:100%;height:52px;padding:10px 13px 10px 43px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font-size:16px;appearance:none;-webkit-appearance:none}.searchbox input:focus{border-color:var(--focus)}
+.controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 12px}
+.tabs{display:inline-flex;padding:3px;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
+.tabs button{min-height:40px;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:650;color:var(--muted)}.tabs button[aria-pressed=true]{background:var(--accent);color:var(--surface)}
+.pill{min-height:44px;padding:8px 14px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font-size:13px;font-weight:650;color:var(--muted)}.pill[aria-pressed=true]{border-color:var(--accent);color:var(--accent);background:var(--soft)}
+select.pill{padding-right:30px;appearance:auto}
+.services{display:flex;gap:6px;flex-wrap:wrap;margin:-4px 0 12px}.services label{display:flex;align-items:center;gap:7px;min-height:40px;padding:6px 11px;border:1px solid var(--line);border-radius:999px;font-size:12px;font-weight:600;background:var(--surface)}.services label:has(input:checked){border-color:var(--accent);color:var(--accent);background:var(--soft)}.services input{width:17px;height:17px;margin:0;accent-color:var(--accent)}
+.services .note{flex-basis:100%;margin:2px 4px 0;font-size:11px;color:var(--muted)}
+.cards{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
+.card{display:flex;flex-direction:column;gap:6px;padding:14px 15px 12px;border:1px solid var(--line);border-radius:14px;background:var(--surface);transition:opacity .25s,transform .25s}
+.card.leaving{opacity:0;transform:scale(.97)}
+.card h3{margin:0;font-family:var(--display);font-size:19px;font-weight:600;line-height:1.25;letter-spacing:-.01em}.card h3 a{text-decoration:none}.card h3 a:hover{text-decoration:underline}
+.kind{display:inline-block;margin-right:7px;padding:1px 7px;border-radius:999px;font-family:system-ui,sans-serif;font-size:10px;font-weight:750;letter-spacing:.06em;text-transform:uppercase;vertical-align:3px;background:var(--gold-bg);color:var(--gold)}.kind.tv{background:var(--green-bg);color:var(--accent)}
+.meta,.scores,.why,.where{margin:0;font-size:13px;color:var(--muted)}
+.scores strong{color:var(--accent);font-size:16px;font-variant-numeric:tabular-nums}.scores .rt{color:var(--tomato);font-weight:700}
+.where{display:flex;gap:6px;flex-wrap:wrap;align-items:center}.svc{padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;background:var(--green-bg);color:var(--accent)}.where a{font-size:12px;text-underline-offset:3px}
+.why{font-size:12px}.why em{color:var(--ink);font-style:normal;font-weight:650}
+.actions{display:flex;gap:8px;margin-top:4px}.actions button{flex:1;min-height:46px;border-radius:999px;font-size:14px;font-weight:700;border:1px solid var(--line);background:var(--page)}
+.actions .like{border-color:var(--like);color:var(--like);background:var(--like-bg)}.actions .nope{color:var(--muted)}
+.actions button:active{transform:scale(.97)}
+.mini{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}.mini .txt{flex:1;min-width:0}.mini .txt b{display:block;font-weight:650;font-size:14px;overflow-wrap:anywhere}.mini .txt span{font-size:12px;color:var(--muted)}
+.mini button{min-width:46px;min-height:46px;border-radius:50%;border:1px solid var(--line);font-size:18px;background:var(--page)}.mini .like{border-color:var(--like);background:var(--like-bg)}
+.mini.rated{opacity:.55}
+.results{display:grid;gap:8px;margin:0 0 14px}
+.more,.ghost{min-height:48px;padding:10px 20px;border-radius:999px;font-size:14px;font-weight:700}.more{display:block;margin:14px auto 0;background:var(--accent);color:var(--surface)}.ghost{border:1px solid var(--line);color:var(--accent);background:var(--surface)}
+.empty{padding:22px 16px;border:1px dashed var(--line);border-radius:14px;text-align:center;color:var(--muted);font-size:14px}
+.progress{height:6px;border-radius:9px;background:var(--line);overflow:hidden;margin:0 2px 12px}.progress span{display:block;height:100%;background:var(--like);border-radius:9px;transition:width .3s}
+details.box{border:1px solid var(--line);border-radius:14px;background:var(--surface);margin:0 0 10px}details.box>summary{min-height:52px;padding:13px 15px;font-weight:700;font-size:14px;cursor:pointer}details.box .inner{padding:0 15px 15px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}.chips button{display:inline-flex;align-items:center;gap:6px;min-height:38px;padding:5px 12px;border:1px solid var(--line);border-radius:999px;font-size:12px;font-weight:600;background:var(--page)}.chips button::after{content:'×';font-size:15px;color:var(--muted)}
+.help{font-size:12px;color:var(--muted);margin:10px 0 0}
+.toast{position:fixed;left:50%;bottom:max(18px,env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;gap:12px;align-items:center;padding:10px 12px 10px 18px;border-radius:999px;background:var(--marquee);color:var(--marquee-ink);font-size:13px;box-shadow:0 10px 30px -10px #000a;z-index:5;max-width:calc(100% - 28px)}.toast button{min-height:38px;padding:4px 12px;border-radius:999px;color:var(--marquee-gold);font-weight:700}
+@media(min-width:640px){.cards{grid-template-columns:1fr 1fr}h1{font-size:48px}.masthead{padding:36px 32px 26px}.shell{padding-top:28px}}
+@media(prefers-reduced-motion:reduce){.card{transition:none}}
+/* Slate & Green look (Nov 2026): dark slate by default, slate-grey light mode, Inter type */
+@font-face{font-family:Inter;font-style:normal;font-weight:400 800;font-display:swap;src:url(fonts/inter-latin.woff2) format('woff2')}
+@font-face{font-family:"Inter Tight";font-style:normal;font-weight:600 800;font-display:swap;src:url(fonts/inter-tight-latin.woff2) format('woff2')}
+body{background:var(--page);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+.masthead{background:none;box-shadow:none;border-radius:0;margin:0 0 16px;padding:8px 2px 18px;border-bottom:1px solid var(--line);color:var(--ink)}
+.marquee-bulbs{display:none}
+.kicker{color:var(--muted);letter-spacing:.12em;font-size:10px;font-weight:700}.kicker .reel{display:none}
+.kicker::before{content:'';flex:none;width:34px;height:10px;background:radial-gradient(circle at 5px 5px,var(--dot-1) 4.5px,transparent 5px),radial-gradient(circle at 17px 5px,var(--dot-2) 4.5px,transparent 5px),radial-gradient(circle at 29px 5px,var(--dot-3) 4.5px,transparent 5px)}
+h1,.masthead h1{font-family:var(--display);font-weight:800;letter-spacing:-.04em;font-size:38px;color:var(--ink)}
+h1 em,.masthead h1 em{font-style:normal;color:var(--accent)}
+.masthead .intro,.masthead .stamp,.masthead .coverage-note{color:var(--muted)}.masthead .intro strong,.masthead a{color:var(--ink)}
+.masthead .dot{background:var(--accent);box-shadow:none}
+.mode-switch{background:var(--surface);box-shadow:none}
+.mode-switch a{color:var(--muted)}.mode-switch a:not([aria-current]):hover{color:var(--ink)}
+.mode-switch a[aria-current=page]{background:var(--ink);color:var(--page)}
+.theme{background:var(--surface);border:1px solid var(--line);color:var(--muted)}
+h2,.empty h2,.section h2{font-family:var(--display);font-weight:700;letter-spacing:-.02em}
+.searchbox input,select,.filters,details.box,.tabs,.pill,.services label{background:var(--surface);border-color:transparent}
+.searchbox input,select,.filters,details.box{border-radius:10px}
+.searchbox input:focus,select:focus{border-color:var(--focus)}
+.filters{box-shadow:none}
+.scope button{border-color:var(--line);color:var(--muted)}
+.scope button[aria-pressed=true],.tabs button[aria-pressed=true]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.pill[aria-pressed=true]{background:var(--green-bg);color:var(--accent);border-color:var(--accent)}
+.done,.more{background:var(--accent);color:var(--on-accent);box-shadow:none}
+.quiet,.reset-main,.export,.ghost{color:var(--accent)}
+.filter-actions{background:color-mix(in srgb,var(--surface) 94%,transparent);box-shadow:0 -10px 20px -14px #0008}
+.active span{background:var(--soft);color:var(--muted);border-radius:6px}
+.results-bar{background:color-mix(in srgb,var(--page) 90%,transparent)}
+.movie-list{border:0;border-radius:12px;overflow:hidden;background:none;display:grid;gap:2px}
+.movie-row{background:var(--surface);border:0;padding:16px 14px 6px}
+.movie-row:hover{background:var(--hover)}
+.movie-info h2,.card h3{font-family:var(--display);font-weight:700;font-size:19px;letter-spacing:-.02em}
+.movie-info h2 a,.card h3 a{text-decoration:none}
+.movie-meta,.movie-genres{color:var(--muted)}
+.score strong{font-family:var(--display);font-weight:800}
+.score.imdb strong,.scores strong{color:var(--imdb)}
+.score.critics strong{color:var(--tomato)}.score.audience strong{color:var(--gold)}
+.movie-watch{gap:8px;padding:6px 0 8px}
+.movie-watch a.stream-link{min-height:34px;padding:0 12px;border-radius:6px;background:var(--soft);color:var(--ink);font-size:12px}
+.movie-watch .au-check,.where a{color:var(--link)}
+.card{background:var(--surface);border-color:transparent;border-radius:12px}
+.svc{background:var(--soft);color:var(--ink)}
+.mini{background:var(--surface);border-color:transparent}
+.actions button,.mini button,.chips button{background:var(--soft);border-color:transparent}
+.actions .like,.mini .like{background:var(--like-bg);border-color:var(--like);color:var(--like)}
+.desktop-head{background:var(--soft)}
+@media(min-width:760px){h1,.masthead h1{font-size:48px}}
+/* Results & filters cleanup (Nov 2026): big Movies/TV switch, prominent reset, language and sort controls, stronger headings */
+.topline{flex-direction:column;align-items:stretch;gap:14px}
+.mode-switch{order:-1;display:flex;width:100%;max-width:560px;padding:4px;gap:4px;border-radius:16px;background:var(--surface);box-shadow:inset 0 0 0 1px var(--line)}
+.mode-switch a{flex:1;justify-content:center;min-height:54px;padding:10px 12px;border-radius:12px;font-size:17px;font-weight:800;letter-spacing:-.01em;font-family:var(--display)}
+.mode-switch a[aria-current=page]{background:var(--accent);color:var(--on-accent);box-shadow:0 6px 16px -8px color-mix(in srgb,var(--accent) 80%,transparent)}
+@media(min-width:760px){.topline{flex-direction:row;align-items:center;flex-wrap:wrap}.mode-switch{order:0;width:auto;flex:0 1 560px;margin-left:auto}}
+.section-head h2,.section h2{font-size:22px;font-weight:800}
+
+/* Top 20 page */
+.tabs.big{display:flex;max-width:420px;margin:0 0 14px}.tabs.big button{flex:1;min-height:48px;font-size:15px;font-weight:750}
+.toplist{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.top{display:grid;grid-template-columns:30px 62px minmax(0,1fr);gap:0 12px;padding:14px 14px 12px;border-radius:12px;background:var(--surface);cursor:pointer;align-items:start}
+.top .rk{font-family:var(--display);font-weight:800;font-size:26px;line-height:1.05;letter-spacing:-.04em;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.top:nth-child(-n+3) .rk{color:var(--accent)}
+.top .pf-poster{float:none;width:62px;margin:2px 0 0}.top .noposter{display:block;width:62px;aspect-ratio:2/3;border-radius:6px;background:var(--soft)}
+.top.pf-open .pf-poster,.top.pf-open .noposter{width:62px}
+.top .body{display:grid;gap:5px;min-width:0}
+.top>.pf-synopsis{grid-column:1/-1;margin-top:10px}
+.top h3{margin:0;font-family:var(--display);font-weight:700;font-size:19px;line-height:1.25;letter-spacing:-.02em;overflow-wrap:anywhere}.top h3 a{text-decoration:none}.top h3 a:hover{text-decoration:underline}
+.top h3 .yr{font-family:Inter,system-ui,sans-serif;font-weight:500;font-size:14px;color:var(--muted);letter-spacing:0}
+.top .line{margin:0;font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.top .xf-bar{margin-top:2px}
+.myservices{display:flex;gap:6px;flex-wrap:wrap}.myservices label{display:flex;align-items:center;gap:8px;min-height:42px;padding:6px 12px 6px 10px;border-radius:999px;font-size:13px;font-weight:600;background:var(--page);color:var(--muted);cursor:pointer}
+.myservices label:has(input:checked){color:var(--ink);background:var(--green-bg);box-shadow:inset 0 0 0 1px var(--accent)}.myservices input{width:18px;height:18px;margin:0;accent-color:var(--accent)}
+.svc-actions{display:flex;gap:8px;margin-top:10px}.svc-actions button{min-height:40px;padding:6px 14px;border-radius:999px;background:var(--soft);font-size:13px;font-weight:700;color:var(--accent)}
+.filter-note{margin:-4px 2px 12px;font-size:12px;color:var(--muted)}
+#svc-sum{font-weight:600;color:var(--muted);margin-left:6px}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:6px;font-size:12px;font-weight:700;background:var(--soft);color:var(--ink)}
+.chip b{color:var(--accent);font-variant-numeric:tabular-nums}.chip.tmdb{background:none;box-shadow:inset 0 0 0 1px var(--line);color:var(--muted);font-weight:600}
+.imdbs strong{color:var(--imdb);font-family:var(--display);font-weight:800;font-size:16px}
+.watch a,.watch span{display:inline-flex;align-items:center;min-height:34px;padding:0 12px;border-radius:6px;background:var(--green-bg);color:var(--accent);font-size:12px;font-weight:700;text-decoration:none}
+.pts{font-size:11px;color:var(--muted)}
+.trend{font-size:11px;font-weight:700;color:var(--muted)}.trend.new{color:var(--dot-3)}
+details.box .inner p,details.box .inner li{font-size:13px;color:var(--muted)}details.box .inner ul{padding-left:18px;margin:6px 0}
+details.box .inner strong{color:var(--ink)}
+.src-ok{color:var(--accent);font-weight:700}.src-no{color:var(--danger);font-weight:700}
+@media(min-width:760px){.top{grid-template-columns:44px 80px minmax(0,1fr)}.top .rk{font-size:34px}.top .pf-poster,.top .noposter,.top.pf-open .pf-poster{width:80px}}
+/* Five-tab nav (Top 20 added Nov 2026): tabs size to their labels and stay on one line on phones */
+.mode-switch a{flex:1 1 auto;white-space:nowrap;padding:10px 8px;font-size:15px}
+@media(max-width:420px){.mode-switch{gap:2px;padding:3px}.mode-switch a{padding:8px 5px;font-size:13.5px;min-height:48px}}
+.reset-small{min-height:40px;padding:6px 14px;border-radius:999px;border:1.5px solid var(--accent);background:transparent;color:var(--accent);font-size:13px;font-weight:750;cursor:pointer;white-space:nowrap}.reset-small:hover{background:var(--accent);color:var(--on-accent)}
+/* Seven-tab nav (Watch list + Notifications added Nov 2026): wraps to two rows on phones */
+.mode-switch{max-width:820px}@media(min-width:860px){.mode-switch{flex-basis:820px}}
+@media(max-width:700px){.mode-switch{display:flex;flex-wrap:wrap;gap:3px}.mode-switch a{flex:1 1 auto;min-height:44px;padding:8px 10px;font-size:14px}}
+</style><link rel="stylesheet" href="posters.css"><link rel="stylesheet" href="nav.css"><link rel="stylesheet" href="lean.css"></head><body><main class="shell">
+<header class="masthead"><div class="topline"><p class="kicker">WHAT AUSTRALIA IS STREAMING</p><nav class="mode-switch" aria-label="Finder"><a href="index.html">Movies</a><a href="tv.html">TV shows</a><a href="foryou.html">For you</a><a href="new.html">New</a><a href="coming.html">Coming soon</a><a href="top20.html" aria-current="page">Top 20</a><a href="watchlist.html">Watch list</a><a href="notifications.html">Notifications</a></nav></div><div class="heading"><h1>Top <em>20</em></h1><button class="theme" id="theme" type="button" aria-label="Switch colour theme" title="Switch colour theme"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="display:block;margin:auto"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button></div>
+<p class="intro"><strong>The most popular movies and shows across Australian streaming services,</strong> combined from the services’ own top 10 charts, with a small boost for well-rated titles.</p>
+<p class="stamp"><span class="dot"></span><span id="loaded">Loading…</span></p></header>
+
+<div class="tabs big" role="group" aria-label="Show"><button type="button" data-tab="movies" aria-pressed="true">Top 20 movies</button><button type="button" data-tab="shows" aria-pressed="false">Top 20 TV</button></div>
+<details class="box" id="svc-box" open><summary>My services <span id="svc-sum"></span></summary><div class="inner">
+<div class="myservices" id="services"></div>
+<div class="svc-actions"><button type="button" id="svc-all">Tick all</button><button type="button" id="svc-none">Untick all</button><button type="button" class="reset-small" id="reset-filters">↺ Reset filters</button></div>
+<p class="help">Tick the services you have and the Top 20 only shows titles you can watch. Saved on this device.</p></div></details>
+<p class="filter-note" id="filter-note" hidden></p>
+<ol class="toplist" id="top20list"></ol>
+<div class="empty" id="empty" hidden></div>
+
+<section class="section" style="margin-top:22px">
+<details class="box explain"><summary>How the ranking works</summary><div class="inner">
+<ul>
+<li>Each service’s official chart gives <strong>10 points to #1</strong>, down to 1 point for #10.</li>
+<li>A title gets points from <strong>every service</strong> it charts on, so a hit on two services ranks higher.</li>
+<li>Netflix also adds <strong>a quarter of last week’s points</strong>, so shows that stay in the chart count a bit more.</li>
+<li>Services without an official chart this time (like Stan and Binge) use TMDB’s popularity for recent titles on that service in Australia (films from the last 18 months, shows with new episodes in the last 2 months), at <strong>60% weight</strong> and counted once per title, shown with an outline and “(popular)”.</li>
+<li>Then a <strong>quality bonus of up to 4.5 points</strong>: (IMDb rating − 6) × 1.5, for titles with 1,000+ IMDb votes. So a 7.0 adds 1.5 and an 8.5 adds 3.75. Titles under 6.0 get nothing extra, but aren’t removed.</li>
+<li>Indian productions are left out, as on the other pages.</li>
+</ul></div></details>
+<details class="box explain"><summary>Sources for this update</summary><div class="inner" id="sources"></div></details>
+</section>
+</main>
+<script id="top20" type="application/json">@@DATA@@</script>
+<script>
+const $=id=>document.getElementById(id);
+const D=JSON.parse($('top20').textContent);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=d=>{if(!d)return'';const x=new Date(d+'T00:00:00');return x.toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'});};
+let tab='movies';
+try{const t=localStorage.getItem('top20-tab');if(t==='movies'||t==='shows')tab=t;}catch{}
+// Services the viewer has, shared between pages: my-services-v1 = {have:[codes]}. Seeded once from
+// the New page's or For you's saved choice so Zac doesn't have to tick them twice.
+const MY='my-services-v1';
+const allCodes=[...new Set([...D.movies,...D.shows].flatMap(x=>x.where.map(w=>w.code)))];
+const nameOf=Object.fromEntries([...D.movies,...D.shows].flatMap(x=>x.where.map(w=>[w.code,w.name])));
+let have=null;
+try{const m=JSON.parse(localStorage.getItem(MY));if(m&&Array.isArray(m.have))have=m.have.filter(c=>!['fxn','bbx','shd'].includes(c));}catch{}
+if(!have){try{const n=JSON.parse(localStorage.getItem('new-streaming-v1'));if(n&&Array.isArray(n.off)&&n.off.length)have=allCodes.filter(c=>!n.off.includes(c));}catch{}}
+if(!have){try{const f=JSON.parse(localStorage.getItem('foryou-v1'));if(f&&Array.isArray(f.services)&&f.services.length)have=f.services.slice();}catch{}}
+const saveHave=()=>{try{localStorage.setItem(MY,JSON.stringify({have:have||[],at:Date.now()}));}catch{}};
+const filtering=()=>have&&have.length&&allCodes.some(c=>!have.includes(c));
+function buildServices(){
+  const box=$('services');box.replaceChildren();
+  const order=['nfx','prv','dnp','stn','bng','pmp','mxx','atp','abc','sbs','cru'];
+  for(const c of [...allCodes].sort((a,b)=>(order.indexOf(a)+99)%99-(order.indexOf(b)+99)%99)){
+    const l=document.createElement('label'),i=document.createElement('input');i.type='checkbox';i.value=c;i.checked=!have||!have.length||have.includes(c);
+    i.addEventListener('change',()=>{have=[...box.querySelectorAll('input:checked')].map(x=>x.value);saveHave();summary();render();});
+    l.append(i,document.createTextNode(nameOf[c]||c));box.append(l);
+  }
+  summary();
+}
+function summary(){const n=have&&have.length?allCodes.filter(c=>have.includes(c)).length:allCodes.length;$('svc-sum').textContent=n===allCodes.length?'· All':`· ${n} of ${allCodes.length}`;}
+const setAll=on=>{have=on?allCodes.slice():[];saveHave();buildServices();render();};
+$('svc-all').addEventListener('click',()=>setAll(true));$('svc-none').addEventListener('click',()=>setAll(false));
+const IMG='https://image.tmdb.org/t/p/';
+function card(x,rank){
+  const charts=x.charts.map(c=>`<span class="chip${c.src==='tmdb'?' tmdb':''}" title="${c.src==='tmdb'?'TMDB popularity on this service':c.src==='netflix'?'Netflix official weekly Top 10':'Official top list'}"><b>#${c.rank}</b> ${esc(D.names[c.svc]||c.svc)}${c.src==='tmdb'?' (popular)':''}</span>`).join('');
+  const nf=x.charts.find(c=>c.src==='netflix');
+  let trend='';
+  if(nf){trend=nf.weeks<=1?'<span class="trend new">New this week</span>':`<span class="trend">${nf.weeks} weeks in Netflix top 10</span>`;}
+  const score=x.imdbScore!=null&&x.imdbVotes>=1000?`<span class="imdbs">IMDb <strong>${x.imdbScore.toFixed(1)}</strong> · ${x.imdbVotes.toLocaleString('en-AU')} votes</span>`:x.saRating!=null?`<span class="imdbs">Rating <strong>${x.saRating}</strong>/100</span>`:'<span>No rating yet</span>';
+  const mine=filtering()?x.where.filter(w=>have.includes(w.code)):x.where;
+  const watch=mine.map(w=>w.link?`<a href="${esc(w.link)}" target="_blank" rel="noopener">${esc(w.name)}</a>`:`<span>${esc(w.name)}</span>`).join('');
+  const title=x.imdb?`<a href="https://www.imdb.com/title/${esc(x.imdb)}/" target="_blank" rel="noopener">${esc(x.title)}</a>`:esc(x.title);
+  const pic=x.poster?`<span class="pf-poster" aria-hidden="true"><img loading="lazy" decoding="async" alt="" referrerpolicy="no-referrer" src="${IMG}w92${esc(x.poster)}" srcset="${IMG}w92${esc(x.poster)} 1x, ${IMG}w185${esc(x.poster)} 2x" onerror="this.parentNode.className='noposter';this.remove()"></span>`:'<span class="noposter" aria-hidden="true"></span>';
+  const syn=x.overview?`<button type="button" class="pf-more" aria-expanded="false">Synopsis<span class="pf-caret">▾</span></button>`:'';
+  return `<li class="top${x.overview?' pf-row':''}"${x.imdb?` data-id="${esc(x.imdb)}"`:''} data-kind="${x.kind}"><span class="rk">${rank}</span>${pic}<div class="body movie-info"><h3>${title}${x.year?` <span class="yr">${x.year}</span>`:''}</h3>
+<p class="line">${charts}${trend}</p><p class="line">${score}${x.genres.length?`<span>· ${esc(x.genres.join(', '))}</span>`:''}</p>
+<p class="line watch">${watch}</p><p class="line pts">${x.chartPts} chart points${x.bonus?` + ${x.bonus} quality bonus`:''} = ${x.total}</p>${syn}</div>${x.overview?`<div class="pf-synopsis"><p>${esc(x.overview)}</p><p class="pf-credit">From <a href="https://www.themoviedb.org/${esc(x.tmdb)}" target="_blank" rel="noopener noreferrer">TMDB</a></p></div>`:''}</li>`;
+}
+function toggle(li){const open=!li.classList.contains('pf-open');li.classList.toggle('pf-open',open);const b=li.querySelector('.pf-more');if(b){b.setAttribute('aria-expanded',String(open));b.firstChild.textContent=open?'Less':'Synopsis';}}
+$('top20list').addEventListener('click',e=>{const li=e.target.closest('li.top');if(!li||!li.classList.contains('pf-row'))return;if(e.target.closest('.pf-more')){toggle(li);return;}if(e.target.closest('a,button,input,select,label,.pf-synopsis,.xf-recs'))return;if(String(getSelection&&getSelection()))return;toggle(li);});
+function render(){
+  document.querySelectorAll('[data-tab]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.tab===tab)));
+  const pool=D[tab]||[];
+  const list=(filtering()?pool.filter(x=>x.where.some(w=>have.includes(w.code))):pool).slice(0,20);
+  $('top20list').innerHTML=list.map((x,i)=>card(x,i+1)).join('');
+  $('filter-note').hidden=!filtering();
+  $('filter-note').textContent=filtering()?`Only showing titles on your ${have.length} ticked service${have.length===1?'':'s'}. Rank is within your services.`:'';
+  $('empty').hidden=list.length>0;
+  $('empty').textContent=pool.length?'Nothing in the charts is on the services you ticked. Tick more in “My services”.':'The charts couldn’t be loaded in the last update. They’ll be tried again in the next one.';
+}
+document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{tab=b.dataset.tab;try{localStorage.setItem('top20-tab',tab);}catch{}render();}));
+buildServices();
+const S=D.sources;
+$('loaded').textContent=`Updated ${fmt(D.built)}${D.netflixWeek?` · Netflix chart for the week to ${fmt(D.netflixWeek)}`:''}`;
+const row=(ok,name,detail)=>`<li><span class="${ok?'src-ok':'src-no'}">${ok?'✓':'✗'}</span> <strong>${name}</strong> ${detail}</li>`;
+const svcList=l=>[...new Set((l||[]).map(s=>D.names[s.split('-')[0]]||s))].join(', ');
+$('sources').innerHTML='<ul>'+
+  row(S.netflix_official.ok,'Netflix Top 10 (official)', S.netflix_official.ok?`Australia, week to ${fmt(S.netflix_official.week)}.`:'couldn’t be downloaded this time.')+
+  row(S.streaming_availability.ok,'Services’ own top lists', S.streaming_availability.ok?`via the Streaming Availability API: ${esc(svcList(S.streaming_availability.lists))}.`:'via the Streaming Availability API: not available this time.')+
+  row(S.tmdb.ok,'TMDB popularity', S.tmdb.ok?`for ${esc(svcList(S.tmdb.lists))}.`:'not available this time, so services without an official chart aren’t covered.')+
+  row(S.imdb.ok,'IMDb ratings', S.imdb.ok?'from IMDb’s official datasets.':'not available in this build.')+
+  row(S.tmdb_where&&S.tmdb_where.ok,'Where to watch','from TMDB’s Australian watch-provider data (JustWatch), for the My services filter.')+
+  '</ul><p>Posters and synopses come from TMDB. This product uses the TMDB API but is not endorsed or certified by TMDB.</p><p>Charts refresh with each scheduled update (the 1st and 15th of the month), so they can be up to two weeks old. No websites are scraped: only published files and official APIs.</p>';
+render();
+$('theme').addEventListener('click',()=>{const dark=getComputedStyle(document.documentElement).colorScheme==='dark';document.documentElement.dataset.theme=dark?'light':'dark';try{localStorage.setItem('movie-finder-theme',dark?'light':'dark');}catch{}});
+try{const t=localStorage.getItem('movie-finder-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;}catch{}
+</script>
+<script src="extras.js" defer>document.getElementById('reset-filters').addEventListener('click',()=>{try{localStorage.removeItem('top20-tab');localStorage.removeItem('my-services-v1');}catch{}location.reload();});
+</script>
+<script src="watchlist.js" defer></script><script src="account.js" defer></script>
+</body></html>

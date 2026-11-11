@@ -6,11 +6,12 @@ import re
 import datetime
 from zoneinfo import ZoneInfo
 from movie_data_utils import norm,aliases
+from title_quality import load_india,drop_reason
 
 BASE=pathlib.Path(__file__).parent
 ROOT=BASE.parent
 OUT=ROOT/'Australian_Movies_Android.html'
-providers={'nfx':'Netflix','prv':'Prime Video','pmp':'Paramount+','stn':'Stan','dnp':'Disney+','mxx':'HBO Max','atp':'Apple TV'}
+providers={'nfx':'Netflix','prv':'Prime Video','pmp':'Paramount+','stn':'Stan','dnp':'Disney+','mxx':'HBO Max','atp':'Apple TV','bng':'Binge','sbs':'SBS On Demand','abc':'ABC iview'}  # bng/sbs/abc come from the live TMDB sweep
 snapshot=json.loads((BASE/'source_snapshot.json').read_text())
 today=datetime.date.fromisoformat(snapshot['dataAsOf'])
 imdb_asof=datetime.date.fromisoformat(snapshot['imdbAsOf']) if snapshot.get('imdbAsOf') else today
@@ -79,6 +80,17 @@ for node in jw.values():
         code=offer['package']['shortName']
         if code in providers and offer['monetizationType']=='FLATRATE':
             m['offers'][code]=html.unescape(offer['standardWebURL'])
+
+# Live where-to-watch (TMDB watch providers, refreshed each scheduled build) replaces the
+# 7 Nov 2026 JustWatch offers when a complete sweep exists. JustWatch deep links are kept for
+# services that still list the film; other services link to TMDB's AU watch page.
+from streaming_au import load_live
+live=load_live()
+if live:
+    for m in movies.values():
+        iid=m['id'][5:] if m['id'].startswith('imdb:') else None
+        now_on=live['movies'].get(iid,{}) if iid else {}
+        m['offers']={c:(m['offers'].get(c) or url) for c,url in sorted(now_on.items()) if c in providers}
 
 idx=collections.defaultdict(set)
 for ident,m in movies.items():
@@ -158,17 +170,26 @@ for m in movies.values():
     m['languageLabels']=[l['label'] for l in entry.get('languages',[])]
     if entry:m['languageSourceUrl']=entry.get('sourceUrl')
 
+# Database floor (Zac, 8 Nov 2026): IMDb 5.0+ so lower-rated films can be found by search.
+# The default IMDb filter stays at 6.0 (default_route and the page's slider value).
 def passes(m):
-    return (m.get('votes') or 0)>=1000 and (((m.get('score') or 0)>=6) or ((m.get('critics') or 0)>=60 and (m.get('criticCount') or 0)>=50) or ((m.get('audience') or 0)>=60 and (m.get('audienceCount') or 0)>=1000))
+    return (m.get('votes') or 0)>=1000 and (((m.get('score') or 0)>=5) or ((m.get('critics') or 0)>=60 and (m.get('criticCount') or 0)>=50) or ((m.get('audience') or 0)>=60 and (m.get('audienceCount') or 0)>=1000))
 
-selected=[m for m in movies.values() if passes(m)]
+india=load_india()
+dropped=collections.Counter()
+selected=[]
+for m in movies.values():
+    if not passes(m):continue
+    reason=drop_reason(m,india)
+    if reason:dropped[reason]+=1;continue
+    selected.append(m)
 selected.sort(key=lambda x:(-(x.get('score') or 0),-(x.get('votes') or 0),x['title']))
 def default_route(m):
-    # Default routes: IMDb OR Tomatometer (Popcornmeter is off by default).
-    return ((m.get('score') or 0)>=6 and (m.get('votes') or 0)>=1000) or ((m.get('critics') or 0)>=60 and (m.get('criticCount') or 0)>=50)
-default_movies=[m for m in selected if default_route(m) and 'IN' not in m['countries'] and m['genres'] and not set(m['genres'])&{'Horror','Romance','Documentary'}]
+    # Default route: IMDb only (Zac, Nov 2026). Tomatometer and Popcornmeter start unticked.
+    return (m.get('score') or 0)>=6 and (m.get('votes') or 0)>=1000
+default_movies=[m for m in selected if default_route(m) and m.get('languageGroup','unknown') in ('english','unknown') and m['genres'] and not set(m['genres'])&{'Horror','Romance','Documentary'}]
 manifest=json.loads((BASE/'rt_count_manifest.json').read_text())
-meta={'checked':checked_label,'checkedISO':today.isoformat(),'imdbAsOf':imdb_asof.isoformat(),'total':len(selected),'defaultResults':len(default_movies),'defaultCountryFilter':'exclude',
+meta={'checked':checked_label,'checkedISO':today.isoformat(),'imdbAsOf':imdb_asof.isoformat(),'total':len(selected),'defaultResults':len(default_movies),'defaultCountryFilter':'exclude','defaultLanguage':'english','dropped':dict(dropped),'defaultLanguage':'english','dropped':dict(dropped),
       'imdbMovieRecordsImported':len(imdb),'imdbBulkQualified':sum(not m['adult'] and m['score']>=6 for m in imdb),
       'justWatchRecords':len(jw),'rtSearchRecords':len(rt),'rtReviewCountsChecked':len(rt_counts),
       'rtCheckedInFinal':sum(bool(m.get('rtCountsChecked')) for m in selected),
@@ -176,15 +197,17 @@ meta={'checked':checked_label,'checkedISO':today.isoformat(),'imdbAsOf':imdb_aso
       'knownAustralianClassifications':sum(bool(m['classifications']) for m in selected),
       'classificationCounts':dict(collections.Counter(c for m in selected for c in m['classifications'])),
       'languageCounts':dict(collections.Counter(m['languageGroup'] for m in selected)),
-      'rtOnlyQualifiers':sum(not ((m.get('score') or 0)>=6 and (m.get('votes') or 0)>=1000) for m in selected),
-      'ambiguousMatchesSkipped':ambiguous,'sourceCounts':{c:sum(c in m['offers'] for m in default_movies) for c in providers},
-      'coverageText':f'IMDb bulk data was checked across {len(imdb):,} movie/short records with at least 1,000 votes. {len(jw):,} JustWatch Australia movie records and {len(rt):,} RT search records were processed. Review counts were confirmed for {len(rt_counts):,} RT film pages before access limits interrupted further checks. Unconfirmed RT counts cannot qualify a movie. The default exclusions show {len(default_movies):,} movies; the file contains {len(selected):,} qualifying records before genre and country filters.',
-      'coverageRows':[['IMDb movie/short records imported (1,000+ votes)',len(imdb)],['IMDb records meeting 6.0+ (all countries/genres)',sum(not m['adult'] and m['score']>=6 for m in imdb)],['JustWatch AU movie records processed',len(jw)],['Rotten Tomatoes search records processed',len(rt)],['RT film pages with confirmed counts',len(rt_counts)],['RT count-checked titles in this file',sum(bool(m.get('rtCountsChecked')) for m in selected)],['Films with an Australian classification',sum(bool(m['classifications']) for m in selected)],['Qualifying records in this file',len(selected)],['Results with your default genre/country exclusions',len(default_movies)]]}
+      'rtOnlyQualifiers':sum(not ((m.get('score') or 0)>=5 and (m.get('votes') or 0)>=1000) for m in selected),
+      'ambiguousMatchesSkipped':ambiguous,'streamingLive':live['label'] if live else None,'sourceCounts':{c:sum(c in m['offers'] for m in default_movies) for c in providers},
+      'coverageText':f'IMDb bulk data was checked across {len(imdb):,} records with at least 1,000 votes; only feature films and TV movies are kept. {len(jw):,} JustWatch Australia movie records and {len(rt):,} RT search records were processed. Review counts were confirmed for {len(rt_counts):,} RT film pages before access limits interrupted further checks. Unconfirmed RT counts cannot qualify a movie. Left out entirely: {dropped["type"]:,} shorts and videos, {dropped["india"]:,} Indian productions and {dropped["suspicious"]+dropped["unconfirmed"]:,} suspicious or unconfirmed ratings. The default English-language view with genre exclusions shows {len(default_movies):,} movies; the file contains {len(selected):,} qualifying records before genre and country filters.',
+      'coverageRows':[['IMDb records imported (1,000+ votes, all title types)',len(imdb)],['IMDb records meeting 6.0+ (all countries/genres)',sum(not m['adult'] and m['score']>=6 for m in imdb)],['JustWatch AU movie records processed',len(jw)],['Rotten Tomatoes search records processed',len(rt)],['RT film pages with confirmed counts',len(rt_counts)],['RT count-checked titles in this file',sum(bool(m.get('rtCountsChecked')) for m in selected)],['Films with an Australian classification',sum(bool(m['classifications']) for m in selected)],['Qualifying records in this file',len(selected)],['Left out: shorts, TV shorts, videos, specials',dropped['type']],['Left out: Indian productions',dropped['india']],['Left out: IMDb 8.5+ from under 10,000 votes, no RT score',dropped['suspicious']],['Left out: unconfirmed by JustWatch, RT or Wikidata, under 25,000 votes',dropped['unconfirmed']],['Results with your default language and genre settings',len(default_movies)]]}
 years=[m['year'] for m in selected if isinstance(m.get('year'),int)]
 minyear=min(years);maxyear=max(years)
 automation_file=BASE/'movie_refresh_automation.json'
 if automation_file.exists():meta['refresh']=json.loads(automation_file.read_text())
-payload=json.dumps(selected,ensure_ascii=False,separators=(',',':')).replace('<','\\u003c')
+# Unknown (None) facts are left out of the page to keep index.html well under Cloudflare's 25 MiB
+# per-file limit; the page and the Python checks treat a missing key the same as null.
+payload=json.dumps([{k:v for k,v in m.items() if v is not None} for m in selected],ensure_ascii=False,separators=(',',':')).replace('<','\\u003c')
 meta_payload=json.dumps(meta,ensure_ascii=False,separators=(',',':')).replace('<','\\u003c')
 template=(BASE/'movie_finder_template.html').read_text()
 for key,value in {'@@MINYEAR@@':str(minyear),'@@MAXYEAR@@':str(maxyear),'@@DATA@@':payload,'@@META@@':meta_payload}.items():template=template.replace(key,value)
@@ -197,7 +220,8 @@ if meta.get('refresh',{}).get('is_enabled'):
     r=meta['refresh']
     template=template.replace('Monthly refresh is being set up. Download the latest file after a refresh; existing downloaded copies stay unchanged.',
         f'<strong>Automatic refresh:</strong> {html.escape(r["description"])}. IMDb ratings and votes last updated {imdb_asof.day} {imdb_asof:%B %Y}. '
-        f'Australian streaming availability, Rotten Tomatoes, classification and language facts are from the {checked_label} snapshot and are not refreshed automatically. '
+        +(f'Australian streaming availability last updated {live["label"]} from TMDB (JustWatch data). Rotten Tomatoes, classification and language facts are from the {checked_label} snapshot and are not refreshed automatically. ' if live else
+        f'Australian streaming availability, Rotten Tomatoes, classification and language facts are from the {checked_label} snapshot and are not refreshed automatically. ')+
         f'<a href="{html.escape(r["latestUrl"])}" target="_blank" rel="noopener noreferrer">Open the latest version</a>. Downloaded copies stay unchanged.')
 refresh_recipe={
     'purpose':'Refresh this personal movie-finder HTML in place, preserving the UI and Library identity.',
@@ -213,7 +237,7 @@ refresh_recipe={
     'rtReviewCounts':'The public movie page has script#media-scorecard-json. criticsScore.reviewCount is the critic count. Use audienceScore.scorePercent with its corresponding bandedRatingCount and reviewsPageUrl. A 1,000+ band is a lower bound, not an exact count. Verified and all-audience groups cannot be mixed. Use conservative request rates; stop further film-page requests immediately on HTTP 403 or 429. Never retry through another channel to evade access limits.',
     'staleData':'Keep last-known RT facts with their actual rtCheckedDate if a refresh is blocked, and show that they were not refreshed. Do not replace old checked dates with the run date. Do not invent missing counts or let them qualify films.',
     'identityMatching':'Use IMDb identifiers where present, otherwise exact normalized title/alias and release year only when unambiguous. Skip ambiguous matches; never fabricate direct review URLs.',
-    'validation':'Check independent OR score gates and minimum review counts; seven service filters; year range; Australian classification multiselect; 16 broad genre groups with exclusion winning over inclusion; reset; sorting; review links; pagination; offline functionality. Replace the same Library file only after validation.',
+    'validation':'Check independent OR score gates and minimum review counts; nine service filters; year range; Australian classification multiselect; 16 broad genre groups with exclusion winning over inclusion; reset; sorting; review links; pagination; offline functionality. Replace the same Library file only after validation.',
     'languageFilter':'Default all. Match original-language facts through IMDb P345 identifiers and Wikidata P364. English means English is one of the recorded original languages; Foreign means known original languages without English. Do not infer languages from countries or title spelling. Preserve Unknown separately. This is not a dubbed-audio availability filter.',
     'fullDatabaseLimitation':'IMDb bulk datasets cover eligible movie records. A complete RT database is not available in this file; a complete authorised RT data feed/export would be required to claim full coverage.'}
 recipe_payload=json.dumps(refresh_recipe,ensure_ascii=False,separators=(',',':')).replace('<','\\u003c')

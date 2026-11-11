@@ -1,0 +1,5 @@
+/* Lean pages (Zac, Nov 2026): buttons and results only, no taglines or explanations.
+   Hidden rather than deleted so the page scripts that fill these spots keep working. */
+.kicker,.intro,.stamp,.coverage-note,.helper,p.help,#start-note,details.about,.explain{display:none!important}
+/* Without the tagline row, the page title sits right under the menu */
+.masthead .heading{margin-top:14px}

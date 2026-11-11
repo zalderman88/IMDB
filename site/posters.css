@@ -1,0 +1,24 @@
+/* Posters and tap-to-expand synopses (see posters.js). Uses each page's own colour tokens. */
+.pf-poster{float:left;width:62px;aspect-ratio:2/3;margin:2px 12px 6px 0;border-radius:6px;overflow:hidden;background:var(--soft,#222);box-shadow:0 1px 3px rgba(0,0,0,.25);transition:width .2s}
+.pf-poster img{display:block;width:100%;height:100%;object-fit:cover}
+.pf-poster.pf-none{display:none}
+.pf-has-poster .movie-info{display:flow-root}
+.pf-row{cursor:pointer}
+.pf-open .pf-poster{width:110px}
+.pf-more{display:inline-flex;align-items:center;gap:4px;min-height:34px;margin:4px 0 0;padding:4px 10px 4px 0;border:0;background:transparent;color:var(--accent,#00c46a);font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+.pf-caret{display:inline-block;transition:transform .2s}
+.pf-open .pf-caret{transform:rotate(180deg)}
+.pf-synopsis{display:none;clear:both;margin:4px 0 8px;padding:10px 12px;border-radius:8px;background:var(--soft,rgba(127,127,127,.12));font-size:13px;line-height:1.55;color:var(--ink,inherit)}
+.pf-open .pf-synopsis{display:block}
+.pf-synopsis p{margin:0}
+.pf-synopsis .pf-credit,.pf-synopsis .pf-empty{margin-top:6px;font-size:11px;color:var(--muted,#888)}
+.pf-attrib{font-size:11px;color:var(--muted,#888);line-height:1.6}
+/* For You cards are flex columns: put the poster beside the title block instead of floating. */
+.card.pf-has-poster{display:grid;grid-template-columns:62px minmax(0,1fr);column-gap:12px;align-content:start}
+.card.pf-has-poster>*{grid-column:2}
+.card.pf-has-poster>.pf-poster{grid-column:1;grid-row:1/span 4;float:none;margin:2px 0 0;align-self:start}
+.card.pf-has-poster>.actions,.card.pf-has-poster>.pf-synopsis{grid-column:1/-1}
+.card.pf-open.pf-has-poster{grid-template-columns:110px minmax(0,1fr)}
+/* Wide screens: the movie row is a 3-column grid; the synopsis spans all of it. */
+@media(min-width:1040px){.movie-row>.pf-synopsis{grid-column:1/-1;order:9;margin-top:0}}
+@media(prefers-reduced-motion:reduce){.pf-poster,.pf-caret{transition:none}}

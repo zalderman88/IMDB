@@ -1,7 +1,18 @@
-# Built by rebuild.py / GitHub Actions; the live app is published to GitHub Pages.
+# Built by rebuild.py / GitLab CI; the live app is published to Cloudflare (Worker static assets).
 Australian_Movies_Android.html
 research/extended_catalogue.json
 data/catalogue.json
 _site/
 __pycache__/
 *.pyc
+
+TV_Shows_Android.html
+research/tv_catalogue.json
+ForYou_Android.html
+New_Streaming_Android.html
+cache/
+Top20_Android.html
+top20.json
+Watchlist_Android.html
+Notifications_Android.html
+Coming_Soon_Android.html

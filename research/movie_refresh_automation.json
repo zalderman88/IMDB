@@ -1,9 +1,9 @@
 {
   "is_enabled": true,
-  "provider": "GitHub Actions",
-  "workflow": ".github/workflows/refresh.yml",
-  "schedule": "cron 0 20 * * 1,4 (UTC)",
+  "provider": "GitLab CI, deployed to Cloudflare (Worker static assets)",
+  "workflow": ".gitlab-ci.yml",
+  "schedule": "GitLab pipeline schedule 0 4 * * 2,5 (Australia/Perth)",
   "timezone": "Australia/Perth",
   "description": "IMDb ratings refresh twice a week, Tuesday and Friday around 4:00 am Perth time",
-  "latestUrl": "https://zalderman88.github.io/IMDB/"
+  "latestUrl": "https://zac-movies.zalderman.workers.dev/"
 }

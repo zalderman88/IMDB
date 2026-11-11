@@ -1,0 +1,105 @@
+# Twice-weekly IMDb refresh, deployed to the Cloudflare Worker zac-movies (static assets, see wrangler.jsonc).
+# Schedule it in GitLab: Build > Pipeline schedules > cron "0 4 * * 2,5", timezone Perth.
+# Needs CI/CD variables CLOUDFLARE_API_TOKEN (masked) and CLOUDFLARE_ACCOUNT_ID.
+# The token needs Account > Workers Scripts > Edit.
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+stages: [build, deploy]
+
+build:
+  stage: build
+  image: python:3.12-bookworm
+  timeout: 60m
+  # Keeps the New on streaming data between pipelines so code pushes don't spend API requests.
+  # Also holds the poster/synopsis lookups (cache/posters.json.gz) so refreshes only look up new titles;
+  # data/posters_seed.json.gz in the repo is the fallback if this cache is lost.
+  cache:
+    key: new-on-streaming
+    paths: [cache/]
+    when: always  # keep sweep progress even if a later step fails
+  script:
+    - apt-get update -qq && apt-get install -y -qq nodejs >/dev/null && node --version
+    - mkdir -p /tmp/imdb
+    - |
+      for f in title.basics title.ratings title.episode title.akas; do
+        curl --fail --silent --show-error --location --retry 4 --retry-delay 15 \
+          -A 'movie-finder-refresh/1.0' -o "/tmp/imdb/$f.tsv.gz" "https://datasets.imdbws.com/$f.tsv.gz"
+      done
+      ls -l /tmp/imdb
+    - python tools/refresh_imdb.py --basics /tmp/imdb/title.basics.tsv.gz --ratings /tmp/imdb/title.ratings.tsv.gz
+    - python tools/refresh_tv.py --basics /tmp/imdb/title.basics.tsv.gz --ratings /tmp/imdb/title.ratings.tsv.gz --episode /tmp/imdb/title.episode.tsv.gz
+    - python tools/refresh_india.py --akas /tmp/imdb/title.akas.tsv.gz
+    # Live where-to-watch (movies, TV, For You) and New page data from TMDB watch providers
+    # (official API, JustWatch data; CI/CD variable TMDB_API_KEY). Cached in cache/ like New.
+    - python tests/test_tmdb_au.py
+    - |
+      if [ "$CI_PIPELINE_SOURCE" = "schedule" ] || [ "$CI_PIPELINE_SOURCE" = "web" ]; then FORCE=--force; else FORCE=; fi
+      python tools/fetch_tmdb_au.py --max-lookups 40000 $FORCE
+    - python rebuild.py
+    - python tools/check_refresh.py
+    - node tests/verify_movie_finder.mjs
+    - python research/build_tv.py --min-shows 1000
+    - python tests/test_tv_pipeline.py
+    - node tests/verify_tv_finder.mjs
+    - python tools/build_foryou.py --require-tv
+    # New on streaming (Streaming Availability API; needs CI/CD variable STREAMING_AVAILABILITY_API_KEY).
+    # Scheduled and manual pipelines fetch fresh data; pushes reuse the cached copy if under 13 days old.
+    - python tests/test_new_streaming.py
+    - |
+      if [ "$CI_PIPELINE_SOURCE" = "schedule" ] || [ "$CI_PIPELINE_SOURCE" = "web" ]; then FORCE=--force; else FORCE=; fi
+      python tools/fetch_new_streaming.py $FORCE
+    - python tools/build_new_streaming.py --ratings /tmp/imdb/title.ratings.tsv.gz
+    # Top 20: Netflix's official AU Top 10 file + services' own top lists (Streaming Availability
+    # /shows/top, same key, ~12 requests, cached like New) + optional TMDB_API_KEY + IMDb ratings.
+    - python tests/test_top20.py
+    - |
+      curl --fail --silent --show-error --location --retry 4 --retry-delay 15 --retry-all-errors \
+        -A 'movie-finder-top20/1.0' -o /tmp/netflix_top10.tsv \
+        https://www.netflix.com/tudum/top10/data/all-weeks-countries.tsv || rm -f /tmp/netflix_top10.tsv
+      NF=; [ -s /tmp/netflix_top10.tsv ] && NF="--netflix-tsv /tmp/netflix_top10.tsv"
+      python tools/build_top20.py --basics /tmp/imdb/title.basics.tsv.gz --ratings /tmp/imdb/title.ratings.tsv.gz $NF $FORCE
+    # Coming soon: upcoming movies, new shows and new seasons in AU (TMDB, same TMDB_API_KEY, ~500 requests).
+    - python tests/test_coming_soon.py
+    - python tools/build_coming_soon.py --ratings /tmp/imdb/title.ratings.tsv.gz
+    - mkdir -p _site
+    # Posters and synopses: TMDB if the masked CI/CD variable TMDB_API_KEY is set, then Wikipedia and TVmaze.
+    - python tests/test_posters.py
+    - python tools/fetch_posters.py --cache cache/posters.json.gz --out _site/posters --budget-minutes 20
+    - cp Australian_Movies_Android.html _site/index.html
+    - cp TV_Shows_Android.html _site/tv.html
+    - cp ForYou_Android.html _site/foryou.html
+    - cp New_Streaming_Android.html _site/new.html
+    - cp Top20_Android.html _site/top20.html
+    - cp Coming_Soon_Android.html _site/coming.html
+    # Watch list + Notifications pages: no data, the list is saved in each browser (site/watchlist.js).
+    - python tests/test_watchlist.py
+    - python tools/build_watchlist.py --out _site/watchlist.html --notifications-out _site/notifications.html
+    - cp -r site/. _site/
+    # Actor/director search: IMDb credits for titles on the site (site/extras.js loads people.json).
+    - |
+      for f in title.principals name.basics; do
+        curl --fail --silent --show-error --location --retry 4 --retry-delay 15 \
+          -A 'movie-finder-refresh/1.0' -o "/tmp/imdb/$f.tsv.gz" "https://datasets.imdbws.com/$f.tsv.gz"
+      done
+    - python tools/build_people.py --principals /tmp/imdb/title.principals.tsv.gz --names /tmp/imdb/name.basics.tsv.gz --out _site/people.json
+    - python tests/test_people.py
+    - node tests/test_worker.mjs
+    - ls -l _site
+  artifacts:
+    paths: [_site/]
+    expire_in: 1 week
+
+deploy:
+  stage: deploy
+  image: node:22-bookworm-slim
+  needs: [build]
+  script:
+    - npx --yes wrangler@4 deploy
+    # Trailers and "More like this" (worker/index.js) read TMDB_API_KEY as a Worker secret.
+    - |
+      if [ -n "$TMDB_API_KEY" ]; then printf '%s' "$TMDB_API_KEY" | npx --yes wrangler@4 secret put TMDB_API_KEY; else echo "TMDB_API_KEY not set: trailers and suggestions stay off"; fi

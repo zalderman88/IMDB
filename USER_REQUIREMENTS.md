@@ -30,3 +30,22 @@ Certified Fresh and Verified Hot are reported source designations, not inferred 
 - Sorting: IMDb, Tomatometer, Popcornmeter and release year in either direction; IMDb votes in either direction; most critic reviews; most audience ratings; title A–Z. Missing numeric values sort last.
 
 Browser-stored preferences override fresh defaults after the user chooses settings. A fresh open and Reset are both tested with the latest country/language defaults.
+- Title type (added 7 Nov 2026): default `mainstream` = IMDb title type `movie` only, hiding suspicious ratings (IMDb 9.0+ from under 10,000 votes with no RT score). `features` keeps all ratings; `all` also includes TV movies, shorts and videos. Reset restores `mainstream`.
+
+## TV finder (requested 7 November 2026)
+
+- Separate page (`tv.html`) with a Movies / TV shows switch; same look as the movie finder.
+- Only IMDb TV series and miniseries with at least **1,000 IMDb votes**; adult titles omitted.
+- Listed if **IMDb 6.0+ and aired in 2020 or later**: first aired 2020+, or started earlier but has an end year or any episode released in 2020 or later (episode years from `title.episode` joined to each episode's own year; future announced episodes ignored).
+- **Exception:** first aired in 2000 or later with **IMDb above 8.0** is listed even if it has not aired since 2020.
+- Defaults mirror the movie finder: IMDb 6.0+, 1,000+ votes, Romance/Horror/Documentary excluded. Shows at **9.0+ with under 10,000 votes are hidden by default** (likely vote-stuffed); a tick box shows them.
+- No AU streaming, RT, classification, country or language data for TV yet, so the Indian-production default cannot apply. Do not invent these facts.
+
+## Clean-up (requested 7 November 2026)
+
+- Only feature films and TV movies (IMDb `movie`, `tvMovie`) and TV series/miniseries. Shorts, TV shorts, videos and TV specials are left out of the data entirely.
+- India is always excluded; the country option is gone. Unknown countries stay in. Movies: JustWatch country India; if JustWatch has no country, Wikidata country of origin India, or the IMDb alternative-title pattern (2+ Indian titles with under 15 regions, or 3+ with under 30) when the recorded language is unknown or Indian. TV: Wikidata only, because IMDb gives nearly every series the same Indian alternative titles.
+- Suspicious ratings are left out: IMDb 8.5+ from under 10,000 votes with no RT score (movies and TV), and movies that JustWatch, RT and Wikidata know nothing about unless they have 25,000+ IMDb votes. Replaces the earlier 9.0+ title-type option and the TV tick box.
+- Language: English (including unknown) is the default and sits in a prominent switch with Any language and Non-English. TV has no language data yet.
+- Results show the release year as its own column; one-tap sort buttons above the list for Release date, IMDb, Tomatometer and Popcornmeter (TV: First aired, Last aired, IMDb, Votes). Tap again to reverse.
+- Bigger Movies / TV / For you switch, bigger Reset filters button, stronger section and field headings.

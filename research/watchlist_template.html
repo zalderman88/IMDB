@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en-AU"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark light"><meta name="theme-color" content="#14181c">
+<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Movies">
+<link rel="manifest" href="manifest.webmanifest" crossorigin="use-credentials">
+<link rel="icon" href="icon-192.png" type="image/png"><link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>Watch list · Movies &amp; TV</title>
+<script>try{const t=localStorage.getItem('movie-finder-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;}catch(e){}</script>
+@@STYLE@@
+<style>
+/* Watch list page (shares the For You page's styles above, built by tools/build_watchlist.py) */
+.wl-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.card .wl-added{margin:0;font-size:12px;color:var(--muted)}
+.card .wl-tick{margin-top:2px}
+.wl-tools{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 0}
+.empty a{color:var(--link);font-weight:650}
+.card .pf-poster.wl-own{display:block}
+.card.wl-pic{display:grid;grid-template-columns:62px minmax(0,1fr);column-gap:12px;align-content:start}
+.card.wl-pic>*{grid-column:2}
+.card.wl-pic>.wl-own{grid-column:1;grid-row:1/span 4;float:none;margin:2px 0 0;align-self:start}
+.card.wl-pic>.xf-recs{grid-column:1/-1}
+.card.pf-has-poster .wl-own{display:none}
+.wl-ticks{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.wl-ticks .wl-tick{margin:2px 0}
+.card.is-watched{opacity:.5;filter:grayscale(1)}.card.is-watched:hover,.card.is-watched:focus-within{opacity:.85}
+.card.is-watched h3 a{text-decoration:line-through;text-decoration-thickness:1.5px}
+.wl-back{margin:0;font-size:13px;font-weight:700;color:var(--accent)}
+.card.is-back{background:var(--green-bg);box-shadow:inset 0 0 0 2px var(--accent)}
+.wl-newtag{display:inline-block;margin-right:7px;padding:1px 8px;border-radius:999px;background:var(--accent);color:var(--on-accent);font-family:Inter,system-ui,sans-serif;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;vertical-align:3px}
+.wl-scores{display:flex;gap:8px;flex-wrap:wrap}
+.wl-sc{display:inline-flex;align-items:center;gap:4px;min-height:36px;padding:4px 11px;border-radius:8px;background:var(--soft);color:var(--ink);font-size:13px;font-weight:600;text-decoration:none}
+.wl-sc:hover{box-shadow:inset 0 0 0 1px var(--accent)}
+.wl-sc.imdb strong{color:var(--imdb)}.wl-sc.rt strong{color:var(--tomato)}.wl-sc.rt strong+strong,.wl-sc.rt strong:nth-of-type(2){color:var(--gold)}
+.wl-season{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:2px 0 0;font-size:13px;color:var(--muted)}
+.wl-bell{min-height:36px;padding:5px 12px;border:1px solid var(--line);border-radius:18px;background:transparent;color:var(--muted);font-size:13px;font-weight:650;cursor:pointer}
+.wl-bell[aria-pressed=true]{border-color:var(--accent);color:var(--accent);background:var(--green-bg)}
+.wl-st.new{color:var(--accent);font-weight:700}.wl-st.soon{color:var(--ink);font-weight:600}
+.wl-sure{max-width:min(360px,calc(100vw - 32px));padding:22px 20px 18px;border:1px solid var(--line);border-radius:16px;background:var(--surface);color:var(--ink);box-shadow:0 20px 60px -20px #000c}
+.wl-sure::backdrop{background:#0009}
+.wl-sure h2{margin:0 0 8px;font-size:20px}.wl-sure p{margin:0 0 18px;color:var(--muted);font-size:14px}
+.wl-sure .row{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.wl-sure button{min-height:46px;padding:10px 18px;border-radius:999px;font-size:14px;font-weight:700}
+.wl-sure .keep{border:1px solid var(--line);background:var(--soft);color:var(--ink)}
+.wl-sure .yes{background:var(--danger);color:#14181c}
+
+.wl-soon{color:var(--accent);font-weight:650}
+</style>
+<link rel="stylesheet" href="posters.css"><script src="posters.js" defer></script><link rel="stylesheet" href="nav.css"><link rel="stylesheet" href="lean.css"></head><body><main class="shell">
+<header class="masthead"><div class="marquee-bulbs" aria-hidden="true"></div><div class="topline"><p class="kicker">SAVED ON THIS PHONE</p><nav class="mode-switch" aria-label="Finder"><a href="index.html">Movies</a><a href="tv.html">TV shows</a><a href="foryou.html">For you</a><a href="new.html">New</a><a href="coming.html">Coming soon</a><a href="top20.html">Top 20</a><a href="watchlist.html" aria-current="page">Watch list</a><a href="notifications.html">Notifications</a></nav></div><div class="heading"><h1>Watch <em>list</em></h1><button class="theme" id="theme" type="button" aria-label="Switch colour theme" title="Switch colour theme"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="display:block;margin:auto"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button></div>
+<p class="intro"><strong>Tick “Watch list” on any movie or show</strong> and it is kept here. The list is saved in this browser on this phone, nowhere else.</p>
+<p class="stamp"><span class="dot"></span><span id="count">Loading…</span></p></header>
+
+<section class="section" aria-labelledby="list-h"><div class="section-head"><h2 id="list-h">To watch</h2><p id="list-note"></p></div>
+<div class="controls"><div class="tabs" role="group" aria-label="Show"><button type="button" data-tab="all" aria-pressed="true">All</button><button type="button" data-tab="movie" aria-pressed="false">Movies</button><button type="button" data-tab="tv" aria-pressed="false">TV</button></div>
+<label class="sr-only" for="sort">Sort</label><select class="pill" id="sort"><option value="new">Newest added</option><option value="old">Oldest added</option><option value="title">Title A–Z</option><option value="year">Newest release</option><option value="score">IMDb score</option></select><button class="pill" id="hide-watched" type="button" aria-pressed="false">Hide watched</button></div>
+<ol class="cards" id="wl-list"></ol>
+<div class="empty" id="empty" hidden></div>
+<div class="wl-tools" id="tools" hidden><button class="ghost" id="copy" type="button">Copy list as text</button><button class="ghost" id="clear" type="button">Clear watch list</button></div>
+</section>
+<dialog class="wl-sure" id="sure" aria-labelledby="sure-h"><h2 id="sure-h">Clear your watch list?</h2><p id="sure-text"></p><div class="row"><button type="button" class="keep" id="sure-no">Keep my list</button><button type="button" class="yes" id="sure-yes">Yes, clear it</button></div></dialog>
+<div class="toast" id="toast" role="status" hidden><span id="toast-text"></span><button type="button" id="undo">Undo</button></div>
+<noscript><p>Enable JavaScript to see your watch list.</p></noscript>
+</main>
+<script src="watchlist.js"></script><script src="account.js" defer></script>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const WL=window.WatchList;
+function el(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e;}
+const dayFmt=new Intl.DateTimeFormat('en-AU',{day:'numeric',month:'short',year:'numeric',timeZone:'Australia/Perth'});
+let hideWatched=false,tab='all',undoItem=null,undoAt=0,undoAll=null,toastTimer;
+try{const s=JSON.parse(localStorage.getItem('watchlist-view-v1')||'{}');if(['all','movie','tv'].includes(s.tab))tab=s.tab;if(s.hide)hideWatched=true;if(s.sort&&[...$('sort').options].some(o=>o.value===s.sort))$('sort').value=s.sort;}catch(e){}
+function saveView(){try{localStorage.setItem('watchlist-view-v1',JSON.stringify({tab,sort:$('sort').value,hide:hideWatched}));}catch(e){}}
+const yr=it=>parseInt(it.year,10)||0;
+const SORTS={new:(a,b)=>b.added-a.added,old:(a,b)=>a.added-b.added,title:(a,b)=>a.title.localeCompare(b.title,'en',{sensitivity:'base'}),year:(a,b)=>yr(b)-yr(a)||b.added-a.added,score:(a,b)=>(b.score||0)-(a.score||0)||b.added-a.added};
+// IMDb and Rotten Tomatoes scores, each a link to its page (RT search when the page isn't known).
+function ext(label,href,cls){const a=el('a',cls||'',label);a.href=href;a.target='_blank';a.rel='noopener noreferrer';return a;}
+function scoreLine(it){
+  const sc=el('p','scores wl-scores');
+  const im=ext('','https://www.imdb.com/title/'+it.id+'/','wl-sc imdb');im.append('IMDb ',el('strong','',it.score?it.score.toFixed(1):'—'),' ↗');im.setAttribute('aria-label','IMDb '+(it.score?it.score.toFixed(1):'')+', open on IMDb');sc.append(im);
+  const rtUrl=it.rt||'https://www.rottentomatoes.com/search?search='+encodeURIComponent(it.title);
+  const rt=ext('',rtUrl,'wl-sc rt');rt.append('🍅 ',el('strong','',it.critics!=null?it.critics+'%':'—'));if(it.audience!=null)rt.append(' · 🍿 ',el('strong','',it.audience+'%'));rt.append(' ↗');
+  rt.setAttribute('aria-label','Rotten Tomatoes'+(it.critics!=null?' Tomatometer '+it.critics+'%':'')+(it.audience!=null?', Popcornmeter '+it.audience+'%':'')+', open on Rotten Tomatoes');sc.append(rt);
+  return sc;
+}
+function card(it){
+  const li=el('li','card');li.dataset.id=it.id;li.dataset.kind=it.kind;
+  if(it.poster){const box=el('span','pf-poster wl-own');box.setAttribute('aria-hidden','true');const img=el('img');img.src=it.poster;img.alt='';img.loading='lazy';img.decoding='async';img.referrerPolicy='no-referrer';img.onerror=()=>{box.remove();li.classList.remove('wl-pic');};box.append(img);li.append(box);li.classList.add('wl-pic');}
+  const h=el('h3');h.append(el('span','kind'+(it.kind==='tv'?' tv':''),it.kind==='tv'?'TV':'Film'));const a=el('a','',it.title);a.href='https://www.imdb.com/title/'+it.id+'/';a.target='_blank';a.rel='noopener noreferrer';h.append(a);li.append(h);
+  const ticks=el('div','wl-ticks'),wl=el('label','wl-tick wl-seen'+(it.watched?' on':'')),wbox=el('input');wbox.type='checkbox';wbox.checked=!!it.watched;
+  wbox.addEventListener('change',()=>WL.setWatched(it.id,wbox.checked));wl.append(wbox,el('span','','Watched'));ticks.append(wl);li.append(ticks);
+  if(it.watched)li.classList.add('is-watched');
+  if(it.back&&!it.watched){li.classList.add('is-back');h.prepend(el('span','wl-newtag',it.back.number===1?'New season':'New episode'));li.append(el('p','wl-back','New since you watched: season '+it.back.season+(it.back.number?' episode '+it.back.number:'')+' · '+dayFmt.format(new Date(it.back.at))));}
+  const meta=[it.year,(it.genres||[]).join(' · ')].filter(Boolean).join(' · ');if(meta)li.append(el('p','meta',meta));
+  if(it.soon&&it.soon>=new Intl.DateTimeFormat('en-CA',{timeZone:'Australia/Perth'}).format(new Date())){const c=el('p','meta wl-soon','Coming '+new Intl.DateTimeFormat('en-AU',{weekday:'short',day:'numeric',month:'short'}).format(new Date(it.soon+'T12:00:00'))+(it.where?' · '+it.where:''));li.append(c);}
+  li.append(scoreLine(it));
+  const where=el('p','where');const jw=el('a','','Where to watch ↗');jw.href='https://www.justwatch.com/au/search?q='+encodeURIComponent(it.title);jw.target='_blank';jw.rel='noopener noreferrer';where.append(jw);li.append(where);
+  if(it.kind==='tv')li.append(seasonRow(it));
+  li.append(el('p','wl-added','Added '+dayFmt.format(new Date(it.added))+(it.watched?' · watched '+dayFmt.format(new Date(it.watched)):'')));
+  return li;
+}
+// TV shows: a bell to turn new-season alerts on, and what TVmaze says about the next season.
+function seasonRow(it){
+  const row=el('div','wl-season'),bell=el('button','wl-bell'),st=el('span','wl-st','Checking seasons…');bell.type='button';
+  const on=!!it.alert;bell.setAttribute('aria-pressed',String(on));bell.textContent=(on?'🔔 ':'🔕 ')+'Notify me when new season released';
+  bell.title=on?'Tap to stop new-season alerts for this show':'Show a message on this site when a new season of this show comes out';
+  bell.addEventListener('click',()=>{WL.setAlert(it.id,!it.alert);if(!it.alert)toast('You’ll see a message here when '+it.title+' gets a new season');});
+  row.append(bell,st);
+  WL.seasonInfo(it.id).then(v=>{const cur=WL.all().find(x=>x.id===it.id)||it,s=WL.seasonStatus(cur,v);st.textContent=s.text;st.className='wl-st '+s.kind;if(s.kind==='new'){const ok=el('button','wl-bell','Got it');ok.type='button';ok.addEventListener('click',()=>WL.seasonsSeen(it.id));row.append(ok);}});
+  return row;
+}
+function render(){
+  document.querySelectorAll('[data-tab]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.tab===tab)));
+  $('hide-watched').setAttribute('aria-pressed',String(hideWatched));const all=WL.all(),shown=all.filter(it=>(tab==='all'||it.kind===tab)&&!(hideWatched&&it.watched)).sort(SORTS[$('sort').value]||SORTS.new).sort((a,b)=>(!!b.back&&!b.watched)-(!!a.back&&!a.watched));
+  const films=all.filter(it=>it.kind!=='tv').length,tv=all.length-films;
+  $('count').textContent=all.length?all.length+(all.length===1?' title':' titles')+' · '+films+(films===1?' film':' films')+' · '+tv+(tv===1?' show':' shows'):'Nothing saved yet';
+  $('list-note').textContent=shown.length&&shown.length<all.length?shown.length+' of '+all.length:'';
+  const list=$('wl-list');list.replaceChildren(...shown.map(card));
+  const empty=$('empty');empty.hidden=shown.length>0;$('tools').hidden=!all.length;
+  if(!shown.length){empty.replaceChildren();if(all.length){empty.append(hideWatched&&all.some(it=>it.watched&&(tab==='all'||it.kind===tab))?'Everything here is watched. Tap “Hide watched” to see them again.':tab==='tv'?'No TV shows on your list yet.':'No movies on your list yet.');}else{empty.append('Your watch list is empty. Tick ',el('strong','','Watch list'),' on anything in ');[['Movies','index.html'],['TV shows','tv.html'],['For you','foryou.html'],['New','new.html'],['Top 20','top20.html']].forEach(([t,h],i,arr)=>{const a=el('a','',t);a.href=h;empty.append(a,i<arr.length-2?', ':i===arr.length-2?' or ':'.');});}}
+}
+function toast(text){$('toast-text').textContent=text;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>{$('toast').hidden=true;undoItem=undoAll=null;},5000);}
+// Called by watchlist.js when a tick is cleared on this page: fade the card out, then offer Undo.
+window.WatchListPage={removed(id){const li=document.querySelector('#wl-list li[data-id="'+id+'"]');undoAt=WL.indexOf(id);const gone=()=>{undoItem=WL.remove(id);undoAll=null;if(undoItem)toast('Removed '+undoItem.title);};if(li&&!matchMedia('(prefers-reduced-motion: reduce)').matches){li.classList.add('leaving');setTimeout(gone,220);}else gone();}};
+$('undo').addEventListener('click',()=>{if(undoItem)WL.restore(undoItem,undoAt);else if(undoAll)undoAll.forEach(it=>WL.restore(it));undoItem=undoAll=null;$('toast').hidden=true;});
+document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{tab=b.dataset.tab;saveView();render();}));
+$('hide-watched').addEventListener('click',()=>{hideWatched=!hideWatched;saveView();render();});
+$('sort').addEventListener('change',()=>{saveView();render();});
+function clearAll(){const all=WL.all();all.forEach(it=>WL.remove(it.id));undoAll=all;undoItem=null;toast('Cleared your watch list');}
+// "Are you sure?" before clearing (Zac's ask); falls back to the browser's own confirm box.
+$('clear').addEventListener('click',()=>{const n=WL.all().length;if(!n)return;const msg='This removes all '+n+(n===1?' title':' titles')+' from your watch list on this phone.';const d=$('sure');if(!d.showModal){if(confirm(msg+' Are you sure?'))clearAll();return;}$('sure-text').textContent=msg+' Are you sure?';d.showModal();$('sure-no').focus();});
+$('sure-no').addEventListener('click',()=>$('sure').close());
+$('sure-yes').addEventListener('click',()=>{$('sure').close();clearAll();});
+$('sure').addEventListener('click',e=>{if(e.target===$('sure'))$('sure').close();});
+$('copy').addEventListener('click',async()=>{const lines=WL.all().sort(SORTS[$('sort').value]||SORTS.new).map(it=>'• '+it.title+(it.year?' ('+it.year+')':'')+(it.kind==='tv'?' [TV]':'')+' https://www.imdb.com/title/'+it.id+'/');const text='My watch list\n'+lines.join('\n');try{await navigator.clipboard.writeText(text);toast('Copied '+lines.length+(lines.length===1?' title':' titles'));}catch(e){prompt('Copy your list:',text);}});
+$('theme').addEventListener('click',()=>{const dark=getComputedStyle(document.documentElement).colorScheme==='dark';document.documentElement.dataset.theme=dark?'light':'dark';try{localStorage.setItem('movie-finder-theme',dark?'light':'dark');}catch(e){}});
+WL.onChange(render);
+render();
+</script>
+<script src="extras.js" defer></script>
+</body></html>

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en-AU"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark light"><meta name="theme-color" content="#14181c">
+<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Movies">
+<link rel="manifest" href="manifest.webmanifest" crossorigin="use-credentials">
+<link rel="icon" href="icon-192.png" type="image/png"><link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>Notifications · New seasons</title>
+<script>try{const t=localStorage.getItem('movie-finder-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;}catch(e){}</script>
+@@STYLE@@
+<style>
+/* Notifications page (shares the For You page's styles above, built by tools/build_watchlist.py) */
+.nt-list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.nt{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:13px 15px;border-radius:12px;background:var(--surface)}
+.nt .txt{flex:1 1 220px;min-width:0}
+.nt h3{margin:0;font-family:var(--display);font-size:17px;font-weight:700;letter-spacing:-.01em;line-height:1.3}.nt h3 a{text-decoration:none}.nt h3 a:hover{text-decoration:underline}
+.nt p{margin:2px 0 0;font-size:13px;color:var(--muted)}
+.nt.new{box-shadow:inset 0 0 0 1px var(--accent);background:var(--green-bg)}.nt.new p{color:var(--accent);font-weight:700}
+.nt.soon p{color:var(--ink);font-weight:600}
+.nt .btns{display:flex;gap:6px;flex-wrap:wrap}
+.nt button,.nt .go{min-height:38px;padding:6px 13px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;cursor:pointer}
+.nt .go{color:var(--link)}
+.nt button.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.nt button.quiet{color:var(--muted)}
+.empty a{color:var(--link);font-weight:650}
+</style>
+<link rel="stylesheet" href="nav.css"><link rel="stylesheet" href="lean.css"></head><body><main class="shell">
+<header class="masthead"><div class="marquee-bulbs" aria-hidden="true"></div><div class="topline"><p class="kicker">NEW SEASONS</p><nav class="mode-switch" aria-label="Finder"><a href="index.html">Movies</a><a href="tv.html">TV shows</a><a href="foryou.html">For you</a><a href="new.html">New</a><a href="coming.html">Coming soon</a><a href="top20.html">Top 20</a><a href="watchlist.html">Watch list</a><a href="notifications.html" aria-current="page">Notifications</a></nav></div><div class="heading"><h1>Notifi<em>cations</em></h1><button class="theme" id="theme" type="button" aria-label="Switch colour theme" title="Switch colour theme"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="display:block;margin:auto"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button></div>
+<p class="intro"><strong>New seasons of the shows you follow.</strong> Tap “Notify me when new season released” on a TV show in your watch list to follow it. Dates come from TVmaze and are checked when you open the site.</p>
+<p class="stamp"><span class="dot"></span><span id="count">Checking…</span></p></header>
+
+<section class="section" id="new-s" aria-labelledby="new-h" hidden><div class="section-head"><h2 id="new-h">New seasons out</h2></div><ol class="nt-list" id="new"></ol></section>
+<section class="section" id="soon-s" aria-labelledby="soon-h" hidden><div class="section-head"><h2 id="soon-h">Coming up</h2><p>Seasons with a start date, and shows on air now</p></div><ol class="nt-list" id="soon"></ol></section>
+<section class="section" id="rest-s" aria-labelledby="rest-h" hidden><div class="section-head"><h2 id="rest-h">Following</h2><p>No new season announced yet</p></div><ol class="nt-list" id="rest"></ol></section>
+<div class="empty" id="empty" hidden></div>
+<section class="section" id="more-s" aria-labelledby="more-h" hidden><div class="section-head"><h2 id="more-h">Other shows on your watch list</h2><p>Not followed yet</p></div><ol class="nt-list" id="more"></ol></section>
+<div class="toast" id="toast" role="status" hidden><span id="toast-text"></span><button type="button" id="undo">Undo</button></div>
+<noscript><p>Enable JavaScript to see your notifications.</p></noscript>
+</main>
+<script src="watchlist.js"></script><script src="account.js" defer></script>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const WL=window.WatchList;
+function el(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e;}
+function btn(label,cls,fn){const b=el('button',cls||'',label);b.type='button';b.addEventListener('click',fn);return b;}
+let toastTimer,undoFn=null;
+function toast(text,undo){$('toast-text').textContent=text;$('undo').hidden=!undo;undoFn=undo||null;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>{$('toast').hidden=true;undoFn=null;},5000);}
+$('undo').addEventListener('click',()=>{if(undoFn)undoFn();undoFn=null;$('toast').hidden=true;});
+function startOf(v){const e=v&&v.next;if(!e)return Infinity;const d=e.airstamp?Date.parse(e.airstamp):e.airdate?Date.parse(e.airdate+'T12:00:00'):NaN;return isNaN(d)?Infinity-1:d;}
+function row(it,s,v){
+  const li=el('li','nt '+s.kind),txt=el('div','txt'),h=el('h3'),a=el('a','',it.title);a.href='https://www.imdb.com/title/'+it.id+'/';a.target='_blank';a.rel='noopener noreferrer';h.append(a);
+  txt.append(h,el('p','',s.text||'Checking…'));li.append(txt);
+  const b=el('div','btns');
+  if(s.kind==='new')b.append(btn('Got it','primary',()=>{WL.seasonsSeen(it.id);toast('Marked '+it.title+' as seen');}));
+  const jw=el('a','go','Where to watch ↗');jw.href='https://www.justwatch.com/au/search?q='+encodeURIComponent(it.title);jw.target='_blank';jw.rel='noopener noreferrer';
+  if(it.alert){b.append(jw,btn('Stop','quiet',()=>{WL.setAlert(it.id,false);toast('Stopped notifications for '+it.title,()=>WL.setAlert(it.id,true));}));}
+  else b.append(btn('🔔 Notify me','primary',()=>{WL.setAlert(it.id,true);toast('You’ll be notified when '+it.title+' gets a new season');}));
+  li.append(b);return li;
+}
+let seq=0;
+async function render(){
+  const my=++seq,tv=WL.all().filter(it=>it.kind==='tv'),on=tv.filter(it=>it.alert),off=tv.filter(it=>!it.alert);
+  const info=await Promise.all(on.map(it=>WL.seasonInfo(it.id).then(v=>({it:WL.all().find(x=>x.id===it.id)||it,v}))));
+  if(my!==seq)return;
+  const groups={new:[],soon:[],rest:[]};
+  for(const x of info){const s=WL.seasonStatus(x.it,x.v);const g=s.kind==='new'?'new':(s.kind==='soon'||s.kind==='airing')?'soon':'rest';groups[g].push({...x,s});}
+  groups.soon.sort((a,b)=>startOf(a.v)-startOf(b.v));
+  groups.rest.sort((a,b)=>a.it.title.localeCompare(b.it.title));
+  for(const k of ['new','soon','rest']){$(k).replaceChildren(...groups[k].map(x=>row(x.it,x.s,x.v)));$(k+'-s').hidden=!groups[k].length;}
+  $('more').replaceChildren(...off.sort((a,b)=>a.title.localeCompare(b.title)).map(it=>row(it,{kind:'off',text:it.year?String(it.year):'TV show'})));$('more-s').hidden=!off.length;
+  const n=groups.new.length;
+  $('count').textContent=on.length?(n?n+(n===1?' new season':' new seasons')+' · ':'')+'following '+on.length+(on.length===1?' show':' shows'):'Not following any shows yet';
+  const empty=$('empty');empty.hidden=on.length>0;
+  if(!on.length){empty.replaceChildren();if(tv.length)empty.append('You aren’t following any shows yet. Tap 🔔 Notify me on a show below.');else{const a=el('a','','TV shows');a.href='tv.html';const w=el('a','','Watch list');w.href='watchlist.html';empty.append('No TV shows on your ',w,' yet. Add some from ',a,', then tap “Notify me when new season released”.');}}
+}
+$('theme').addEventListener('click',()=>{const dark=getComputedStyle(document.documentElement).colorScheme==='dark';document.documentElement.dataset.theme=dark?'light':'dark';try{localStorage.setItem('movie-finder-theme',dark?'light':'dark');}catch(e){}});
+WL.onChange(render);
+render();
+</script>
+</body></html>

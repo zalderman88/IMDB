@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en-AU"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark light"><meta name="theme-color" content="#14181c">
+<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Movies">
+<meta name="referrer" content="no-referrer">
+<link rel="manifest" href="manifest.webmanifest" crossorigin="use-credentials">
+<link rel="icon" href="icon-192.png" type="image/png"><link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>Coming soon · Australia</title>
+<script>try{const t=localStorage.getItem('movie-finder-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;}catch(e){}</script>
+@@STYLE@@
+<style>
+/* Coming soon page (uses the New page's styles above, built by tools/build_coming_soon.py) */
+.where span.svc.none i{background:transparent}
+.where span.svc.soon{background:var(--green-bg);color:var(--ink)}
+.when{margin:0;font-size:13px;font-weight:700;color:var(--accent)}.when.later{color:var(--muted);font-weight:600}
+.day .n{font-family:Inter,system-ui,sans-serif;font-size:12px;font-weight:500;margin-left:6px}
+.day.now{color:var(--accent)}
+</style>
+<link rel="stylesheet" href="nav.css"><link rel="stylesheet" href="lean.css"></head><body><main class="shell">
+<header class="masthead"><div class="topline"><p class="kicker">ARRIVING IN AUSTRALIA</p><nav class="mode-switch" aria-label="Finder"><a href="index.html">Movies</a><a href="tv.html">TV shows</a><a href="foryou.html">For you</a><a href="new.html">New</a><a href="coming.html" aria-current="page">Coming soon</a><a href="top20.html">Top 20</a><a href="watchlist.html">Watch list</a><a href="notifications.html">Notifications</a></nav></div><div class="heading"><h1>Coming <em>soon</em></h1><button class="theme" id="theme" type="button" aria-label="Switch colour theme" title="Switch colour theme"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="display:block;margin:auto"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button></div>
+<p class="intro"><strong>New movies, new shows and new seasons, with the date they arrive.</strong> Tick Watch list on anything you want to remember.</p>
+<p class="stamp"><span class="dot"></span><span id="stamp">Loading…</span></p></header>
+
+<details class="box" id="svc-box" open><summary>My services <span id="svc-sum"></span></summary><div class="inner">
+<div class="services" id="services"></div>
+<div class="svc-actions"><button type="button" id="svc-all">Tick all</button><button type="button" id="svc-none">Untick all</button></div>
+<p class="help">Your choice is shared with the New and Top 20 pages.</p></div></details>
+
+<div class="controls"><div class="tabs" role="group" aria-label="Show"><button type="button" data-tab="all" aria-pressed="true">All</button><button type="button" data-tab="movie" aria-pressed="false">Movies</button><button type="button" data-tab="tv" aria-pressed="false">TV</button></div>
+<button class="pill" id="others" type="button" aria-pressed="true">Include cinema &amp; not on a service yet</button>
+<button class="pill" id="english" type="button" aria-pressed="true">English</button>
+<button type="button" class="reset-small" id="reset-filters">↺ Reset filters</button></div>
+<p class="count" id="count" aria-live="polite"></p>
+<div id="cs-list"></div><div class="empty" id="empty" hidden></div>
+<button class="more" id="more" type="button" hidden>Show more</button>
+<p class="note" id="note"></p>
+<noscript><p>Enable JavaScript to see what’s coming.</p></noscript>
+</main>
+<script id="catalogue" type="application/json">@@DATA@@</script>
+<script id="metadata" type="application/json">@@META@@</script>
+<script>
+'use strict';
+const D=JSON.parse(document.getElementById('catalogue').textContent),META=JSON.parse(document.getElementById('metadata').textContent);
+const $=id=>document.getElementById(id),SV=META.services||[],SVN=Object.fromEntries(SV.map(s=>[s.id,s.name])),STORE='coming-soon-v1',BATCH=50;
+let store={tab:'all',others:true,english:true};
+try{const s=JSON.parse(localStorage.getItem(STORE));if(s&&typeof s==='object')store=Object.assign(store,s);}catch{}
+function save(){try{localStorage.setItem(STORE,JSON.stringify(store));}catch{}}
+// One "My services" choice shared with New and Top 20 (my-services-v1 = {have:[codes]}; empty or missing = all).
+const MY='my-services-v1';
+let have=SV.map(s=>s.id);
+try{const m=JSON.parse(localStorage.getItem(MY));if(m&&Array.isArray(m.have)&&m.have.some(c=>SVN[c]))have=m.have.filter(c=>SVN[c]);}catch{}
+function saveShared(){try{let keep=[];const m=JSON.parse(localStorage.getItem(MY));if(m&&Array.isArray(m.have))keep=m.have.filter(c=>!SVN[c]&&!['fxn','bbx','shd'].includes(c));localStorage.setItem(MY,JSON.stringify({have:keep.concat(have),at:Date.now()}));}catch{}}
+function el(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e;}
+const fmt=n=>Number(n).toLocaleString('en-AU'),votesShort=v=>v>=1e6?(v/1e6).toFixed(1).replace(/\.0$/,'')+'M':v>=1e3?Math.round(v/1e3)+'k':String(v);
+const D8=s=>new Date(s+'T12:00:00');
+const dayFmt=new Intl.DateTimeFormat('en-AU',{weekday:'short',day:'numeric',month:'short'});
+const shortFmt=new Intl.DateTimeFormat('en-AU',{day:'numeric',month:'short'});
+const longFmt=new Intl.DateTimeFormat('en-AU',{day:'numeric',month:'long',year:'numeric'});
+const today=new Intl.DateTimeFormat('en-CA',{timeZone:'Australia/Perth'}).format(new Date());
+const back=new Intl.DateTimeFormat('en-CA',{timeZone:'Australia/Perth'}).format(new Date(Date.now()-14*864e5));
+const items=D.filter(x=>x.date>=back);
+const svcCount=Object.fromEntries(SV.map(s=>[s.id,0]));for(const it of items)for(const c of it.services||[])if(c in svcCount)svcCount[c]++;
+
+function stamp(){
+  if(META.state==='no-key'){$('stamp').textContent='Not set up yet';return;}
+  if(META.state==='error'){$('stamp').textContent='Couldn’t load the list';return;}
+  $('stamp').textContent='Checked '+longFmt.format(new Date(META.fetchedAt*1000))+(META.state==='stale'?' (the latest check failed)':'')+' · dates are Australian release dates where known';
+}
+function buildServices(){
+  const box=$('services');box.replaceChildren();
+  SV.forEach(s=>{const l=el('label'),c=el('input');c.type='checkbox';c.checked=have.includes(s.id);
+    c.addEventListener('change',()=>{have=have.filter(x=>x!==s.id);if(c.checked)have.push(s.id);saveShared();render(true);});
+    l.append(c,el('span','',s.name),el('span','n',String(svcCount[s.id]||0)));box.append(l);});
+  summary();
+}
+function summary(){$('svc-sum').textContent=have.length===SV.length?'All '+SV.length:have.length+' of '+SV.length;}
+function setAll(on){have=on?SV.map(s=>s.id):[];saveShared();buildServices();render(true);}
+$('svc-all').addEventListener('click',()=>setAll(true));$('svc-none').addEventListener('click',()=>setAll(false));
+
+function visible(it){
+  if(store.tab!=='all'&&it.kind!==store.tab)return false;
+  if(store.english&&it.lang&&it.lang!=='en')return false;
+  const mine=(it.services||[]).filter(c=>have.includes(c));
+  if(mine.length)return true;
+  return store.others&&!(it.services||[]).length;
+}
+function label(it){
+  if(it.kind==='tv')return it.what==='premiere'?'New show':'Season '+it.season;
+  return it.what==='streaming'?'Streaming':it.what==='digital'?'Digital release':'In cinemas';
+}
+function card(it){
+  const li=el('li','card');
+  if(it.imdb){li.dataset.id=it.imdb;li.dataset.kind=it.kind;}
+  li.dataset.soon=it.date;
+  if(it.poster){const img=el('img','poster');img.src=it.poster;img.alt='';img.loading='lazy';img.decoding='async';img.referrerPolicy='no-referrer';img.width=72;img.height=108;img.onerror=()=>img.replaceWith(el('div','poster',it.title.slice(0,1)));li.append(img);}
+  else li.append(el('div','poster',it.title.slice(0,1)));
+  const b=el('div','body movie-info'),h=el('h3');h.append(el('span','kind'+(it.kind==='tv'?' series':''),it.kind==='tv'?'TV':'Movie'));
+  const a=el('a','',it.title);a.href=it.imdb?'https://www.imdb.com/title/'+it.imdb+'/':'https://www.themoviedb.org/'+it.kind+'/'+it.tmdb;a.target='_blank';a.rel='noopener noreferrer';h.append(a);
+  b.append(h);
+  const meta=[String(it.year||''),(it.genres||[]).join(' · ')].filter(Boolean).join(' · ');if(meta)b.append(el('p','meta',meta));
+  const out=it.date<=today;
+  b.append(el('p','when'+(out?'':' later'),it.kind==='tv'?(out?label(it)+' started '+dayFmt.format(D8(it.date)):label(it)+(it.what==='premiere'?' premieres ':' starts ')+dayFmt.format(D8(it.date))):(out?'Out '+dayFmt.format(D8(it.date))+' · '+label(it).toLowerCase():label(it)+' '+dayFmt.format(D8(it.date)))));
+  if(typeof it.score==='number'){const p=el('p','imdb');p.append(el('strong','',it.score.toFixed(1)),document.createTextNode(' IMDb · '+votesShort(it.votes)+' votes'));b.append(p);}
+  if(it.overview){const o=el('p','overview',it.overview);o.title='Tap to read more';o.addEventListener('click',()=>o.classList.toggle('open'));b.append(o);}
+  const w=el('div','where');
+  const svcs=it.services||[];
+  if(svcs.length){for(const c of svcs){const tag=it.link?el('a'):el('span','svc');if(it.link){tag.href=it.link;tag.target='_blank';tag.rel='noopener noreferrer';}
+    tag.append(el('i'),document.createTextNode(SVN[c]||c),el('small','',shortFmt.format(D8(it.date))));if(!have.includes(c))tag.style.opacity='.55';w.append(tag);}}
+  else{const t=el('span','svc none');t.append(el('i'),document.createTextNode(it.kind==='tv'?(it.network?'On '+it.network+' (overseas)':'Service not announced'):it.what==='digital'?'Rent or buy':'In cinemas'),el('small','','no AU streaming date yet'));w.append(t);}
+  b.append(w);li.append(b);
+  li.dataset.where=svcs.map(c=>SVN[c]||c).join(', ');
+  return li;
+}
+let rows=[],limit=BATCH;
+function render(reset){
+  if(reset)limit=BATCH;summary();
+  rows=items.filter(visible);
+  const list=$('cs-list');list.replaceChildren();
+  let ol=null,lastDay='';
+  const outN=rows.filter(x=>x.date<=today).length;
+  for(const it of rows.slice(0,limit)){
+    const k=it.date<=today?'now':it.date;
+    if(k!==lastDay){lastDay=k;const h=el('h2','day'+(k==='now'?' now':''),k==='now'?'Out in the last two weeks':dayFmt.format(D8(it.date)));if(k==='now')h.append(el('span','n',String(outN)));list.append(h);ol=el('ol','cards');list.append(ol);}
+    ol.append(card(it));
+  }
+  $('more').hidden=rows.length<=limit;
+  $('count').textContent=items.length?fmt(rows.length)+(rows.length===1?' title':' titles'):'';
+  const empty=$('empty');empty.replaceChildren();
+  if(!items.length){
+    empty.hidden=false;
+    if(META.state==='no-key'){empty.append(el('strong','','Waiting for the TMDB key.'),document.createElement('br'),document.createTextNode('Once the key is saved in GitLab, the next build fills this page.'));}
+    else if(META.state==='error'){empty.append(el('strong','','TMDB didn’t answer last time.'),document.createElement('br'),document.createTextNode('The next build will try again.'));}
+    else empty.textContent='Nothing coming up was found.';
+  }else if(!rows.length){empty.hidden=false;empty.textContent=!have.length&&!store.others?'Tick at least one service above.':'Nothing matches these filters.';}
+  else empty.hidden=true;
+}
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{store.tab=b.dataset.tab;save();sync();render(true);}));
+$('others').addEventListener('click',()=>{store.others=!store.others;save();sync();render(true);});
+$('english').addEventListener('click',()=>{store.english=!store.english;save();sync();render(true);});
+$('more').addEventListener('click',()=>{limit+=BATCH;render(false);});
+function sync(){document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.tab===store.tab)));$('others').setAttribute('aria-pressed',String(!!store.others));$('english').setAttribute('aria-pressed',String(!!store.english));}
+{const n=$('note'),a=el('a','','TMDB');a.href=META.sourceUrl;a.target='_blank';a.rel='noopener';
+  n.append(document.createTextNode('Release dates, new seasons and where-to-watch from '),a,document.createTextNode(' (where-to-watch is JustWatch data). A service is shown only when it already lists the title; streaming originals arrive on their release date. Other films show their Australian cinema or digital date until a service picks them up. TV dates are first-run dates and can be a day later in Australia. This product uses the TMDB API but is not endorsed or certified by TMDB. Refreshed with each build (1st and 15th of the month).'+(META.imdbAsOf?' IMDb ratings from IMDb’s official datasets ('+META.imdbAsOf+').':'')));}
+$('theme').addEventListener('click',()=>{const dark=getComputedStyle(document.documentElement).colorScheme==='dark';document.documentElement.dataset.theme=dark?'light':'dark';try{localStorage.setItem('movie-finder-theme',dark?'light':'dark');}catch{}});
+$('reset-filters').addEventListener('click',()=>{try{localStorage.removeItem(STORE);}catch{}location.reload();});
+stamp();sync();buildServices();render(true);
+</script><script src="watchlist.js" defer></script><script src="extras.js" defer></script><script src="account.js" defer></script>
+</body></html>
